@@ -138,7 +138,7 @@ when not input user_code, status is 428, body is
 }
 ```
 
-### Step 4: Obtain access_token
+### Step 4: Test
 
 ```
 curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true -v
