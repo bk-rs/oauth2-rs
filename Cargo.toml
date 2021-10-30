@@ -4,4 +4,5 @@ members = [
     "oauth2-github",
     "oauth2-google",
     "oauth2-lite",
+    "oauth2-microsoft",
 ]
