@@ -12,4 +12,18 @@ keywords = []
 categories = []
 readme = "README.md"
 
+[package.metadata.docs.rs]
+features = [ "with-device-authorization-grant" ]
+
+[features]
+default = ["with-device-authorization-grant"]
+
+with-device-authorization-grant = []
+
 [dependencies]
+http = { version = "0.2", default-features = false }
+
+mime = { version = "0.3", default-features = false, optional = true }
+serde = { version = "1.0", default-features = false, features = ["derive"], optional = true }
+serde_json = { version = "1.0", default-features = false, optional = true }
+form_urlencoded = { version = "1.0", default-features = false, optional = true }
