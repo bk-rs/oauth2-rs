@@ -94,10 +94,85 @@ impl ProviderExtDeviceAuthorizationGrant for GithubProviderWithDevice {
 //
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
 pub enum GithubOauthScope {
+    //
     #[serde(rename = "repo")]
     Repo,
     #[serde(rename = "repo:status")]
     RepoStatus,
-    // TODO
+    #[serde(rename = "repo_deployment")]
+    RepoDeployment,
+    #[serde(rename = "public_repo")]
+    PublicRepo,
+    #[serde(rename = "repo:invite")]
+    RepoInvite,
+    #[serde(rename = "security_events")]
+    SecurityEvents,
+    //
+    #[serde(rename = "admin:repo_hook")]
+    AdminRepoHook,
+    #[serde(rename = "write:repo_hook")]
+    WriteRepoHook,
+    #[serde(rename = "read:repo_hook")]
+    ReadRepoHook,
+    //
+    #[serde(rename = "admin:org")]
+    AdminOrg,
+    #[serde(rename = "write:org")]
+    WriteOrg,
+    #[serde(rename = "read:org")]
+    ReadOrg,
+    //
+    #[serde(rename = "admin:public_key")]
+    AdminPublicKey,
+    #[serde(rename = "write:public_key")]
+    WritePublicKey,
+    #[serde(rename = "read:public_key")]
+    ReadPublicKey,
+    //
+    #[serde(rename = "admin:org_hook")]
+    AdminOrgHook,
+    //
+    #[serde(rename = "gist")]
+    Gist,
+    //
+    #[serde(rename = "notifications")]
+    Notifications,
+    //
+    #[serde(rename = "user")]
+    User,
+    #[serde(rename = "read:user")]
+    ReadUser,
+    #[serde(rename = "user:email")]
+    UserEmail,
+    #[serde(rename = "user:follow")]
+    UserFollow,
+    //
+    #[serde(rename = "delete_repo")]
+    DeleteRepo,
+    //
+    #[serde(rename = "write:discussion")]
+    WriteDiscussion,
+    #[serde(rename = "read:discussion")]
+    ReadDiscussion,
+    //
+    #[serde(rename = "write:packages")]
+    WritePackages,
+    #[serde(rename = "read:packages")]
+    ReadPackages,
+    #[serde(rename = "delete:packages")]
+    DeletePackages,
+    //
+    #[serde(rename = "admin:gpg_key")]
+    AdminGpgKey,
+    #[serde(rename = "write:gpg_key")]
+    WriteGpgKey,
+    #[serde(rename = "read:gpg_key")]
+    ReadGpgKey,
+    //
+    #[serde(rename = "codespace")]
+    Codespace,
+    //
+    #[serde(rename = "workflow")]
+    Workflow,
 }
 impl Scope for GithubOauthScope {}
