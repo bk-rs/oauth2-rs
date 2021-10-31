@@ -12,7 +12,9 @@ use oauth2_core::{
         Body as REQ_Body, BodyWithDeviceAuthorizationGrant, CONTENT_TYPE as REQ_CONTENT_TYPE,
         METHOD as REQ_METHOD,
     },
-    access_token_response::{ErrorBodyError, CONTENT_TYPE as RES_CONTENT_TYPE},
+    access_token_response::{
+        ErrorBodyError, CONTENT_TYPE as RES_CONTENT_TYPE, GENERAL_ERROR_BODY_KEY_ERROR,
+    },
     device_authorization_grant::{
         device_access_token_response::{
             ErrorBody as RES_ErrorBody, SuccessfulBody as RES_SuccessfulBody,
@@ -22,7 +24,7 @@ use oauth2_core::{
     Provider, ProviderExtDeviceAuthorizationGrant,
 };
 use serde::de::DeserializeOwned;
-use serde_json::Error as SerdeJsonError;
+use serde_json::{Error as SerdeJsonError, Map, Value};
 use serde_urlencoded::ser::Error as SerdeUrlencodedSerError;
 
 //
@@ -94,32 +96,32 @@ where
     ) -> Result<Result<Self::ParseResponseOutput, Self::RetryReason>, Self::ParseResponseError>
     {
         if response.status().is_success() {
-            match serde_json::from_slice::<RES_SuccessfulBody<<P as Provider>::Scope>>(
-                &response.body(),
-            ) {
-                Ok(body) => return Ok(Ok(Ok(body))),
-                Err(_) => {}
+            let map = serde_json::from_slice::<Map<String, Value>>(&response.body())
+                .map_err(DeviceAccessTokenEndpointError::DeResponseBodyFailed)?;
+            if !map.contains_key(GENERAL_ERROR_BODY_KEY_ERROR) {
+                let body = serde_json::from_slice::<RES_SuccessfulBody<<P as Provider>::Scope>>(
+                    &response.body(),
+                )
+                .map_err(DeviceAccessTokenEndpointError::DeResponseBodyFailed)?;
+
+                return Ok(Ok(Ok(body)));
             }
         }
 
-        match serde_json::from_slice::<RES_ErrorBody>(&response.body()) {
-            Ok(body) => {
-                match body.error {
-                    ErrorBodyError::AuthorizationPending => {
-                        return Ok(Err(
-                            DeviceAccessTokenEndpointRetryReason::AuthorizationPending,
-                        ))
-                    }
-                    ErrorBodyError::SlowDown => {
-                        return Ok(Err(DeviceAccessTokenEndpointRetryReason::SlowDown))
-                    }
-                    _ => {}
-                }
-
-                Ok(Ok(Err(body)))
+        let body = serde_json::from_slice::<RES_ErrorBody>(&response.body())
+            .map_err(DeviceAccessTokenEndpointError::DeResponseBodyFailed)?;
+        match body.error {
+            ErrorBodyError::AuthorizationPending => {
+                return Ok(Err(
+                    DeviceAccessTokenEndpointRetryReason::AuthorizationPending,
+                ))
             }
-            Err(err) => Err(DeviceAccessTokenEndpointError::DeResponseBodyFailed(err)),
+            ErrorBodyError::SlowDown => {
+                return Ok(Err(DeviceAccessTokenEndpointRetryReason::SlowDown))
+            }
+            _ => {}
         }
+        Ok(Ok(Err(body)))
     }
 
     fn next_retry_in(&self, retry: &RetryableEndpointRetry<Self::RetryReason>) -> Duration {

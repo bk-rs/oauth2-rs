@@ -10,6 +10,7 @@ use url::Url;
 use crate::types::{AccessTokenType, Scope, ScopeParameter};
 
 pub const CONTENT_TYPE: Mime = mime::APPLICATION_JSON;
+pub const GENERAL_ERROR_BODY_KEY_ERROR: &str = "error";
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct GeneralSuccessfulBody<SCOPE>

@@ -8,6 +8,7 @@ use http_api_endpoint::{
     Body, Endpoint, Request, Response,
 };
 use oauth2_core::{
+    access_token_response::GENERAL_ERROR_BODY_KEY_ERROR,
     device_authorization_grant::{
         device_authorization_request::{
             Body as REQ_Body, CONTENT_TYPE as REQ_CONTENT_TYPE, METHOD as REQ_METHOD,
@@ -20,7 +21,7 @@ use oauth2_core::{
     Provider, ProviderExtDeviceAuthorizationGrant,
 };
 use serde::Serialize;
-use serde_json::Error as SerdeJsonError;
+use serde_json::{Error as SerdeJsonError, Map, Value};
 use serde_urlencoded::ser::Error as SerdeUrlencodedSerError;
 
 //
@@ -81,16 +82,19 @@ where
         response: Response<Body>,
     ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
         if response.status().is_success() {
-            match serde_json::from_slice::<RES_SuccessfulBody>(&response.body()) {
-                Ok(body) => return Ok(Ok(body)),
-                Err(_) => {}
+            let map = serde_json::from_slice::<Map<String, Value>>(&response.body())
+                .map_err(DeviceAuthorizationEndpointError::DeResponseBodyFailed)?;
+            if !map.contains_key(GENERAL_ERROR_BODY_KEY_ERROR) {
+                let body = serde_json::from_slice::<RES_SuccessfulBody>(&response.body())
+                    .map_err(DeviceAuthorizationEndpointError::DeResponseBodyFailed)?;
+
+                return Ok(Ok(body));
             }
         }
 
-        match serde_json::from_slice::<RES_ErrorBody>(&response.body()) {
-            Ok(body) => Ok(Err(body)),
-            Err(err) => Err(DeviceAuthorizationEndpointError::DeResponseBodyFailed(err)),
-        }
+        let body = serde_json::from_slice::<RES_ErrorBody>(&response.body())
+            .map_err(DeviceAuthorizationEndpointError::DeResponseBodyFailed)?;
+        Ok(Err(body))
     }
 }
 
