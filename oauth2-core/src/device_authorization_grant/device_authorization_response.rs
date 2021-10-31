@@ -3,7 +3,7 @@
 use mime::Mime;
 use serde::{Deserialize, Serialize};
 
-use crate::access_token_response;
+use crate::access_token_response::GeneralErrorBody;
 
 pub const CONTENT_TYPE: Mime = mime::APPLICATION_JSON;
 
@@ -17,7 +17,7 @@ pub struct SuccessfulBody {
     pub interval: Option<usize>,
 }
 
-pub type ErrorBody = access_token_response::ErrorBody;
+pub type ErrorBody = GeneralErrorBody;
 
 #[cfg(test)]
 mod tests {

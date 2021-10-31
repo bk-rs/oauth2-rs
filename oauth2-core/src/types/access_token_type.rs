@@ -8,6 +8,7 @@ pub enum AccessTokenType {
     #[serde(alias = "Bearer")]
     Bearer,
     #[serde(rename = "mac")]
+    #[serde(alias = "Mac")]
     Mac,
     #[serde(other)]
     Other(String),

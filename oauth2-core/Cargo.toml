@@ -13,11 +13,12 @@ categories = []
 readme = "README.md"
 
 [package.metadata.docs.rs]
-features = [ "with-device-authorization-grant" ]
+features = ["with-authorization-code-grant", "with-device-authorization-grant"]
 
 [features]
-default = ["with-device-authorization-grant"]
+default = ["with-authorization-code-grant", "with-device-authorization-grant"]
 
+with-authorization-code-grant = []
 with-device-authorization-grant = []
 
 [dependencies]
@@ -26,6 +27,7 @@ mime = { version = "0.3", default-features = false }
 
 serde = { version = "1.0", default-features = false, features = ["derive"] }
 serde-enum-str = { version = "0.2", default-features = false }
+url = { version = "2.2", default-features = false, features = ["serde"] }
 
 [dev-dependencies]
 serde_json = { version = "1.0" }
