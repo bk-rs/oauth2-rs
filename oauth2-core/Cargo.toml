@@ -1,13 +1,13 @@
 [package]
-name = "oauth2-lite"
+name = "oauth2-core"
 version = "0.0.0"
 authors = ["vkill <vkill.net@gmail.com>"]
 edition = "2021"
-description = "OAuth 2.0 Client"
+description = "OAuth 2.0 Core"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/bk-rs/oauth2-lite"
 homepage = "https://github.com/bk-rs/oauth2-lite"
-documentation = "https://docs.rs/oauth2-lite"
+documentation = "https://docs.rs/oauth2-core"
 keywords = []
 categories = []
 readme = "README.md"
@@ -21,4 +21,10 @@ default = ["with-device-authorization-grant"]
 with-device-authorization-grant = []
 
 [dependencies]
-oauth2-core = { version = "^0.0", path = "../oauth2-core" }
+http = { version = "0.2", default-features = false }
+mime = { version = "0.3", default-features = false }
+serde = { version = "1.0", default-features = false, features = ["derive"] }
+
+[dev-dependencies]
+serde_json = { version = "1.0" }
+serde_urlencoded = { version = "0.7" }
