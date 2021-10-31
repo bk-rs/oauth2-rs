@@ -3,10 +3,12 @@
 use mime::Mime;
 use serde::{Deserialize, Serialize};
 
+use crate::access_token_response;
+
 pub const CONTENT_TYPE: Mime = mime::APPLICATION_JSON;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Body {
+pub struct SuccessfulBody {
     pub device_code: String,
     pub user_code: String,
     pub verification_uri: String,
@@ -14,6 +16,8 @@ pub struct Body {
     pub expires_in: usize,
     pub interval: Option<usize>,
 }
+
+pub type ErrorBody = access_token_response::ErrorBody;
 
 #[cfg(test)]
 mod tests {
@@ -32,7 +36,7 @@ mod tests {
             "interval": 5
         }
         "#;
-        match serde_json::from_str::<Body>(body_str) {
+        match serde_json::from_str::<SuccessfulBody>(body_str) {
             Ok(_) => {}
             Err(err) => panic!("{}", err),
         }

@@ -7,6 +7,8 @@ use serde::{
     Deserialize, Deserializer, Serialize, Serializer,
 };
 
+pub const SCOPE_PARAMETER_DELIMITATION: char = ' ';
+
 //
 pub trait Scope: str::FromStr + ToString + fmt::Debug + Clone + cmp::PartialEq {}
 
@@ -36,7 +38,7 @@ where
                 .iter()
                 .map(|x| x.to_string())
                 .collect::<Vec<_>>()
-                .join(" ")
+                .join(SCOPE_PARAMETER_DELIMITATION.to_string().as_str())
                 .as_str(),
         )
     }
@@ -76,7 +78,7 @@ where
         E: de::Error,
     {
         let inner = v
-            .split(' ')
+            .split(SCOPE_PARAMETER_DELIMITATION)
             .map(|x| T::from_str(x))
             .collect::<Result<Vec<_>, _>>()
             .map_err(|err| de::Error::custom(err.to_string()))?;

@@ -23,7 +23,9 @@ with-device-authorization-grant = []
 [dependencies]
 http = { version = "0.2", default-features = false }
 mime = { version = "0.3", default-features = false }
+
 serde = { version = "1.0", default-features = false, features = ["derive"] }
+serde-enum-str = { version = "0.2", default-features = false }
 
 [dev-dependencies]
 serde_json = { version = "1.0" }
