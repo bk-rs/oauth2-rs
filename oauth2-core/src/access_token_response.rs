@@ -19,15 +19,20 @@ where
 {
     pub access_token: String,
     pub token_type: AccessTokenType,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub expires_in: Option<usize>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub refresh_token: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub scope: Option<ScopeParameter<SCOPE>>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct GeneralErrorBody {
     pub error: ErrorBodyError,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub error_description: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub error_uri: Option<Url>,
 }
 

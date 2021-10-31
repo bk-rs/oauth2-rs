@@ -20,8 +20,10 @@ pub struct SuccessfulBody {
     pub device_code: DeviceCode,
     pub user_code: UserCode,
     pub verification_uri: VerificationUri,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub verification_uri_complete: Option<VerificationUriComplete>,
     pub expires_in: usize,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub interval: Option<usize>,
 }
 impl SuccessfulBody {

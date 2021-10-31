@@ -17,9 +17,9 @@ where
     SCOPE: Scope,
     <SCOPE as str::FromStr>::Err: fmt::Display,
 {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub client_id: Option<ClientId>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub scope: Option<ScopeParameter<SCOPE>>,
 }
 

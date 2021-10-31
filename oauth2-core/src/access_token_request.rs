@@ -38,9 +38,9 @@ pub enum Body {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct BodyWithAuthorizationCodeGrant {
     pub code: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub redirect_uri: Option<Url>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub client_id: Option<ClientId>,
 }
 
@@ -51,7 +51,7 @@ pub struct BodyWithAuthorizationCodeGrant {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct BodyWithDeviceAuthorizationGrant {
     pub device_code: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub client_id: Option<ClientId>,
 }
 

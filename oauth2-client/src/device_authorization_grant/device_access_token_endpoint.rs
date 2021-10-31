@@ -78,7 +78,7 @@ where
 
         let request = Request::builder()
             .method(REQ_METHOD)
-            .uri(self.provider.device_authorization_endpoint_url().as_str())
+            .uri(self.provider.token_endpoint_url().as_str())
             .header(CONTENT_TYPE, REQ_CONTENT_TYPE.to_string())
             .header(ACCEPT, RES_CONTENT_TYPE.to_string())
             .body(body_str.as_bytes().to_vec())
