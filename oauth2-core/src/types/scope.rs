@@ -77,8 +77,17 @@ where
     where
         E: de::Error,
     {
+        let split_char = if v.contains(SCOPE_PARAMETER_DELIMITATION) {
+            SCOPE_PARAMETER_DELIMITATION
+        } else if v.contains(",") {
+            // e.g. github access_token_response
+            ','
+        } else {
+            SCOPE_PARAMETER_DELIMITATION
+        };
+
         let inner = v
-            .split(SCOPE_PARAMETER_DELIMITATION)
+            .split(split_char)
             .map(|x| T::from_str(x))
             .collect::<Result<Vec<_>, _>>()
             .map_err(|err| de::Error::custom(err.to_string()))?;
