@@ -176,5 +176,10 @@ pub enum GithubScope {
     //
     #[serde(rename = "workflow")]
     Workflow,
+    //
+    //
+    //
+    #[serde(other)]
+    Other(String),
 }
 impl Scope for GithubScope {}
