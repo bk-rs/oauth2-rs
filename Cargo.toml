@@ -1,9 +1,11 @@
 [workspace]
 members = [
+    "oauth2-client",
     "oauth2-core",
     "oauth2-facebook",
     "oauth2-github",
     "oauth2-google",
     "oauth2-lite",
     "oauth2-microsoft",
+    "oauth2-server",
 ]
