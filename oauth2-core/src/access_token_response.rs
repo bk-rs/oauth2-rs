@@ -12,16 +12,16 @@ use crate::types::{AccessTokenType, Scope, ScopeParameter};
 pub const CONTENT_TYPE: Mime = mime::APPLICATION_JSON;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct GeneralSuccessfulBody<S>
+pub struct GeneralSuccessfulBody<SCOPE>
 where
-    S: Scope,
-    <S as str::FromStr>::Err: fmt::Display,
+    SCOPE: Scope,
+    <SCOPE as str::FromStr>::Err: fmt::Display,
 {
     pub access_token: String,
     pub token_type: AccessTokenType,
     pub expires_in: Option<usize>,
     pub refresh_token: Option<String>,
-    pub scope: Option<ScopeParameter<S>>,
+    pub scope: Option<ScopeParameter<SCOPE>>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

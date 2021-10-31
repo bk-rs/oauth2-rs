@@ -30,7 +30,7 @@ impl GithubProviderWithWebApplication {
     }
 }
 impl Provider for GithubProviderWithWebApplication {
-    type Scope = GithubOauthScope;
+    type Scope = GithubScope;
 
     fn client_id(&self) -> Option<ClientId> {
         Some(self.client_id.to_owned())
@@ -69,7 +69,7 @@ impl GithubProviderWithDevice {
     }
 }
 impl Provider for GithubProviderWithDevice {
-    type Scope = GithubOauthScope;
+    type Scope = GithubScope;
 
     fn client_id(&self) -> Option<ClientId> {
         Some(self.client_id.to_owned())
@@ -93,7 +93,7 @@ impl ProviderExtDeviceAuthorizationGrant for GithubProviderWithDevice {
 //
 //
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
-pub enum GithubOauthScope {
+pub enum GithubScope {
     //
     #[serde(rename = "repo")]
     Repo,
@@ -175,4 +175,4 @@ pub enum GithubOauthScope {
     #[serde(rename = "workflow")]
     Workflow,
 }
-impl Scope for GithubOauthScope {}
+impl Scope for GithubScope {}

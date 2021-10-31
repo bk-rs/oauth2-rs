@@ -12,15 +12,15 @@ pub const METHOD: Method = Method::POST;
 pub const CONTENT_TYPE: Mime = mime::APPLICATION_WWW_FORM_URLENCODED;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Body<T>
+pub struct Body<SCOPE>
 where
-    T: Scope,
-    <T as str::FromStr>::Err: fmt::Display,
+    SCOPE: Scope,
+    <SCOPE as str::FromStr>::Err: fmt::Display,
 {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub client_id: Option<ClientId>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub scope: Option<ScopeParameter<T>>,
+    pub scope: Option<ScopeParameter<SCOPE>>,
 }
 
 #[cfg(test)]

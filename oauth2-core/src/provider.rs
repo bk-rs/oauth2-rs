@@ -13,11 +13,11 @@ pub trait Provider {
 }
 
 #[cfg(feature = "with-authorization-code-grant")]
-pub trait ProviderExtAuthorizationCodeGrant {
+pub trait ProviderExtAuthorizationCodeGrant: Provider {
     fn authorization_endpoint_url(&self) -> Url;
 }
 
 #[cfg(feature = "with-device-authorization-grant")]
-pub trait ProviderExtDeviceAuthorizationGrant {
+pub trait ProviderExtDeviceAuthorizationGrant: Provider {
     fn device_authorization_endpoint_url(&self) -> Url;
 }
