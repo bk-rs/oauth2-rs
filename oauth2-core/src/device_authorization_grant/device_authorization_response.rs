@@ -1,11 +1,14 @@
 //! https://datatracker.ietf.org/doc/html/rfc8628#section-3.2
 
+use std::time::Duration;
+
 use mime::Mime;
 use serde::{Deserialize, Serialize};
 
 use crate::access_token_response::GeneralErrorBody;
 
 pub const CONTENT_TYPE: Mime = mime::APPLICATION_JSON;
+pub const INTERVAL_DEFAULT: usize = 5;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SuccessfulBody {
@@ -15,6 +18,11 @@ pub struct SuccessfulBody {
     pub verification_uri_complete: Option<String>,
     pub expires_in: usize,
     pub interval: Option<usize>,
+}
+impl SuccessfulBody {
+    pub fn interval(&self) -> Duration {
+        Duration::from_secs(self.interval.unwrap_or_else(|| INTERVAL_DEFAULT) as u64)
+    }
 }
 
 pub type ErrorBody = GeneralErrorBody;

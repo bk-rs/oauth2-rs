@@ -6,8 +6,13 @@
 use http::Method;
 use mime::Mime;
 use serde::{Deserialize, Serialize};
+#[cfg(any(feature = "with-authorization-code-grant",))]
 use url::Url;
 
+#[cfg(any(
+    feature = "with-authorization-code-grant",
+    feature = "with-device-authorization-grant"
+))]
 use crate::types::ClientId;
 
 pub const METHOD: Method = Method::POST;
@@ -33,9 +38,9 @@ pub enum Body {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct BodyWithAuthorizationCodeGrant {
     pub code: String,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub redirect_uri: Option<Url>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub client_id: Option<ClientId>,
 }
 
@@ -46,7 +51,7 @@ pub struct BodyWithAuthorizationCodeGrant {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct BodyWithDeviceAuthorizationGrant {
     pub device_code: String,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub client_id: Option<ClientId>,
 }
 
@@ -66,6 +71,7 @@ mod tests {
                     Some("https://client.example.com/cb".parse().unwrap())
                 );
             }
+            #[allow(unreachable_patterns)]
             Ok(body) => panic!("{:?}", body),
             Err(err) => panic!("{}", err),
         }
@@ -83,6 +89,7 @@ mod tests {
                 );
                 assert_eq!(body.client_id, Some("1406020730".to_owned()));
             }
+            #[allow(unreachable_patterns)]
             Ok(body) => panic!("{:?}", body),
             Err(err) => panic!("{}", err),
         }
