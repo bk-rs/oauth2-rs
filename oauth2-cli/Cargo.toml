@@ -12,4 +12,22 @@ keywords = []
 categories = []
 readme = "README.md"
 
+[[bin]]
+name = "github_device_access_token_mgr"
+path = "src/bin/github_device_access_token_mgr.rs"
+required-features = ["with-github"]
+
+[features]
+default = ["with-github"]
+
+with-github = ["oauth2-github"]
+
 [dependencies]
+oauth2-client = { version = "^0.0", path = "../oauth2-client" }
+
+oauth2-github = { version = "^0.0", path = "../oauth2-github", optional = true }
+
+tokio = { version = "1.12", default-features = false, features = ["macros", "rt-multi-thread"] }
+http-api-isahc-client = { version = "0.1", features = ["with-sleep-via-tokio"] }
+
+pretty_env_logger = { version = "0.4" }
