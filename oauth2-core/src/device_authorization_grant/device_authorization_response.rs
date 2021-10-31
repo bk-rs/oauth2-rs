@@ -4,18 +4,23 @@ use std::time::Duration;
 
 use mime::Mime;
 use serde::{Deserialize, Serialize};
+use url::Url;
 
 use crate::access_token_response::GeneralErrorBody;
 
 pub const CONTENT_TYPE: Mime = mime::APPLICATION_JSON;
 pub const INTERVAL_DEFAULT: usize = 5;
+pub type DeviceCode = String;
+pub type UserCode = String;
+pub type VerificationUri = Url;
+pub type VerificationUriComplete = Url;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SuccessfulBody {
-    pub device_code: String,
-    pub user_code: String,
-    pub verification_uri: String,
-    pub verification_uri_complete: Option<String>,
+    pub device_code: DeviceCode,
+    pub user_code: UserCode,
+    pub verification_uri: VerificationUri,
+    pub verification_uri_complete: Option<VerificationUriComplete>,
     pub expires_in: usize,
     pub interval: Option<usize>,
 }

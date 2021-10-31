@@ -13,18 +13,26 @@ categories = []
 readme = "README.md"
 
 [package.metadata.docs.rs]
-features = ["with-authorization-code-grant", "with-device-authorization-grant"]
+all-features = true
 
 [features]
-default = ["with-authorization-code-grant", "with-device-authorization-grant"]
+default = [
+    "with-authorization-code-grant",
+    "with-device-authorization-grant",
+    # 
+    "with-flow"
+]
 
 with-authorization-code-grant = ["oauth2-core/with-authorization-code-grant"]
 with-device-authorization-grant = ["oauth2-core/with-device-authorization-grant"]
+
+with-flow = ["http-api-client"]
 
 [dependencies]
 oauth2-core = { version = "^0.0", path = "../oauth2-core" }
 
 http-api-endpoint = { version = "0.1", default-features = false }
+http-api-client = { version = "0.1", default-features = false, optional = true }
 
 serde = { version = "1.0", default-features = false, features = ["derive"] }
 serde_json = { version = "1.0", default-features = false, features = ["std"] }

@@ -1,4 +1,4 @@
-use std::{fmt, str};
+use std::{cmp::max, fmt, str, time::Duration};
 
 use http_api_endpoint::{
     http::{
@@ -12,9 +12,12 @@ use oauth2_core::{
         Body as REQ_Body, BodyWithDeviceAuthorizationGrant, CONTENT_TYPE as REQ_CONTENT_TYPE,
         METHOD as REQ_METHOD,
     },
-    access_token_response::{
-        GeneralErrorBody as RES_ErrorBody, GeneralSuccessfulBody as RES_SuccessfulBody,
-        CONTENT_TYPE as RES_CONTENT_TYPE,
+    access_token_response::{ErrorBodyError, CONTENT_TYPE as RES_CONTENT_TYPE},
+    device_authorization_grant::{
+        device_access_token_response::{
+            ErrorBody as RES_ErrorBody, SuccessfulBody as RES_SuccessfulBody,
+        },
+        device_authorization_response::{DeviceCode, INTERVAL_DEFAULT},
     },
     Provider, ProviderExtDeviceAuthorizationGrant,
 };
@@ -23,36 +26,38 @@ use serde_json::Error as SerdeJsonError;
 use serde_urlencoded::ser::Error as SerdeUrlencodedSerError;
 
 //
-pub struct DeviceAccessTokenEndpoint<P>
+pub struct DeviceAccessTokenEndpoint<'a, P>
 where
     P: ProviderExtDeviceAuthorizationGrant,
     <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
-    provider: P,
-    device_code: String,
+    provider: &'a P,
+    device_code: DeviceCode,
+    interval: Duration,
 }
-impl<P> DeviceAccessTokenEndpoint<P>
+impl<'a, P> DeviceAccessTokenEndpoint<'a, P>
 where
     P: ProviderExtDeviceAuthorizationGrant,
     <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
-    pub fn new(provider: P, device_code: impl AsRef<str>) -> Self {
+    pub fn new(provider: &'a P, device_code: DeviceCode, interval: Duration) -> Self {
         Self {
             provider,
-            device_code: device_code.as_ref().to_owned(),
+            device_code,
+            interval: max(interval, Duration::from_secs(INTERVAL_DEFAULT as u64)),
         }
     }
 }
 
-impl<P> RetryableEndpoint for DeviceAccessTokenEndpoint<P>
+impl<'a, P> RetryableEndpoint for DeviceAccessTokenEndpoint<'a, P>
 where
     P: ProviderExtDeviceAuthorizationGrant,
     <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
     <P as Provider>::Scope: DeserializeOwned,
 {
-    type RetryReason = String;
-
-    const MAX_RETRY_COUNT: usize = 5;
+    type RetryReason = DeviceAccessTokenEndpointRetryReason;
+    // 1800 / 5
+    const MAX_RETRY_COUNT: usize = 360;
 
     type RenderRequestError = DeviceAccessTokenEndpointError;
 
@@ -61,7 +66,7 @@ where
 
     fn render_request(
         &self,
-        retry: Option<&RetryableEndpointRetry<Self::RetryReason>>,
+        _retry: Option<&RetryableEndpointRetry<Self::RetryReason>>,
     ) -> Result<Request<Body>, Self::RenderRequestError> {
         let body = REQ_Body::DeviceAuthorizationGrant(BodyWithDeviceAuthorizationGrant {
             device_code: self.device_code.to_owned(),
@@ -85,7 +90,7 @@ where
     fn parse_response(
         &self,
         response: Response<Body>,
-        retry: Option<&RetryableEndpointRetry<Self::RetryReason>>,
+        _retry: Option<&RetryableEndpointRetry<Self::RetryReason>>,
     ) -> Result<Result<Self::ParseResponseOutput, Self::RetryReason>, Self::ParseResponseError>
     {
         if response.status().is_success() {
@@ -98,10 +103,37 @@ where
         }
 
         match serde_json::from_slice::<RES_ErrorBody>(&response.body()) {
-            Ok(body) => Ok(Ok(Err(body))),
+            Ok(body) => {
+                match body.error {
+                    ErrorBodyError::AuthorizationPending => {
+                        return Ok(Err(
+                            DeviceAccessTokenEndpointRetryReason::AuthorizationPending,
+                        ))
+                    }
+                    ErrorBodyError::SlowDown => {
+                        return Ok(Err(DeviceAccessTokenEndpointRetryReason::SlowDown))
+                    }
+                    _ => {}
+                }
+
+                Ok(Ok(Err(body)))
+            }
             Err(err) => Err(DeviceAccessTokenEndpointError::DeResponseBodyFailed(err)),
         }
     }
+
+    fn next_retry_in(&self, retry: &RetryableEndpointRetry<Self::RetryReason>) -> Duration {
+        match retry.reason {
+            DeviceAccessTokenEndpointRetryReason::AuthorizationPending => self.interval,
+            DeviceAccessTokenEndpointRetryReason::SlowDown => self.interval,
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum DeviceAccessTokenEndpointRetryReason {
+    AuthorizationPending,
+    SlowDown,
 }
 
 #[derive(thiserror::Error, Debug)]

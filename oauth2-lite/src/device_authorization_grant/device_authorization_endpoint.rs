@@ -24,20 +24,20 @@ use serde_json::Error as SerdeJsonError;
 use serde_urlencoded::ser::Error as SerdeUrlencodedSerError;
 
 //
-pub struct DeviceAuthorizationEndpoint<P>
+pub struct DeviceAuthorizationEndpoint<'a, P>
 where
     P: ProviderExtDeviceAuthorizationGrant,
     <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
-    provider: P,
+    provider: &'a P,
     scopes: Option<Vec<<P as Provider>::Scope>>,
 }
-impl<P> DeviceAuthorizationEndpoint<P>
+impl<'a, P> DeviceAuthorizationEndpoint<'a, P>
 where
     P: ProviderExtDeviceAuthorizationGrant,
     <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
-    pub fn new(provider: P, scopes: impl Into<Option<Vec<<P as Provider>::Scope>>>) -> Self {
+    pub fn new(provider: &'a P, scopes: impl Into<Option<Vec<<P as Provider>::Scope>>>) -> Self {
         Self {
             provider,
             scopes: scopes.into(),
@@ -45,7 +45,7 @@ where
     }
 }
 
-impl<P> Endpoint for DeviceAuthorizationEndpoint<P>
+impl<'a, P> Endpoint for DeviceAuthorizationEndpoint<'a, P>
 where
     P: ProviderExtDeviceAuthorizationGrant,
     <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,

@@ -12,6 +12,7 @@ pub const DEVICE_AUTHORIZATION_URL: &str = "https://github.com/login/device/code
 //
 //
 //
+#[derive(Debug, Clone)]
 pub struct GithubProviderWithWebApplication {
     client_id: ClientId,
     client_secret: ClientSecret,
@@ -53,6 +54,7 @@ impl ProviderExtAuthorizationCodeGrant for GithubProviderWithWebApplication {
 //
 //
 //
+#[derive(Debug, Clone)]
 pub struct GithubProviderWithDevice {
     client_id: ClientId,
     //
