@@ -65,6 +65,12 @@ pub enum ErrorBodyError {
     //
     //
     //
+    /// https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1
+    #[cfg(feature = "with-authorization-code-grant")]
+    UnsupportedResponseType,
+    //
+    //
+    //
     /// https://datatracker.ietf.org/doc/html/rfc8628#section-3.5
     #[cfg(feature = "with-device-authorization-grant")]
     AuthorizationPending,
@@ -73,10 +79,36 @@ pub enum ErrorBodyError {
     SlowDown,
     /// https://datatracker.ietf.org/doc/html/rfc8628#section-3.5
     #[cfg(feature = "with-device-authorization-grant")]
-    AccessDenied,
-    /// https://datatracker.ietf.org/doc/html/rfc8628#section-3.5
-    #[cfg(feature = "with-device-authorization-grant")]
     ExpiredToken,
+    //
+    //
+    //
+    /// https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1
+    /// https://datatracker.ietf.org/doc/html/rfc6749#section-4.2.2.1
+    /// https://datatracker.ietf.org/doc/html/rfc8628#section-3.5
+    #[cfg(any(
+        feature = "with-authorization-code-grant",
+        feature = "with-device-authorization",
+        feature = "with-implicit-grant"
+    ))]
+    AccessDenied,
+    //
+    //
+    //
+    /// https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1
+    /// https://datatracker.ietf.org/doc/html/rfc6749#section-4.2.2.1
+    #[cfg(any(
+        feature = "with-authorization-code-grant",
+        feature = "with-implicit-grant"
+    ))]
+    ServerError,
+    /// https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1
+    /// https://datatracker.ietf.org/doc/html/rfc6749#section-4.2.2.1
+    #[cfg(any(
+        feature = "with-authorization-code-grant",
+        feature = "with-implicit-grant"
+    ))]
+    TemporarilyUnavailable,
     //
     //
     //

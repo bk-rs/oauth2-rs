@@ -23,6 +23,7 @@ default = [
 
 with-authorization-code-grant = []
 with-device-authorization-grant = []
+with-implicit-grant = []
 
 [dependencies]
 http = { version = "0.2", default-features = false }
@@ -36,3 +37,4 @@ url = { version = "2.2", default-features = false, features = ["serde"] }
 [dev-dependencies]
 serde_json = { version = "1.0" }
 serde_urlencoded = { version = "0.7" }
+serde_qs = { version = "0.8" }

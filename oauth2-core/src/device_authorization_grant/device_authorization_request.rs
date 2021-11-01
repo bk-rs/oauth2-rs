@@ -30,12 +30,12 @@ mod tests {
     #[test]
     fn ser() {
         let body = Body {
-            client_id: Some("Foo".to_owned()),
+            client_id: Some("your_client_id".to_owned()),
             scope: Some(vec!["email".to_owned(), "profile".to_owned()].into()),
         };
         match serde_urlencoded::to_string(&body) {
             Ok(body_str) => {
-                assert_eq!(body_str, "client_id=Foo&scope=email+profile");
+                assert_eq!(body_str, "client_id=your_client_id&scope=email+profile");
             }
             Err(err) => panic!("{}", err),
         }
