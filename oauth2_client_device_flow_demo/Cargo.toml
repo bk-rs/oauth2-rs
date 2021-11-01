@@ -1,5 +1,5 @@
 [package]
-name = "oauth2_client_device_authorization_grant_demo"
+name = "oauth2_client_device_flow_demo"
 version = "0.1.0"
 edition = "2021"
 
