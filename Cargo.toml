@@ -1,18 +1,19 @@
 [workspace]
 members = [
-    "oauth2-amazon",
     "oauth2-cli",
     "oauth2-client",
     "oauth2_client_device_authorization_grant_demo",
     "oauth2-core",
-    "oauth2-facebook",
-    "oauth2-github",
-    "oauth2-gitlab",
-    "oauth2-google",
-    "oauth2-instagram",
     "oauth2-lite",
-    "oauth2-microsoft",
     "oauth2-server",
-    "oauth2-twitch",
-    "oauth2-wechat",
+    # 
+    "providers/oauth2-amazon",
+    "providers/oauth2-facebook",
+    "providers/oauth2-github",
+    "providers/oauth2-gitlab",
+    "providers/oauth2-google",
+    "providers/oauth2-instagram",
+    "providers/oauth2-microsoft",
+    "providers/oauth2-twitch",
+    "providers/oauth2-wechat",
 ]

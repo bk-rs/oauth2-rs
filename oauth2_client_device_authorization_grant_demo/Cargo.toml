@@ -14,8 +14,8 @@ path = "src/google.rs"
 [dependencies]
 oauth2-client = { version = "^0.0", path = "../oauth2-client", default-features = false, features = ["with-device-authorization-grant", "with-flow"] }
 
-oauth2-github = { version = "^0.0", path = "../oauth2-github", default-features = false, features = ["with-device-authorization-grant"] }
-oauth2-google = { version = "^0.0", path = "../oauth2-google", default-features = false, features = ["with-device-authorization-grant"] }
+oauth2-github = { version = "^0.0", path = "../providers/oauth2-github", default-features = false, features = ["with-device-authorization-grant"] }
+oauth2-google = { version = "^0.0", path = "../providers/oauth2-google", default-features = false, features = ["with-device-authorization-grant"] }
 
 tokio = { version = "1.12", default-features = false, features = ["macros", "rt-multi-thread"] }
 http-api-isahc-client = { version = "0.1", features = ["with-sleep-via-tokio"] }

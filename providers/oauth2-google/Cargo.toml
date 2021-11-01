@@ -1,13 +1,13 @@
 [package]
-name = "oauth2-microsoft"
+name = "oauth2-google"
 version = "0.0.0"
 authors = ["vkill <vkill.net@gmail.com>"]
 edition = "2021"
-description = "OAuth 2.0 Microsoft"
+description = "OAuth 2.0 Google"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/bk-rs/oauth2-rs"
 homepage = "https://github.com/bk-rs/oauth2-rs"
-documentation = "https://docs.rs/oauth2-microsoft"
+documentation = "https://docs.rs/oauth2-google"
 keywords = []
 categories = []
 readme = "README.md"
@@ -25,7 +25,7 @@ with-authorization-code-grant = ["oauth2-core/with-authorization-code-grant"]
 with-device-authorization-grant = ["oauth2-core/with-device-authorization-grant"]
 
 [dependencies]
-oauth2-core = { version = "^0.0", path = "../oauth2-core" }
+oauth2-core = { version = "^0.0", path = "../../oauth2-core" }
 
 serde = { version = "1.0", default-features = false, features = ["derive"] }
 serde-enum-str = { version = "0.2", default-features = false }
