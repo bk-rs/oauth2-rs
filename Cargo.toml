@@ -13,4 +13,5 @@ members = [
     "oauth2-lite",
     "oauth2-microsoft",
     "oauth2-server",
+    "oauth2-wechat",
 ]
