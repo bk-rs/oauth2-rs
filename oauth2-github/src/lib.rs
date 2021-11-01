@@ -1,6 +1,6 @@
 use oauth2_core::{
+    provider::{Url, UrlParseError},
     types::{ClientId, ClientSecret, Scope},
-    url::{ParseError as UrlParseError, Url},
     Provider, ProviderExtAuthorizationCodeGrant, ProviderExtDeviceAuthorizationGrant,
 };
 use serde_enum_str::{Deserialize_enum_str, Serialize_enum_str};

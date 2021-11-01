@@ -19,8 +19,13 @@ pub type VerificationUriComplete = Url;
 pub struct SuccessfulBody {
     pub device_code: DeviceCode,
     pub user_code: UserCode,
+    // e.g. google
+    #[serde(alias = "verification_url")]
     pub verification_uri: VerificationUri,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(
+        alias = "verification_url_complete",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub verification_uri_complete: Option<VerificationUriComplete>,
     pub expires_in: usize,
     #[serde(skip_serializing_if = "Option::is_none")]

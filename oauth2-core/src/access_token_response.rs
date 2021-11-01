@@ -5,6 +5,7 @@ use std::{fmt, str};
 use mime::Mime;
 use serde::{Deserialize, Serialize};
 use serde_enum_str::{Deserialize_enum_str, Serialize_enum_str};
+use serde_json::{Map, Value};
 use url::Url;
 
 use crate::types::{AccessTokenType, Scope, ScopeParameter};
@@ -26,6 +27,9 @@ where
     pub refresh_token: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scope: Option<ScopeParameter<SCOPE>>,
+
+    #[serde(flatten, skip_serializing_if = "Option::is_none")]
+    pub _extensions: Option<Map<String, Value>>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -35,6 +39,9 @@ pub struct GeneralErrorBody {
     pub error_description: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error_uri: Option<Url>,
+
+    #[serde(flatten, skip_serializing_if = "Option::is_none")]
+    pub _extensions: Option<Map<String, Value>>,
 }
 
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
@@ -82,7 +89,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn de() {
+    fn ser_de_error_body() {
         let body_str = r#"
         {
             "error": "invalid_scope"
@@ -98,7 +105,7 @@ mod tests {
 
     #[cfg(feature = "with-device-authorization-grant")]
     #[test]
-    fn de_with_device_authorization_grant() {
+    fn ser_de_error_body_with_device_authorization_grant() {
         let body_str = r#"
         {
             "error": "authorization_pending"

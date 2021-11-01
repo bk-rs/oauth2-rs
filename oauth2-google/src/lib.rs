@@ -1,6 +1,6 @@
 use oauth2_core::{
+    provider::{Map, Url, UrlParseError, Value},
     types::{ClientId, ClientSecret, Scope},
-    url::{ParseError as UrlParseError, Url},
     Provider, ProviderExtDeviceAuthorizationGrant,
 };
 use serde_enum_str::{Deserialize_enum_str, Serialize_enum_str};
@@ -48,6 +48,15 @@ impl Provider for GoogleProviderForTvAndDeviceApps {
 impl ProviderExtDeviceAuthorizationGrant for GoogleProviderForTvAndDeviceApps {
     fn device_authorization_endpoint_url(&self) -> Url {
         self.device_authorization_endpoint_url.to_owned()
+    }
+
+    fn device_access_token_request_body_extensions(&self) -> Option<Map<String, Value>> {
+        let mut map = Map::new();
+        map.insert(
+            "client_secret".to_owned(),
+            Value::String(self.client_secret.to_owned()),
+        );
+        Some(map)
     }
 }
 

@@ -1,5 +1,3 @@
-pub use url;
-
 pub mod types;
 
 //

@@ -70,10 +70,13 @@ where
         &self,
         _retry: Option<&RetryableEndpointRetry<Self::RetryReason>>,
     ) -> Result<Request<Body>, Self::RenderRequestError> {
-        let body = REQ_Body::DeviceAuthorizationGrant(BodyWithDeviceAuthorizationGrant {
-            device_code: self.device_code.to_owned(),
-            client_id: self.provider.client_id(),
-        });
+        let mut body = BodyWithDeviceAuthorizationGrant::new(
+            self.device_code.to_owned(),
+            self.provider.client_id(),
+        );
+        body._extensions = self.provider.device_access_token_request_body_extensions();
+
+        let body = REQ_Body::DeviceAuthorizationGrant(body);
 
         let body_str = serde_urlencoded::to_string(body)
             .map_err(DeviceAccessTokenEndpointError::SerRequestBodyFailed)?;
