@@ -13,10 +13,13 @@ categories = []
 readme = "README.md"
 
 [package.metadata.docs.rs]
-features = ["with-authorization-code-grant", "with-device-authorization-grant"]
+all-features = true
 
 [features]
-default = ["with-authorization-code-grant", "with-device-authorization-grant"]
+default = [
+    "with-authorization-code-grant",
+    "with-device-authorization-grant"
+]
 
 with-authorization-code-grant = ["oauth2-core/with-authorization-code-grant"]
 with-device-authorization-grant = ["oauth2-core/with-device-authorization-grant"]

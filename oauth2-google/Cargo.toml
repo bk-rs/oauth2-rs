@@ -12,4 +12,20 @@ keywords = []
 categories = []
 readme = "README.md"
 
+[package.metadata.docs.rs]
+all-features = true
+
+[features]
+default = [
+    "with-authorization-code-grant",
+    "with-device-authorization-grant"
+]
+
+with-authorization-code-grant = ["oauth2-core/with-authorization-code-grant"]
+with-device-authorization-grant = ["oauth2-core/with-device-authorization-grant"]
+
 [dependencies]
+oauth2-core = { version = "^0.0", path = "../oauth2-core" }
+
+serde = { version = "1.0", default-features = false, features = ["derive"] }
+serde-enum-str = { version = "0.2", default-features = false }
