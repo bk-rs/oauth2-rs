@@ -25,7 +25,7 @@ async fn run() -> Result<(), Box<dyn error::Error>> {
     let provider = GoogleProviderForTvAndDeviceApps::new(client_id, client_secret)?;
 
     let access_token_body = flow
-        .start(
+        .execute(
             &provider,
             scopes,
             |user_code, verification_uri, _verification_uri_complete| {

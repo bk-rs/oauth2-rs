@@ -1,7 +1,7 @@
 pub use serde_json::{Map, Value};
 pub use url::{ParseError as UrlParseError, Url};
 
-use crate::types::{ClientId, ClientSecret, Scope};
+use crate::types::{ClientId, ClientSecret, RedirectUri, Scope};
 
 pub trait Provider {
     type Scope: Scope;
@@ -15,7 +15,13 @@ pub trait Provider {
 
 #[cfg(feature = "with-authorization-code-grant")]
 pub trait ProviderExtAuthorizationCodeGrant: Provider {
+    fn redirect_uri(&self) -> Option<RedirectUri>;
+
     fn authorization_endpoint_url(&self) -> Url;
+
+    fn access_token_request_body_extensions(&self) -> Option<Map<String, Value>> {
+        None
+    }
 }
 
 #[cfg(feature = "with-device-authorization-grant")]

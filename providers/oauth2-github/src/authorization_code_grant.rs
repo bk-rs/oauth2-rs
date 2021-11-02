@@ -1,6 +1,6 @@
 use oauth2_core::{
     provider::{Url, UrlParseError},
-    types::{ClientId, ClientSecret},
+    types::{ClientId, ClientSecret, RedirectUri},
     Provider, ProviderExtAuthorizationCodeGrant,
 };
 
@@ -10,15 +10,21 @@ use crate::{GithubScope, AUTHORIZATION_URL, TOKEN_URL};
 pub struct GithubProviderWithWebApplication {
     client_id: ClientId,
     client_secret: ClientSecret,
+    redirect_uri: RedirectUri,
     //
     token_endpoint_url: Url,
     authorization_endpoint_url: Url,
 }
 impl GithubProviderWithWebApplication {
-    pub fn new(client_id: ClientId, client_secret: ClientSecret) -> Result<Self, UrlParseError> {
+    pub fn new(
+        client_id: ClientId,
+        client_secret: ClientSecret,
+        redirect_uri: RedirectUri,
+    ) -> Result<Self, UrlParseError> {
         Ok(Self {
             client_id,
             client_secret,
+            redirect_uri,
             token_endpoint_url: TOKEN_URL.parse()?,
             authorization_endpoint_url: AUTHORIZATION_URL.parse()?,
         })
@@ -40,6 +46,10 @@ impl Provider for GithubProviderWithWebApplication {
     }
 }
 impl ProviderExtAuthorizationCodeGrant for GithubProviderWithWebApplication {
+    fn redirect_uri(&self) -> Option<RedirectUri> {
+        Some(self.redirect_uri.to_owned())
+    }
+
     fn authorization_endpoint_url(&self) -> Url {
         self.authorization_endpoint_url.to_owned()
     }

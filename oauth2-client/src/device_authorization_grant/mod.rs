@@ -13,4 +13,4 @@ pub use device_authorization_endpoint::{
 #[cfg(feature = "with-flow")]
 pub mod flow;
 #[cfg(feature = "with-flow")]
-pub use flow::{Flow, FlowError};
+pub use flow::{Flow, FlowExecuteError};

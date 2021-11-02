@@ -24,7 +24,7 @@ async fn run() -> Result<(), Box<dyn error::Error>> {
     let provider = GithubProviderWithDevice::new(client_id)?;
 
     let access_token_body = flow
-        .start(
+        .execute(
             &provider,
             scopes,
             |user_code, verification_uri, _verification_uri_complete| {

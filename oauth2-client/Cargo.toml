@@ -23,7 +23,7 @@ default = [
     "with-flow"
 ]
 
-with-authorization-code-grant = ["oauth2-core/with-authorization-code-grant"]
+with-authorization-code-grant = ["oauth2-core/with-authorization-code-grant", "serde_qs"]
 with-device-authorization-grant = ["oauth2-core/with-device-authorization-grant"]
 
 with-flow = ["http-api-client"]
@@ -37,5 +37,7 @@ http-api-client = { version = "0.1", default-features = false, optional = true }
 serde = { version = "1.0", default-features = false, features = ["derive"] }
 serde_json = { version = "1.0", default-features = false, features = ["std"] }
 serde_urlencoded = { version = "0.7", default-features = false }
+serde_qs = { version = "0.8", default-features = false, optional = true }
+url = { version = "2.2", default-features = false }
 
 thiserror = { version = "1.0", default-features = false }

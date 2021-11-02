@@ -38,12 +38,12 @@ impl<'a, C> Flow<C>
 where
     C: RetryableClient + Send + Sync,
 {
-    pub async fn start<P, UI>(
+    pub async fn execute<P, UI>(
         &self,
         provider: &'a P,
         scopes: impl Into<Option<Vec<<P as Provider>::Scope>>>,
         user_interaction: UI,
-    ) -> Result<DATRES_SuccessfulBody<<P as Provider>::Scope>, FlowError>
+    ) -> Result<DATRES_SuccessfulBody<<P as Provider>::Scope>, FlowExecuteError>
     where
         P: ProviderExtDeviceAuthorizationGrant + Send + Sync,
         <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
@@ -57,10 +57,12 @@ where
             .client
             .respond_endpoint(&device_authorization_endpoint)
             .await
-            .map_err(|err| FlowError::DeviceAuthorizationEndpointRespondFailed(err.to_string()))?;
+            .map_err(|err| {
+                FlowExecuteError::DeviceAuthorizationEndpointRespondFailed(err.to_string())
+            })?;
 
         let device_authorization_successful_body =
-            device_authorization_ret.map_err(FlowError::DeviceAuthorizationFailed)?;
+            device_authorization_ret.map_err(FlowExecuteError::DeviceAuthorizationFailed)?;
 
         // Step 2
         user_interaction(
@@ -84,17 +86,19 @@ where
             .client
             .respond_endpoint_until_done(&device_access_token_endpoint)
             .await
-            .map_err(|err| FlowError::DeviceAccessTokenEndpointRespondFailed(err.to_string()))?;
+            .map_err(|err| {
+                FlowExecuteError::DeviceAccessTokenEndpointRespondFailed(err.to_string())
+            })?;
 
         let device_access_token_successful_body =
-            device_access_token_ret.map_err(FlowError::DeviceAccessTokenFailed)?;
+            device_access_token_ret.map_err(FlowExecuteError::DeviceAccessTokenFailed)?;
 
         Ok(device_access_token_successful_body)
     }
 }
 
 #[derive(thiserror::Error, Debug)]
-pub enum FlowError {
+pub enum FlowExecuteError {
     #[error("DeviceAuthorizationEndpointError {0}")]
     DeviceAuthorizationEndpointError(DeviceAuthorizationEndpointError),
     #[error("DeviceAuthorizationEndpointRespondFailed {0}")]

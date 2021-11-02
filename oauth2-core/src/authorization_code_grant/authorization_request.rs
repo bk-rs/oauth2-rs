@@ -10,6 +10,7 @@ use crate::types::{ClientId, Scope, ScopeParameter};
 
 pub const METHOD: Method = Method::GET;
 pub const RESPONSE_TYPE: &str = "code";
+pub type State = String;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Query<SCOPE>
@@ -24,7 +25,27 @@ where
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scope: Option<ScopeParameter<SCOPE>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub state: Option<String>,
+    pub state: Option<State>,
+}
+impl<SCOPE> Query<SCOPE>
+where
+    SCOPE: Scope,
+    <SCOPE as str::FromStr>::Err: fmt::Display,
+{
+    pub fn new(
+        client_id: ClientId,
+        redirect_uri: Option<Url>,
+        scope: Option<ScopeParameter<SCOPE>>,
+        state: Option<State>,
+    ) -> Self {
+        Self {
+            response_type: RESPONSE_TYPE.to_owned(),
+            client_id,
+            redirect_uri,
+            scope,
+            state,
+        }
+    }
 }
 
 #[cfg(test)]

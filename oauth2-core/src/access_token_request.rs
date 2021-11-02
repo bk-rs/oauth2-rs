@@ -10,6 +10,8 @@ use serde_json::{Map, Value};
 #[cfg(any(feature = "with-authorization-code-grant",))]
 use url::Url;
 
+#[cfg(feature = "with-authorization-code-grant")]
+use crate::authorization_code_grant::authorization_response::Code;
 #[cfg(any(
     feature = "with-authorization-code-grant",
     feature = "with-device-authorization-grant"
@@ -38,7 +40,7 @@ pub enum Body {
 #[cfg(feature = "with-authorization-code-grant")]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct BodyWithAuthorizationCodeGrant {
-    pub code: String,
+    pub code: Code,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub redirect_uri: Option<Url>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -48,7 +50,7 @@ pub struct BodyWithAuthorizationCodeGrant {
     pub _extensions: Option<Map<String, Value>>,
 }
 impl BodyWithAuthorizationCodeGrant {
-    pub fn new(code: String, redirect_uri: Option<Url>, client_id: Option<ClientId>) -> Self {
+    pub fn new(code: Code, redirect_uri: Option<Url>, client_id: Option<ClientId>) -> Self {
         Self {
             code,
             redirect_uri,
