@@ -56,10 +56,11 @@ where
     type ParseResponseError = DeviceAuthorizationEndpointError;
 
     fn render_request(&self) -> Result<Request<Body>, Self::RenderRequestError> {
-        let body = REQ_Body {
-            client_id: self.provider.client_id(),
-            scope: self.scopes.to_owned().map(Into::into),
-        };
+        let mut body = REQ_Body::new(
+            self.provider.client_id(),
+            self.scopes.to_owned().map(Into::into),
+        );
+        body._extensions = self.provider.device_authorization_request_body_extensions();
 
         let body_str = serde_urlencoded::to_string(body)
             .map_err(DeviceAuthorizationEndpointError::SerRequestBodyFailed)?;

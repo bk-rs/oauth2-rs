@@ -4,6 +4,7 @@ use std::time::Duration;
 
 use mime::Mime;
 use serde::{Deserialize, Serialize};
+use serde_json::{Map, Value};
 use url::Url;
 
 use crate::access_token_response::GeneralErrorBody;
@@ -30,6 +31,9 @@ pub struct SuccessfulBody {
     pub expires_in: usize,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub interval: Option<usize>,
+
+    #[serde(flatten, skip_serializing_if = "Option::is_none")]
+    pub _extensions: Option<Map<String, Value>>,
 }
 impl SuccessfulBody {
     pub fn interval(&self) -> Duration {

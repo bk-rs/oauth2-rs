@@ -4,6 +4,7 @@ use std::{fmt, str};
 
 use http::Method;
 use serde::{Deserialize, Serialize};
+use serde_json::{Map, Value};
 use url::Url;
 
 use crate::types::{ClientId, Scope, ScopeParameter};
@@ -26,6 +27,9 @@ where
     pub scope: Option<ScopeParameter<SCOPE>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub state: Option<State>,
+
+    #[serde(flatten, skip_serializing_if = "Option::is_none")]
+    pub _extensions: Option<Map<String, Value>>,
 }
 impl<SCOPE> Query<SCOPE>
 where
@@ -44,6 +48,7 @@ where
             redirect_uri,
             scope,
             state,
+            _extensions: None,
         }
     }
 }
@@ -54,13 +59,12 @@ mod tests {
 
     #[test]
     fn ser() {
-        let query = Query {
-            response_type: RESPONSE_TYPE.to_owned(),
-            client_id: "your_client_id".to_owned(),
-            redirect_uri: Some("https://client.example.com/cb".parse().unwrap()),
-            scope: Some(vec!["email".to_owned(), "profile".to_owned()].into()),
-            state: Some("STATE".to_owned()),
-        };
+        let query = Query::new(
+            "your_client_id".to_owned(),
+            Some("https://client.example.com/cb".parse().unwrap()),
+            Some(vec!["email".to_owned(), "profile".to_owned()].into()),
+            Some("STATE".to_owned()),
+        );
         match serde_qs::to_string(&query) {
             Ok(query_str) => {
                 assert_eq!(query_str, "response_type=code&client_id=your_client_id&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&scope=email+profile&state=STATE");

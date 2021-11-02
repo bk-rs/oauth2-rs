@@ -1,6 +1,7 @@
 //! https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2
 
 use serde::{Deserialize, Serialize};
+use serde_json::{Map, Value};
 
 use crate::access_token_response::GeneralErrorBody;
 
@@ -13,6 +14,18 @@ pub struct SuccessfulQuery {
     pub code: Code,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub state: Option<State>,
+
+    #[serde(flatten, skip_serializing_if = "Option::is_none")]
+    pub _extensions: Option<Map<String, Value>>,
+}
+impl SuccessfulQuery {
+    pub fn new(code: Code, state: Option<State>) -> Self {
+        Self {
+            code,
+            state,
+            _extensions: None,
+        }
+    }
 }
 
 pub type ErrorQuery = GeneralErrorBody;

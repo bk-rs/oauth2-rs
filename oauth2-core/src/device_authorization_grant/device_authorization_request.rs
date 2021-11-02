@@ -5,6 +5,7 @@ use std::{fmt, str};
 use http::Method;
 use mime::Mime;
 use serde::{Deserialize, Serialize};
+use serde_json::{Map, Value};
 
 use crate::types::{ClientId, Scope, ScopeParameter};
 
@@ -21,6 +22,22 @@ where
     pub client_id: Option<ClientId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scope: Option<ScopeParameter<SCOPE>>,
+
+    #[serde(flatten, skip_serializing_if = "Option::is_none")]
+    pub _extensions: Option<Map<String, Value>>,
+}
+impl<SCOPE> Body<SCOPE>
+where
+    SCOPE: Scope,
+    <SCOPE as str::FromStr>::Err: fmt::Display,
+{
+    pub fn new(client_id: Option<ClientId>, scope: Option<ScopeParameter<SCOPE>>) -> Self {
+        Self {
+            client_id,
+            scope,
+            _extensions: None,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -29,10 +46,10 @@ mod tests {
 
     #[test]
     fn ser() {
-        let body = Body {
-            client_id: Some("your_client_id".to_owned()),
-            scope: Some(vec!["email".to_owned(), "profile".to_owned()].into()),
-        };
+        let body = Body::new(
+            Some("your_client_id".to_owned()),
+            Some(vec!["email".to_owned(), "profile".to_owned()].into()),
+        );
         match serde_urlencoded::to_string(&body) {
             Ok(body_str) => {
                 assert_eq!(body_str, "client_id=your_client_id&scope=email+profile");
