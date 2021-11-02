@@ -346,6 +346,7 @@ mod tests {
 
         let request = endpoint.render_request()?;
 
+        assert_eq!(request.method(), "GET");
         assert_eq!(request.uri(), "https://api.weixin.qq.com/sns/oauth2/access_token?appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code");
 
         Ok(())
@@ -376,6 +377,9 @@ mod tests {
         match body_ret {
             Ok(body) => {
                 assert_eq!(body.access_token, "ACCESS_TOKEN");
+                assert_eq!(body.token_type, AccessTokenType::Bearer);
+                assert_eq!(body.expires_in, Some(7200));
+                assert_eq!(body.refresh_token, Some("REFRESH_TOKEN".to_owned()));
                 assert_eq!(
                     body.scope,
                     Some(vec![WeChatScope::Other("SCOPE".to_owned())].into())
