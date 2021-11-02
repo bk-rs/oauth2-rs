@@ -5,10 +5,10 @@ use http_api_endpoint::Endpoint;
 use oauth2_core::{
     authorization_code_grant::{
         access_token_response::{
-            ErrorBody as ATRES_ErrorBody, SuccessfulBody as ATRES_SuccessfulBody,
+            ErrorBody as AT_RES_ErrorBody, SuccessfulBody as AT_RES_SuccessfulBody,
         },
         authorization_request::State,
-        authorization_response::ErrorQuery as ARES_ErrorQuery,
+        authorization_response::ErrorQuery as A_RES_ErrorQuery,
     },
     Provider, ProviderExtAuthorizationCodeGrant,
 };
@@ -58,7 +58,7 @@ where
         provider: &'a P,
         query: impl AsRef<str>,
         state: impl Into<Option<State>>,
-    ) -> Result<ATRES_SuccessfulBody<<P as Provider>::Scope>, FlowHandleCallbackError>
+    ) -> Result<AT_RES_SuccessfulBody<<P as Provider>::Scope>, FlowHandleCallbackError>
     where
         P: ProviderExtAuthorizationCodeGrant + Send + Sync,
         <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
@@ -104,7 +104,7 @@ pub enum FlowHandleCallbackError {
     ParseRedirectUriQueryError(ParseRedirectUriQueryError),
     //
     #[error("AuthorizationFailed {0:?}")]
-    AuthorizationFailed(ARES_ErrorQuery),
+    AuthorizationFailed(A_RES_ErrorQuery),
     #[error("StateMismatch")]
     StateMismatch,
     //
@@ -113,7 +113,7 @@ pub enum FlowHandleCallbackError {
     #[error("AccessTokenEndpointError {0}")]
     AccessTokenEndpointError(AccessTokenEndpointError),
     #[error("AccessTokenFailed {0:?}")]
-    AccessTokenFailed(ATRES_ErrorBody),
+    AccessTokenFailed(AT_RES_ErrorBody),
 }
 
 //

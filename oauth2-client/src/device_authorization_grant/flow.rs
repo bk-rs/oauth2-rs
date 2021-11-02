@@ -6,10 +6,10 @@ use http_api_client::{
 use oauth2_core::{
     device_authorization_grant::{
         device_access_token_response::{
-            ErrorBody as DATRES_ErrorBody, SuccessfulBody as DATRES_SuccessfulBody,
+            ErrorBody as DAT_RES_ErrorBody, SuccessfulBody as DAT_RES_SuccessfulBody,
         },
         device_authorization_response::{
-            ErrorBody as DARES_ErrorBody, UserCode, VerificationUri, VerificationUriComplete,
+            ErrorBody as DA_RES_ErrorBody, UserCode, VerificationUri, VerificationUriComplete,
         },
     },
     Provider, ProviderExtDeviceAuthorizationGrant,
@@ -45,7 +45,7 @@ where
         provider: &'a P,
         scopes: impl Into<Option<Vec<<P as Provider>::Scope>>>,
         user_interaction: UI,
-    ) -> Result<DATRES_SuccessfulBody<<P as Provider>::Scope>, FlowExecuteError>
+    ) -> Result<DAT_RES_SuccessfulBody<<P as Provider>::Scope>, FlowExecuteError>
     where
         P: ProviderExtDeviceAuthorizationGrant + Send + Sync,
         <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
@@ -127,12 +127,12 @@ pub enum FlowExecuteError {
     #[error("DeviceAuthorizationEndpointError {0}")]
     DeviceAuthorizationEndpointError(DeviceAuthorizationEndpointError),
     #[error("DeviceAuthorizationFailed {0:?}")]
-    DeviceAuthorizationFailed(DARES_ErrorBody),
+    DeviceAuthorizationFailed(DA_RES_ErrorBody),
     //
     #[error("DeviceAccessTokenEndpointRespondFailed {0}")]
     DeviceAccessTokenEndpointRespondFailed(String),
     #[error("DeviceAccessTokenEndpointError {0}")]
     DeviceAccessTokenEndpointError(DeviceAccessTokenEndpointError),
     #[error("DeviceAccessTokenFailed {0:?}")]
-    DeviceAccessTokenFailed(DATRES_ErrorBody),
+    DeviceAccessTokenFailed(DAT_RES_ErrorBody),
 }
