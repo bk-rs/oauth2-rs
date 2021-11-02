@@ -3,5 +3,3 @@
 pub mod device_access_token_response;
 pub mod device_authorization_request;
 pub mod device_authorization_response;
-
-pub mod provider_ext;

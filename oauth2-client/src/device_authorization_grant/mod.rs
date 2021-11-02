@@ -3,6 +3,7 @@
 //
 pub mod device_access_token_endpoint;
 pub mod device_authorization_endpoint;
+pub mod provider_ext;
 
 pub use device_access_token_endpoint::{DeviceAccessTokenEndpoint, DeviceAccessTokenEndpointError};
 pub use device_authorization_endpoint::{

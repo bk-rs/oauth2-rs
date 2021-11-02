@@ -1,6 +1,5 @@
-use oauth2_core::{
-    provider::{Url, UrlParseError},
-    types::{ClientId, ClientSecret},
+use oauth2_client::{
+    provider::{ClientId, ClientSecret, Url, UrlParseError},
     Provider, ProviderExtDeviceAuthorizationGrant,
 };
 

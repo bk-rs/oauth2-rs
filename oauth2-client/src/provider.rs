@@ -1,8 +1,12 @@
 pub use http::{self, Error as HttpError, Request, Response};
-pub use serde_json::{Map, Value};
+pub use serde;
+pub use serde_enum_str;
+pub use serde_json::{self, Error as SerdeJsonError, Map, Value};
+pub use serde_urlencoded::{self, ser::Error as SerdeUrlencodedSerError};
+pub use thiserror;
 pub use url::{ParseError as UrlParseError, Url};
 
-use crate::types::{ClientId, ClientSecret, Scope};
+pub use oauth2_core::types::{AccessTokenType, ClientId, ClientSecret, RedirectUri, Scope};
 
 pub trait Provider {
     type Scope: Scope;

@@ -1,18 +1,18 @@
 use std::{error, str::FromStr};
 
-use oauth2_core::{
-    access_token_request::{
-        BodyWithAuthorizationCodeGrant, GRANT_TYPE_WITH_AUTHORIZATION_CODE_GRANT,
+use oauth2_client::{
+    authorization_code_grant::provider_ext::{
+        serde_qs, AccessTokenRequestBody, AccessTokenResponseErrorBody,
+        AccessTokenResponseErrorBodyError, AccessTokenResponseSuccessfulBody,
+        AuthorizationRequestQuery, SerdeQsError, GRANT_TYPE_WITH_AUTHORIZATION_CODE_GRANT,
     },
-    access_token_response::{ErrorBodyError, GeneralErrorBody, GeneralSuccessfulBody},
-    authorization_code_grant::authorization_request::Query,
-    provider::{HttpError, Request, Response, Url, UrlParseError},
-    types::{AccessTokenType, ClientId, ClientSecret, RedirectUri},
+    provider::{
+        serde::{Deserialize, Serialize},
+        serde_json, thiserror, AccessTokenType, ClientId, ClientSecret, HttpError, Map,
+        RedirectUri, Request, Response, SerdeJsonError, Url, UrlParseError, Value,
+    },
     Provider, ProviderExtAuthorizationCodeGrant,
 };
-use serde::{Deserialize, Serialize};
-use serde_json::{Error as SerdeJsonError, Map, Value};
-use serde_qs::Error as SerdeQsError;
 
 use crate::{WeChatScope, AUTHORIZATION_URL, TOKEN_URL};
 
@@ -66,10 +66,12 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
 
     fn authorization_request_query_serializing(
         &self,
-        query: &Query<<Self as Provider>::Scope>,
+        query: &AuthorizationRequestQuery<<Self as Provider>::Scope>,
     ) -> Option<Result<String, Box<dyn error::Error>>> {
         fn doing(
-            query: &Query<<WeChatProviderWithWebApplication as Provider>::Scope>,
+            query: &AuthorizationRequestQuery<
+                <WeChatProviderWithWebApplication as Provider>::Scope,
+            >,
         ) -> Result<String, Box<dyn error::Error>> {
             let redirect_uri = query
                 .redirect_uri
@@ -90,7 +92,7 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
                 .collect::<Vec<_>>()
                 .join(",");
 
-            let query = AuthorizationRequestQuery {
+            let query = MyAuthorizationRequestQuery {
                 appid: query.client_id.to_owned(),
                 redirect_uri,
                 response_type: query.response_type.to_owned(),
@@ -109,18 +111,18 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
 
     fn access_token_request_rendering(
         &self,
-        body: &BodyWithAuthorizationCodeGrant,
+        body: &AccessTokenRequestBody,
     ) -> Option<Result<Request<Vec<u8>>, Box<dyn error::Error>>> {
         fn doing(
             this: &WeChatProviderWithWebApplication,
-            body: &BodyWithAuthorizationCodeGrant,
+            body: &AccessTokenRequestBody,
         ) -> Result<Request<Vec<u8>>, Box<dyn error::Error>> {
             let appid = body
                 .client_id
                 .to_owned()
                 .ok_or_else(|| AccessTokenRequestRenderingError::ClientIdMissing)?;
 
-            let query = AccessTokenRequestQuery {
+            let query = MyAccessTokenRequestQuery {
                 appid,
                 secret: this.secret.to_owned(),
                 code: body.code.to_owned(),
@@ -148,21 +150,24 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
         response: &Response<Vec<u8>>,
     ) -> Option<
         Result<
-            Result<GeneralSuccessfulBody<<Self as Provider>::Scope>, GeneralErrorBody>,
+            Result<
+                AccessTokenResponseSuccessfulBody<<Self as Provider>::Scope>,
+                AccessTokenResponseErrorBody,
+            >,
             Box<dyn error::Error>,
         >,
     > {
         fn doing(
             response: &Response<Vec<u8>>,
         ) -> Result<
-            Result<AccessTokenResponseSuccessfulBody, AccessTokenResponseErrorBody>,
+            Result<MyAccessTokenResponseSuccessfulBody, MyAccessTokenResponseErrorBody>,
             Box<dyn error::Error>,
         > {
             if response.status().is_success() {
                 let map = serde_json::from_slice::<Map<String, Value>>(&response.body())
                     .map_err(AccessTokenResponseParsingError::DeResponseBodyFailed)?;
                 if !map.contains_key("errcode") {
-                    let body = serde_json::from_slice::<AccessTokenResponseSuccessfulBody>(
+                    let body = serde_json::from_slice::<MyAccessTokenResponseSuccessfulBody>(
                         &response.body(),
                     )
                     .map_err(AccessTokenResponseParsingError::DeResponseBodyFailed)?;
@@ -171,7 +176,7 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
                 }
             }
 
-            let body = serde_json::from_slice::<AccessTokenResponseErrorBody>(&response.body())
+            let body = serde_json::from_slice::<MyAccessTokenResponseErrorBody>(&response.body())
                 .map_err(AccessTokenResponseParsingError::DeResponseBodyFailed)?;
             Ok(Err(body))
         }
@@ -182,7 +187,7 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
 
 //
 #[derive(Serialize, Deserialize)]
-pub struct AuthorizationRequestQuery {
+pub struct MyAuthorizationRequestQuery {
     pub appid: String,
     pub redirect_uri: String,
     pub response_type: String,
@@ -203,7 +208,7 @@ pub enum AuthorizationRequestQuerySerializingError {
 
 //
 #[derive(Serialize, Deserialize)]
-pub struct AccessTokenRequestQuery {
+pub struct MyAccessTokenRequestQuery {
     pub appid: String,
     pub secret: String,
     pub code: String,
@@ -222,7 +227,7 @@ pub enum AccessTokenRequestRenderingError {
 
 //
 #[derive(Serialize, Deserialize)]
-pub struct AccessTokenResponseSuccessfulBody {
+pub struct MyAccessTokenResponseSuccessfulBody {
     pub access_token: String,
     pub expires_in: usize,
     pub refresh_token: String,
@@ -230,8 +235,8 @@ pub struct AccessTokenResponseSuccessfulBody {
     pub scope: String,
     pub unionid: Option<String>,
 }
-impl From<AccessTokenResponseSuccessfulBody> for GeneralSuccessfulBody<WeChatScope> {
-    fn from(body: AccessTokenResponseSuccessfulBody) -> Self {
+impl From<MyAccessTokenResponseSuccessfulBody> for AccessTokenResponseSuccessfulBody<WeChatScope> {
+    fn from(body: MyAccessTokenResponseSuccessfulBody) -> Self {
         let scope: Vec<_> = body
             .scope
             .split(',')
@@ -262,14 +267,14 @@ impl From<AccessTokenResponseSuccessfulBody> for GeneralSuccessfulBody<WeChatSco
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct AccessTokenResponseErrorBody {
+pub struct MyAccessTokenResponseErrorBody {
     pub errcode: usize,
     pub errmsg: String,
 }
-impl From<AccessTokenResponseErrorBody> for GeneralErrorBody {
-    fn from(body: AccessTokenResponseErrorBody) -> Self {
+impl From<MyAccessTokenResponseErrorBody> for AccessTokenResponseErrorBody {
+    fn from(body: MyAccessTokenResponseErrorBody) -> Self {
         Self::new(
-            ErrorBodyError::Other(body.errcode.to_string()),
+            AccessTokenResponseErrorBodyError::Other(body.errcode.to_string()),
             Some(body.errmsg),
             None,
         )

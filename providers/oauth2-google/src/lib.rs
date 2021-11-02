@@ -1,5 +1,7 @@
-use oauth2_core::types::Scope;
-use serde_enum_str::{Deserialize_enum_str, Serialize_enum_str};
+use oauth2_client::provider::{
+    serde_enum_str::{Deserialize_enum_str, Serialize_enum_str},
+    Scope,
+};
 
 pub const TOKEN_URL: &str = "https://oauth2.googleapis.com/token";
 pub const AUTHORIZATION_URL: &str = "https://accounts.google.com/o/oauth2/v2/auth";

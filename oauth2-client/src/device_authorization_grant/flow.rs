@@ -3,18 +3,17 @@ use std::{error, fmt, io, str};
 use http_api_client::{
     ClientRespondEndpointError, RetryableClient, RetryableClientRespondEndpointUntilDoneError,
 };
-use oauth2_core::{
-    device_authorization_grant::{
-        device_access_token_response::{
-            ErrorBody as DAT_RES_ErrorBody, SuccessfulBody as DAT_RES_SuccessfulBody,
-        },
-        device_authorization_response::{
-            ErrorBody as DA_RES_ErrorBody, UserCode, VerificationUri, VerificationUriComplete,
-        },
+use oauth2_core::device_authorization_grant::{
+    device_access_token_response::{
+        ErrorBody as DAT_RES_ErrorBody, SuccessfulBody as DAT_RES_SuccessfulBody,
     },
-    Provider, ProviderExtDeviceAuthorizationGrant,
+    device_authorization_response::{
+        ErrorBody as DA_RES_ErrorBody, UserCode, VerificationUri, VerificationUriComplete,
+    },
 };
 use serde::{de::DeserializeOwned, Serialize};
+
+use crate::{Provider, ProviderExtDeviceAuthorizationGrant};
 
 use super::{
     DeviceAccessTokenEndpoint, DeviceAccessTokenEndpointError, DeviceAuthorizationEndpoint,

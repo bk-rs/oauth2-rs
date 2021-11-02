@@ -9,11 +9,12 @@ use oauth2_core::{
             ErrorQuery as RES_ErrorQuery, SuccessfulQuery as RES_SuccessfulQuery,
         },
     },
-    Provider, ProviderExtAuthorizationCodeGrant,
 };
 use serde::Serialize;
 use serde_json::{Map, Value};
 use serde_qs::Error as SerdeQsError;
+
+use crate::{Provider, ProviderExtAuthorizationCodeGrant};
 
 //
 pub struct AuthorizationEndpoint<'a, P>

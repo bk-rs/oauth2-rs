@@ -3,6 +3,7 @@
 //
 pub mod access_token_endpoint;
 pub mod authorization_endpoint;
+pub mod provider_ext;
 
 pub use access_token_endpoint::{AccessTokenEndpoint, AccessTokenEndpointError};
 pub use authorization_endpoint::{

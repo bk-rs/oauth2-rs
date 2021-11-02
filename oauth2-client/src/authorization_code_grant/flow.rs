@@ -2,18 +2,17 @@ use std::{error, fmt, str};
 
 use http_api_client::{Client, ClientRespondEndpointError};
 use http_api_endpoint::Endpoint;
-use oauth2_core::{
-    authorization_code_grant::{
-        access_token_response::{
-            ErrorBody as AT_RES_ErrorBody, SuccessfulBody as AT_RES_SuccessfulBody,
-        },
-        authorization_request::State,
-        authorization_response::ErrorQuery as A_RES_ErrorQuery,
+use oauth2_core::authorization_code_grant::{
+    access_token_response::{
+        ErrorBody as AT_RES_ErrorBody, SuccessfulBody as AT_RES_SuccessfulBody,
     },
-    Provider, ProviderExtAuthorizationCodeGrant,
+    authorization_request::State,
+    authorization_response::ErrorQuery as A_RES_ErrorQuery,
 };
 use serde::{de::DeserializeOwned, Serialize};
 use url::{ParseError as UrlParseError, Url};
+
+use crate::{Provider, ProviderExtAuthorizationCodeGrant};
 
 use super::{
     parse_redirect_uri_query, AccessTokenEndpoint, AccessTokenEndpointError, AuthorizationEndpoint,

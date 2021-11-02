@@ -18,11 +18,12 @@ use oauth2_core::{
             CONTENT_TYPE as RES_CONTENT_TYPE,
         },
     },
-    Provider, ProviderExtDeviceAuthorizationGrant,
 };
 use serde::Serialize;
 use serde_json::{Error as SerdeJsonError, Map, Value};
 use serde_urlencoded::ser::Error as SerdeUrlencodedSerError;
+
+use crate::{Provider, ProviderExtDeviceAuthorizationGrant};
 
 //
 pub struct DeviceAuthorizationEndpoint<'a, P>

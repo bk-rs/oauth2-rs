@@ -1,6 +1,5 @@
-use oauth2_core::{
-    provider::{Url, UrlParseError},
-    types::{ClientId, ClientSecret, RedirectUri},
+use oauth2_client::{
+    provider::{ClientId, ClientSecret, RedirectUri, Url, UrlParseError},
     Provider, ProviderExtAuthorizationCodeGrant,
 };
 

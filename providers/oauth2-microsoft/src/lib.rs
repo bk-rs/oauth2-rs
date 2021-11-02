@@ -1,5 +1,7 @@
-use oauth2_core::types::Scope;
-use serde_enum_str::{Deserialize_enum_str, Serialize_enum_str};
+use oauth2_client::provider::{
+    serde_enum_str::{Deserialize_enum_str, Serialize_enum_str},
+    Scope,
+};
 
 #[cfg(feature = "with-authorization-code-grant")]
 pub mod authorization_code_grant;

@@ -21,11 +21,12 @@ use oauth2_core::{
         },
         device_authorization_response::{DeviceCode, INTERVAL_DEFAULT},
     },
-    Provider, ProviderExtDeviceAuthorizationGrant,
 };
 use serde::de::DeserializeOwned;
 use serde_json::{Error as SerdeJsonError, Map, Value};
 use serde_urlencoded::ser::Error as SerdeUrlencodedSerError;
+
+use crate::{Provider, ProviderExtDeviceAuthorizationGrant};
 
 //
 pub struct DeviceAccessTokenEndpoint<'a, P>

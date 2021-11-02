@@ -1,14 +1,25 @@
 use std::{error, fmt, str};
 
+pub use oauth2_core::{
+    access_token_request::{
+        BodyWithAuthorizationCodeGrant as AccessTokenRequestBody,
+        GRANT_TYPE_WITH_AUTHORIZATION_CODE_GRANT,
+    },
+    access_token_response::ErrorBodyError as AccessTokenResponseErrorBodyError,
+    authorization_code_grant::{
+        access_token_response::{
+            ErrorBody as AccessTokenResponseErrorBody,
+            SuccessfulBody as AccessTokenResponseSuccessfulBody,
+        },
+        authorization_request::Query as AuthorizationRequestQuery,
+    },
+};
+pub use serde_qs::{self, Error as SerdeQsError};
+
 use crate::{
-    access_token_request::BodyWithAuthorizationCodeGrant,
-    access_token_response::{GeneralErrorBody, GeneralSuccessfulBody},
-    provider::{Map, Request, Response, Url, Value},
-    types::RedirectUri,
+    provider::{Map, RedirectUri, Request, Response, Url, Value},
     Provider,
 };
-
-use super::authorization_request::Query;
 
 pub trait ProviderExtAuthorizationCodeGrant: Provider
 where
@@ -24,7 +35,7 @@ where
 
     fn authorization_request_query_serializing(
         &self,
-        _query: &Query<<Self as Provider>::Scope>,
+        _query: &AuthorizationRequestQuery<<Self as Provider>::Scope>,
     ) -> Option<Result<String, Box<dyn error::Error>>> {
         None
     }
@@ -35,7 +46,7 @@ where
 
     fn access_token_request_rendering(
         &self,
-        _body: &BodyWithAuthorizationCodeGrant,
+        _body: &AccessTokenRequestBody,
     ) -> Option<Result<Request<Vec<u8>>, Box<dyn error::Error>>> {
         None
     }
@@ -45,7 +56,10 @@ where
         _response: &Response<Vec<u8>>,
     ) -> Option<
         Result<
-            Result<GeneralSuccessfulBody<<Self as Provider>::Scope>, GeneralErrorBody>,
+            Result<
+                AccessTokenResponseSuccessfulBody<<Self as Provider>::Scope>,
+                AccessTokenResponseErrorBody,
+            >,
             Box<dyn error::Error>,
         >,
     > {

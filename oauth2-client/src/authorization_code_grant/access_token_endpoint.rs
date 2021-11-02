@@ -17,11 +17,12 @@ use oauth2_core::{
         access_token_response::{ErrorBody as RES_ErrorBody, SuccessfulBody as RES_SuccessfulBody},
         authorization_response::Code,
     },
-    Provider, ProviderExtAuthorizationCodeGrant,
 };
 use serde::de::DeserializeOwned;
 use serde_json::{Error as SerdeJsonError, Map, Value};
 use serde_urlencoded::ser::Error as SerdeUrlencodedSerError;
+
+use crate::{Provider, ProviderExtAuthorizationCodeGrant};
 
 //
 pub struct AccessTokenEndpoint<'a, P>
