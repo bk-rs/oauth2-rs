@@ -1,4 +1,4 @@
-use std::{fmt, str};
+use std::{error, fmt, str};
 
 use http_api_client::{Client, ClientRespondEndpointError};
 use http_api_endpoint::Endpoint;
@@ -81,7 +81,7 @@ where
             .await
             .map_err(|err| match err {
                 ClientRespondEndpointError::RespondFailed(err) => {
-                    FlowHandleCallbackError::AccessTokenEndpointRespondFailed(err.to_string())
+                    FlowHandleCallbackError::AccessTokenEndpointRespondFailed(Box::new(err))
                 }
                 ClientRespondEndpointError::EndpointRenderRequestFailed(err) => {
                     FlowHandleCallbackError::AccessTokenEndpointError(err)
@@ -109,7 +109,7 @@ pub enum FlowHandleCallbackError {
     StateMismatch,
     //
     #[error("AccessTokenEndpointRespondFailed {0}")]
-    AccessTokenEndpointRespondFailed(String),
+    AccessTokenEndpointRespondFailed(Box<dyn error::Error>),
     #[error("AccessTokenEndpointError {0}")]
     AccessTokenEndpointError(AccessTokenEndpointError),
     #[error("AccessTokenFailed {0:?}")]

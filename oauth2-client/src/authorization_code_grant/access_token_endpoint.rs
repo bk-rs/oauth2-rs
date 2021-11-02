@@ -1,4 +1,4 @@
-use std::{fmt, str};
+use std::{error, fmt, str};
 
 use http_api_endpoint::{
     http::{
@@ -61,18 +61,25 @@ where
         );
         body._extensions = self.provider.access_token_request_body_extensions();
 
-        let body = REQ_Body::AuthorizationCodeGrant(body);
+        let request = if let Some(request_ret) = self.provider.access_token_request_building(&body)
+        {
+            request_ret.map_err(|err| AccessTokenEndpointError::CustomBuildRequestFailed(err))?
+        } else {
+            let body = REQ_Body::AuthorizationCodeGrant(body);
 
-        let body_str = serde_urlencoded::to_string(body)
-            .map_err(AccessTokenEndpointError::SerRequestBodyFailed)?;
+            let body_str = serde_urlencoded::to_string(body)
+                .map_err(AccessTokenEndpointError::SerRequestBodyFailed)?;
 
-        let request = Request::builder()
-            .method(REQ_METHOD)
-            .uri(self.provider.token_endpoint_url().as_str())
-            .header(CONTENT_TYPE, REQ_CONTENT_TYPE.to_string())
-            .header(ACCEPT, RES_CONTENT_TYPE.to_string())
-            .body(body_str.as_bytes().to_vec())
-            .map_err(AccessTokenEndpointError::MakeRequestFailed)?;
+            let request = Request::builder()
+                .method(REQ_METHOD)
+                .uri(self.provider.token_endpoint_url().as_str())
+                .header(CONTENT_TYPE, REQ_CONTENT_TYPE.to_string())
+                .header(ACCEPT, RES_CONTENT_TYPE.to_string())
+                .body(body_str.as_bytes().to_vec())
+                .map_err(AccessTokenEndpointError::MakeRequestFailed)?;
+
+            request
+        };
 
         Ok(request)
     }
@@ -102,10 +109,14 @@ where
 
 #[derive(thiserror::Error, Debug)]
 pub enum AccessTokenEndpointError {
+    #[error("CustomBuildRequestFailed {0}")]
+    CustomBuildRequestFailed(Box<dyn error::Error>),
+    //
     #[error("SerRequestBodyFailed {0}")]
     SerRequestBodyFailed(SerdeUrlencodedSerError),
     #[error("MakeRequestFailed {0}")]
     MakeRequestFailed(HttpError),
+    //
     #[error("DeResponseBodyFailed {0}")]
     DeResponseBodyFailed(SerdeJsonError),
 }

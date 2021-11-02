@@ -1,4 +1,4 @@
-use std::{convert::Infallible, fmt, str};
+use std::{convert::Infallible, error, fmt, str};
 
 use http_api_endpoint::{http::Error as HttpError, Body, Endpoint, Request, Response};
 use oauth2_core::{
@@ -70,9 +70,8 @@ where
             .provider
             .authorization_request_query_serializing(&query)
         {
-            query_str_ret.map_err(|err| {
-                AuthorizationEndpointError::CustomSerRequestQueryFailed(err.to_string())
-            })?
+            query_str_ret
+                .map_err(|err| AuthorizationEndpointError::CustomSerRequestQueryFailed(err))?
         } else {
             serde_qs::to_string(&query)
                 .map_err(AuthorizationEndpointError::SerRequestQueryFailed)?
@@ -102,10 +101,12 @@ where
 pub enum AuthorizationEndpointError {
     #[error("ClientIdMissing")]
     ClientIdMissing,
+    //
+    #[error("CustomSerRequestQueryFailed {0}")]
+    CustomSerRequestQueryFailed(Box<dyn error::Error>),
+    //
     #[error("SerRequestQueryFailed {0}")]
     SerRequestQueryFailed(SerdeQsError),
-    #[error("CustomSerRequestQueryFailed {0}")]
-    CustomSerRequestQueryFailed(String),
     #[error("MakeRequestFailed {0}")]
     MakeRequestFailed(HttpError),
 }
