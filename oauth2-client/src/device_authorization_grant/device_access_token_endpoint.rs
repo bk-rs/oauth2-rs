@@ -73,7 +73,9 @@ where
             self.device_code.to_owned(),
             self.provider.client_id().cloned(),
         );
-        body._extensions = self.provider.device_access_token_request_body_extensions();
+        if let Some(extensions) = self.provider.device_access_token_request_body_extensions() {
+            body.set_extensions(extensions);
+        }
 
         let body = REQ_Body::DeviceAuthorizationGrant(body);
 

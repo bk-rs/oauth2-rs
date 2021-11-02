@@ -29,7 +29,7 @@ where
     pub scope: Option<ScopeParameter<SCOPE>>,
 
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
-    pub _extensions: Option<Map<String, Value>>,
+    _extensions: Option<Map<String, Value>>,
 }
 impl<SCOPE> GeneralSuccessfulBody<SCOPE>
 where
@@ -52,6 +52,13 @@ where
             _extensions: None,
         }
     }
+
+    pub fn set_extensions(&mut self, extensions: Map<String, Value>) {
+        self._extensions = Some(extensions);
+    }
+    pub fn extensions(&self) -> Option<&Map<String, Value>> {
+        self._extensions.as_ref()
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -63,7 +70,7 @@ pub struct GeneralErrorBody {
     pub error_uri: Option<Url>,
 
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
-    pub _extensions: Option<Map<String, Value>>,
+    _extensions: Option<Map<String, Value>>,
 }
 impl GeneralErrorBody {
     pub fn new(
@@ -77,6 +84,13 @@ impl GeneralErrorBody {
             error_uri,
             _extensions: None,
         }
+    }
+
+    pub fn set_extensions(&mut self, extensions: Map<String, Value>) {
+        self._extensions = Some(extensions);
+    }
+    pub fn extensions(&self) -> Option<&Map<String, Value>> {
+        self._extensions.as_ref()
     }
 }
 

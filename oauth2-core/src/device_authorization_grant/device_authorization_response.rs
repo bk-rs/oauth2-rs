@@ -33,11 +33,18 @@ pub struct SuccessfulBody {
     pub interval: Option<usize>,
 
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
-    pub _extensions: Option<Map<String, Value>>,
+    _extensions: Option<Map<String, Value>>,
 }
 impl SuccessfulBody {
     pub fn interval(&self) -> Duration {
         Duration::from_secs(self.interval.unwrap_or_else(|| INTERVAL_DEFAULT) as u64)
+    }
+
+    pub fn set_extensions(&mut self, extensions: Map<String, Value>) {
+        self._extensions = Some(extensions);
+    }
+    pub fn extensions(&self) -> Option<&Map<String, Value>> {
+        self._extensions.as_ref()
     }
 }
 

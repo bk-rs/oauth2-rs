@@ -48,7 +48,7 @@ pub struct BodyWithAuthorizationCodeGrant {
     pub client_id: Option<ClientId>,
 
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
-    pub _extensions: Option<Map<String, Value>>,
+    _extensions: Option<Map<String, Value>>,
 }
 impl BodyWithAuthorizationCodeGrant {
     pub fn new(code: Code, redirect_uri: Option<Url>, client_id: Option<ClientId>) -> Self {
@@ -58,6 +58,13 @@ impl BodyWithAuthorizationCodeGrant {
             client_id,
             _extensions: None,
         }
+    }
+
+    pub fn set_extensions(&mut self, extensions: Map<String, Value>) {
+        self._extensions = Some(extensions);
+    }
+    pub fn extensions(&self) -> Option<&Map<String, Value>> {
+        self._extensions.as_ref()
     }
 }
 
@@ -72,7 +79,7 @@ pub struct BodyWithDeviceAuthorizationGrant {
     pub client_id: Option<ClientId>,
 
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
-    pub _extensions: Option<Map<String, Value>>,
+    _extensions: Option<Map<String, Value>>,
 }
 impl BodyWithDeviceAuthorizationGrant {
     pub fn new(device_code: String, client_id: Option<ClientId>) -> Self {
@@ -81,6 +88,13 @@ impl BodyWithDeviceAuthorizationGrant {
             client_id,
             _extensions: None,
         }
+    }
+
+    pub fn set_extensions(&mut self, extensions: Map<String, Value>) {
+        self._extensions = Some(extensions);
+    }
+    pub fn extensions(&self) -> Option<&Map<String, Value>> {
+        self._extensions.as_ref()
     }
 }
 
@@ -138,17 +152,18 @@ mod tests {
             "client_secret".to_owned(),
             Value::String("your_client_secret".to_owned()),
         );
-        let body = Body::DeviceAuthorizationGrant(BodyWithDeviceAuthorizationGrant {
-            device_code: "your_device_code".to_owned(),
-            client_id: Some("your_client_id".to_owned()),
-            _extensions: Some(extensions.to_owned()),
-        });
+        let mut body = BodyWithDeviceAuthorizationGrant::new(
+            "your_device_code".to_owned(),
+            Some("your_client_id".to_owned()),
+        );
+        body.set_extensions(extensions.to_owned());
+        let body = Body::DeviceAuthorizationGrant(body);
         let body_str = serde_urlencoded::to_string(body).unwrap();
         assert_eq!(body_str, "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Adevice_code&device_code=your_device_code&client_id=your_client_id&client_secret=your_client_secret");
 
         match serde_urlencoded::from_str::<Body>(body_str.as_str()) {
             Ok(Body::DeviceAuthorizationGrant(body)) => {
-                assert_eq!(body._extensions, Some(extensions));
+                assert_eq!(body.extensions(), Some(&extensions));
             }
             #[allow(unreachable_patterns)]
             Ok(body) => panic!("{:?}", body),

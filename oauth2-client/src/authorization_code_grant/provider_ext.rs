@@ -40,6 +40,8 @@ where
         None
     }
 
+    fn authorization_request_url_modifying(&self, _url: &mut Url) {}
+
     fn access_token_request_body_extensions(&self) -> Option<Map<String, Value>> {
         None
     }

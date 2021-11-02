@@ -60,7 +60,9 @@ where
             self.provider.redirect_uri().map(|x| x.url().to_owned()),
             self.provider.client_id().cloned(),
         );
-        body._extensions = self.provider.access_token_request_body_extensions();
+        if let Some(extensions) = self.provider.access_token_request_body_extensions() {
+            body.set_extensions(extensions);
+        }
 
         if let Some(request_ret) = self.provider.access_token_request_rendering(&body) {
             let request =

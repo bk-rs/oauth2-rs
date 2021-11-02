@@ -61,7 +61,9 @@ where
             self.provider.client_id().cloned(),
             self.scopes.to_owned().map(Into::into),
         );
-        body._extensions = self.provider.device_authorization_request_body_extensions();
+        if let Some(extensions) = self.provider.device_authorization_request_body_extensions() {
+            body.set_extensions(extensions);
+        }
 
         let body_str = serde_urlencoded::to_string(body)
             .map_err(DeviceAuthorizationEndpointError::SerRequestBodyFailed)?;

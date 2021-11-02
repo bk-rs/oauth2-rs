@@ -65,7 +65,9 @@ where
             self.scopes.to_owned().map(Into::into),
             self.state.to_owned(),
         );
-        query._extensions = self.provider.authorization_request_query_extensions();
+        if let Some(extensions) = self.provider.authorization_request_query_extensions() {
+            query.set_extensions(extensions);
+        }
 
         let query_str = if let Some(query_str_ret) = self
             .provider
@@ -81,6 +83,10 @@ where
         let mut url = self.provider.authorization_endpoint_url().to_owned();
         url.set_query(Some(query_str.as_str()));
 
+        //
+        self.provider.authorization_request_url_modifying(&mut url);
+
+        //
         let request = Request::builder()
             .method(REQ_METHOD)
             .uri(url.as_str())

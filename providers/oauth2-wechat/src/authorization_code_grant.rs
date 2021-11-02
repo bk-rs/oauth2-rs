@@ -21,6 +21,7 @@ pub struct WeChatProviderWithWebApplication {
     appid: ClientId,
     secret: ClientSecret,
     redirect_uri: RedirectUri,
+    wechat_redirect: Option<bool>,
     //
     token_endpoint_url: Url,
     authorization_endpoint_url: Url,
@@ -35,9 +36,14 @@ impl WeChatProviderWithWebApplication {
             appid,
             secret,
             redirect_uri,
+            wechat_redirect: None,
             token_endpoint_url: TOKEN_URL.parse()?,
             authorization_endpoint_url: AUTHORIZATION_URL.parse()?,
         })
+    }
+
+    pub fn enable_wechat_redirect(&mut self) {
+        self.wechat_redirect = Some(true);
     }
 }
 impl Provider for WeChatProviderWithWebApplication {
@@ -107,6 +113,12 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
         }
 
         Some(doing(query))
+    }
+
+    fn authorization_request_url_modifying(&self, url: &mut Url) {
+        if self.wechat_redirect == Some(true) {
+            url.set_fragment(Some("wechat_redirect"));
+        }
     }
 
     fn access_token_request_rendering(
@@ -260,7 +272,7 @@ impl From<MyAccessTokenResponseSuccessfulBody> for AccessTokenResponseSuccessful
                 Some(scope.into())
             },
         );
-        body._extensions = Some(map);
+        body.set_extensions(map);
 
         body
     }
@@ -286,4 +298,95 @@ pub enum AccessTokenResponseParsingError {
     //
     #[error("DeResponseBodyFailed {0}")]
     DeResponseBodyFailed(SerdeJsonError),
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use std::error;
+
+    use oauth2_client::{
+        authorization_code_grant::{AccessTokenEndpoint, AuthorizationEndpoint},
+        http_api_endpoint::Endpoint as _,
+        provider::Response,
+    };
+
+    #[test]
+    fn authorization_request() -> Result<(), Box<dyn error::Error>> {
+        let mut provider = WeChatProviderWithWebApplication::new(
+            "APPID".to_owned(),
+            "SECRET".to_owned(),
+            RedirectUri::new("https://client.example.com/cb")?,
+        )?;
+        provider.enable_wechat_redirect();
+
+        let endpoint = AuthorizationEndpoint::new(
+            &provider,
+            vec![WeChatScope::SnsapiLogin],
+            "3d6be0a4035d839573b04816624a415e".to_owned(),
+        );
+
+        let request = endpoint.render_request()?;
+
+        assert_eq!(request.uri(), "https://open.weixin.qq.com/connect/qrconnect?appid=APPID&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&response_type=code&scope=snsapi_login&state=3d6be0a4035d839573b04816624a415e#wechat_redirect");
+
+        Ok(())
+    }
+
+    #[test]
+    fn access_token_request() -> Result<(), Box<dyn error::Error>> {
+        let provider = WeChatProviderWithWebApplication::new(
+            "APPID".to_owned(),
+            "SECRET".to_owned(),
+            RedirectUri::new("https://client.example.com/cb")?,
+        )?;
+
+        let endpoint = AccessTokenEndpoint::new(&provider, "CODE".to_owned());
+
+        let request = endpoint.render_request()?;
+
+        assert_eq!(request.uri(), "https://api.weixin.qq.com/sns/oauth2/access_token?appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code");
+
+        Ok(())
+    }
+
+    #[test]
+    fn access_token_response() -> Result<(), Box<dyn error::Error>> {
+        let provider = WeChatProviderWithWebApplication::new(
+            "APPID".to_owned(),
+            "SECRET".to_owned(),
+            RedirectUri::new("https://client.example.com/cb")?,
+        )?;
+
+        let endpoint = AccessTokenEndpoint::new(&provider, "CODE".to_owned());
+
+        let response_body = r#"
+        { 
+            "access_token":"ACCESS_TOKEN", 
+            "expires_in":7200, 
+            "refresh_token":"REFRESH_TOKEN",
+            "openid":"OPENID", 
+            "scope":"SCOPE",
+            "unionid": "o6_bmasdasdsad6_2sgVt7hMZOPfL"
+        }"#;
+        let body_ret = endpoint
+            .parse_response(Response::builder().body(response_body.as_bytes().to_vec())?)?;
+
+        match body_ret {
+            Ok(body) => {
+                assert_eq!(body.access_token, "ACCESS_TOKEN");
+                assert_eq!(
+                    body.scope,
+                    Some(vec![WeChatScope::Other("SCOPE".to_owned())].into())
+                );
+                let map = body.extensions().unwrap();
+                assert_eq!(map.get("openid").unwrap(), "OPENID");
+                assert_eq!(map.get("unionid").unwrap(), "o6_bmasdasdsad6_2sgVt7hMZOPfL");
+            }
+            Err(body) => panic!("{:?}", body),
+        }
+
+        Ok(())
+    }
 }
