@@ -1,6 +1,7 @@
 use std::{error, fmt, str};
 
 use crate::{
+    access_token_request::BodyWithAuthorizationCodeGrant,
     provider::{Map, Url, Value},
     types::RedirectUri,
     Provider,
@@ -19,6 +20,7 @@ where
     fn authorization_request_query_extensions(&self) -> Option<Map<String, Value>> {
         None
     }
+
     fn authorization_request_query_serializer(
         &self,
         _query: &Query<<Self as Provider>::Scope>,
@@ -27,6 +29,13 @@ where
     }
 
     fn access_token_request_body_extensions(&self) -> Option<Map<String, Value>> {
+        None
+    }
+
+    fn access_token_request_body_serializer(
+        &self,
+        _body: &BodyWithAuthorizationCodeGrant,
+    ) -> Option<Result<String, Box<dyn error::Error>>> {
         None
     }
 }

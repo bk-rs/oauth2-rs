@@ -20,6 +20,7 @@ use crate::types::ClientId;
 
 pub const METHOD: Method = Method::POST;
 pub const CONTENT_TYPE: Mime = mime::APPLICATION_WWW_FORM_URLENCODED;
+pub const GRANT_TYPE_WITH_AUTHORIZATION_CODE_GRANT: &str = "authorization_code";
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(tag = "grant_type")]
