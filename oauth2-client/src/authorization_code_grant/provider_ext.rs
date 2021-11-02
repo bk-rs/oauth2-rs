@@ -17,7 +17,7 @@ pub use oauth2_core::{
 pub use serde_qs::{self, Error as SerdeQsError};
 
 use crate::{
-    provider::{Map, RedirectUri, Request, Response, Url, Value},
+    provider::{Body, Map, RedirectUri, Request, Response, Url, Value},
     Provider,
 };
 
@@ -49,13 +49,13 @@ where
     fn access_token_request_rendering(
         &self,
         _body: &AccessTokenRequestBody,
-    ) -> Option<Result<Request<Vec<u8>>, Box<dyn error::Error>>> {
+    ) -> Option<Result<Request<Body>, Box<dyn error::Error>>> {
         None
     }
 
     fn access_token_response_parsing(
         &self,
-        _response: &Response<Vec<u8>>,
+        _response: &Response<Body>,
     ) -> Option<
         Result<
             Result<

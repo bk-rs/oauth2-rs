@@ -34,8 +34,6 @@ oauth2-core = { version = "^0.0", path = "../oauth2-core" }
 http-api-endpoint = { version = "0.1", default-features = false }
 http-api-client = { version = "0.1", default-features = false, optional = true }
 
-http = { version = "0.2", default-features = false }
-
 serde = { version = "1.0", default-features = false, features = ["derive"] }
 serde-enum-str = { version = "0.2", default-features = false }
 serde_json = { version = "1.0", default-features = false, features = ["std"] }

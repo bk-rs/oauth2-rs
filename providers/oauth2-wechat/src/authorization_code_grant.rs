@@ -8,7 +8,7 @@ use oauth2_client::{
     },
     provider::{
         serde::{Deserialize, Serialize},
-        serde_json, thiserror, AccessTokenType, ClientId, ClientSecret, HttpError, Map,
+        serde_json, thiserror, AccessTokenType, Body, ClientId, ClientSecret, HttpError, Map,
         RedirectUri, Request, Response, SerdeJsonError, Url, UrlParseError, Value,
     },
     Provider, ProviderExtAuthorizationCodeGrant,
@@ -124,11 +124,11 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
     fn access_token_request_rendering(
         &self,
         body: &AccessTokenRequestBody,
-    ) -> Option<Result<Request<Vec<u8>>, Box<dyn error::Error>>> {
+    ) -> Option<Result<Request<Body>, Box<dyn error::Error>>> {
         fn doing(
             this: &WeChatProviderWithWebApplication,
             body: &AccessTokenRequestBody,
-        ) -> Result<Request<Vec<u8>>, Box<dyn error::Error>> {
+        ) -> Result<Request<Body>, Box<dyn error::Error>> {
             let appid = body
                 .client_id
                 .to_owned()
@@ -159,7 +159,7 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
 
     fn access_token_response_parsing(
         &self,
-        response: &Response<Vec<u8>>,
+        response: &Response<Body>,
     ) -> Option<
         Result<
             Result<
@@ -170,7 +170,7 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
         >,
     > {
         fn doing(
-            response: &Response<Vec<u8>>,
+            response: &Response<Body>,
         ) -> Result<
             Result<WeChatAccessTokenResponseSuccessfulBody, WeChatAccessTokenResponseErrorBody>,
             Box<dyn error::Error>,
@@ -194,7 +194,7 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
             Ok(Err(body))
         }
 
-        Some(doing(response).map(|ret| ret.map(|x| x.into()).map_err(|x| x.into())))
+        Some(doing(response).map(|ret| ret.map(Into::into).map_err(Into::into)))
     }
 }
 

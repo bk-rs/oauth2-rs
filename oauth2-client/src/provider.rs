@@ -1,4 +1,7 @@
-pub use http::{self, Error as HttpError, Request, Response};
+pub use http_api_endpoint::{
+    http::{self, Error as HttpError},
+    Body, Request, Response,
+};
 pub use serde;
 pub use serde_enum_str;
 pub use serde_json::{self, Error as SerdeJsonError, Map, Value};
