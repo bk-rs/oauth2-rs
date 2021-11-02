@@ -2,7 +2,8 @@ use std::{error, fmt, str};
 
 use crate::{
     access_token_request::BodyWithAuthorizationCodeGrant,
-    provider::{Map, Request, Url, Value},
+    access_token_response::{GeneralErrorBody, GeneralSuccessfulBody},
+    provider::{Map, Request, Response, Url, Value},
     types::RedirectUri,
     Provider,
 };
@@ -32,10 +33,22 @@ where
         None
     }
 
-    fn access_token_request_building(
+    fn access_token_request_rendering(
         &self,
         _body: &BodyWithAuthorizationCodeGrant,
     ) -> Option<Result<Request<Vec<u8>>, Box<dyn error::Error>>> {
+        None
+    }
+
+    fn access_token_response_parsing(
+        &self,
+        _response: &Response<Vec<u8>>,
+    ) -> Option<
+        Result<
+            Result<GeneralSuccessfulBody<<Self as Provider>::Scope>, GeneralErrorBody>,
+            Box<dyn error::Error>,
+        >,
+    > {
         None
     }
 }

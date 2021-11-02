@@ -29,4 +29,5 @@ serde = { version = "1.0", default-features = false, features = ["derive"] }
 serde-enum-str = { version = "0.2", default-features = false }
 
 serde_qs = { version = "0.8", default-features = false }
+serde_json = { version = "1.0", default-features = false }
 thiserror = { version = "1.0", default-features = false }

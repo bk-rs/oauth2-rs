@@ -61,25 +61,26 @@ where
         );
         body._extensions = self.provider.access_token_request_body_extensions();
 
-        let request = if let Some(request_ret) = self.provider.access_token_request_building(&body)
-        {
-            request_ret.map_err(|err| AccessTokenEndpointError::CustomBuildRequestFailed(err))?
-        } else {
-            let body = REQ_Body::AuthorizationCodeGrant(body);
+        if let Some(request_ret) = self.provider.access_token_request_rendering(&body) {
+            let request =
+                request_ret.map_err(AccessTokenEndpointError::CustomRenderingRequestFailed)?;
 
-            let body_str = serde_urlencoded::to_string(body)
-                .map_err(AccessTokenEndpointError::SerRequestBodyFailed)?;
+            return Ok(request);
+        }
 
-            let request = Request::builder()
-                .method(REQ_METHOD)
-                .uri(self.provider.token_endpoint_url().as_str())
-                .header(CONTENT_TYPE, REQ_CONTENT_TYPE.to_string())
-                .header(ACCEPT, RES_CONTENT_TYPE.to_string())
-                .body(body_str.as_bytes().to_vec())
-                .map_err(AccessTokenEndpointError::MakeRequestFailed)?;
+        //
+        let body = REQ_Body::AuthorizationCodeGrant(body);
 
-            request
-        };
+        let body_str = serde_urlencoded::to_string(body)
+            .map_err(AccessTokenEndpointError::SerRequestBodyFailed)?;
+
+        let request = Request::builder()
+            .method(REQ_METHOD)
+            .uri(self.provider.token_endpoint_url().as_str())
+            .header(CONTENT_TYPE, REQ_CONTENT_TYPE.to_string())
+            .header(ACCEPT, RES_CONTENT_TYPE.to_string())
+            .body(body_str.as_bytes().to_vec())
+            .map_err(AccessTokenEndpointError::MakeRequestFailed)?;
 
         Ok(request)
     }
@@ -88,6 +89,14 @@ where
         &self,
         response: Response<Body>,
     ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
+        if let Some(body_ret_ret) = self.provider.access_token_response_parsing(&response) {
+            let body_ret =
+                body_ret_ret.map_err(AccessTokenEndpointError::CustomparsingResponseFailed)?;
+
+            return Ok(body_ret);
+        }
+
+        //
         if response.status().is_success() {
             let map = serde_json::from_slice::<Map<String, Value>>(&response.body())
                 .map_err(AccessTokenEndpointError::DeResponseBodyFailed)?;
@@ -109,13 +118,16 @@ where
 
 #[derive(thiserror::Error, Debug)]
 pub enum AccessTokenEndpointError {
-    #[error("CustomBuildRequestFailed {0}")]
-    CustomBuildRequestFailed(Box<dyn error::Error>),
+    #[error("CustomRenderingRequestFailed {0}")]
+    CustomRenderingRequestFailed(Box<dyn error::Error>),
     //
     #[error("SerRequestBodyFailed {0}")]
     SerRequestBodyFailed(SerdeUrlencodedSerError),
     #[error("MakeRequestFailed {0}")]
     MakeRequestFailed(HttpError),
+    //
+    #[error("CustomparsingResponseFailed {0}")]
+    CustomparsingResponseFailed(Box<dyn error::Error>),
     //
     #[error("DeResponseBodyFailed {0}")]
     DeResponseBodyFailed(SerdeJsonError),

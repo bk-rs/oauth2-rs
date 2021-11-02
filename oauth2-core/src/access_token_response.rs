@@ -31,6 +31,28 @@ where
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     pub _extensions: Option<Map<String, Value>>,
 }
+impl<SCOPE> GeneralSuccessfulBody<SCOPE>
+where
+    SCOPE: Scope,
+    <SCOPE as str::FromStr>::Err: fmt::Display,
+{
+    pub fn new(
+        access_token: String,
+        token_type: AccessTokenType,
+        expires_in: Option<usize>,
+        refresh_token: Option<String>,
+        scope: Option<ScopeParameter<SCOPE>>,
+    ) -> Self {
+        Self {
+            access_token,
+            token_type,
+            expires_in,
+            refresh_token,
+            scope,
+            _extensions: None,
+        }
+    }
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct GeneralErrorBody {
@@ -42,6 +64,20 @@ pub struct GeneralErrorBody {
 
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     pub _extensions: Option<Map<String, Value>>,
+}
+impl GeneralErrorBody {
+    pub fn new(
+        error: ErrorBodyError,
+        error_description: Option<String>,
+        error_uri: Option<Url>,
+    ) -> Self {
+        Self {
+            error,
+            error_description,
+            error_uri,
+            _extensions: None,
+        }
+    }
 }
 
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
