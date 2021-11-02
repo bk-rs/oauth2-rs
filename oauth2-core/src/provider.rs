@@ -1,3 +1,4 @@
+pub use http::{self, Error as HttpError, Request};
 pub use serde_json::{Map, Value};
 pub use url::{ParseError as UrlParseError, Url};
 

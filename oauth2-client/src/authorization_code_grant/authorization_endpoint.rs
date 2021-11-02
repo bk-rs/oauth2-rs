@@ -66,8 +66,9 @@ where
         );
         query._extensions = self.provider.authorization_request_query_extensions();
 
-        let query_str = if let Some(query_str_ret) =
-            self.provider.authorization_request_query_serializer(&query)
+        let query_str = if let Some(query_str_ret) = self
+            .provider
+            .authorization_request_query_serializing(&query)
         {
             query_str_ret.map_err(|err| {
                 AuthorizationEndpointError::CustomSerRequestQueryFailed(err.to_string())

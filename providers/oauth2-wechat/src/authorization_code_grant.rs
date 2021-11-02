@@ -5,13 +5,12 @@ use oauth2_core::{
         BodyWithAuthorizationCodeGrant, GRANT_TYPE_WITH_AUTHORIZATION_CODE_GRANT,
     },
     authorization_code_grant::authorization_request::Query,
-    provider::{Url, UrlParseError},
+    provider::{HttpError, Request, Url, UrlParseError},
     types::{ClientId, ClientSecret, RedirectUri},
     Provider, ProviderExtAuthorizationCodeGrant,
 };
 use serde::{Deserialize, Serialize};
 use serde_qs::Error as SerdeQsError;
-use serde_urlencoded::ser::Error as SerdeUrlencodedSerError;
 
 use crate::{WeChatScope, AUTHORIZATION_URL, TOKEN_URL};
 
@@ -63,7 +62,7 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
         &self.authorization_endpoint_url
     }
 
-    fn authorization_request_query_serializer(
+    fn authorization_request_query_serializing(
         &self,
         query: &Query<<Self as Provider>::Scope>,
     ) -> Option<Result<String, Box<dyn error::Error>>> {
@@ -71,7 +70,7 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
             redirect_uri.to_string()
         } else {
             return Some(Err(Box::new(
-                AuthorizationRequestQuerySerializerError::RedirectUriMissing,
+                AuthorizationRequestQuerySerializingError::RedirectUriMissing,
             )));
         };
 
@@ -84,7 +83,7 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
                 .join(",")
         } else {
             return Some(Err(Box::new(
-                AuthorizationRequestQuerySerializerError::ScopeMissing,
+                AuthorizationRequestQuerySerializingError::ScopeMissing,
             )));
         };
 
@@ -100,7 +99,7 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
             Ok(x) => x,
             Err(err) => {
                 return Some(Err(Box::new(
-                    AuthorizationRequestQuerySerializerError::SerRequestQueryFailed(err),
+                    AuthorizationRequestQuerySerializingError::SerRequestQueryFailed(err),
                 )))
             }
         };
@@ -108,35 +107,47 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
         Some(Ok(query_str))
     }
 
-    fn access_token_request_body_serializer(
+    fn access_token_request_building(
         &self,
         body: &BodyWithAuthorizationCodeGrant,
-    ) -> Option<Result<String, Box<dyn error::Error>>> {
+    ) -> Option<Result<Request<Vec<u8>>, Box<dyn error::Error>>> {
         let appid = if let Some(client_id) = &body.client_id {
             client_id.to_owned()
         } else {
             return Some(Err(Box::new(
-                AccessTokenRequestBodySerializerError::ClientIdMissing,
+                AccessTokenRequestBuildingError::ClientIdMissing,
             )));
         };
 
-        let body = AccessTokenRequestBody {
+        let query = AccessTokenRequestQuery {
             appid,
             secret: self.secret.to_owned(),
             code: body.code.to_owned(),
             grant_type: GRANT_TYPE_WITH_AUTHORIZATION_CODE_GRANT.to_owned(),
         };
 
-        let query_str = match serde_urlencoded::to_string(&body) {
+        let query_str = match serde_qs::to_string(&query) {
             Ok(x) => x,
             Err(err) => {
                 return Some(Err(Box::new(
-                    AccessTokenRequestBodySerializerError::SerRequestBodyFailed(err),
+                    AccessTokenRequestBuildingError::SerRequestQueryFailed(err),
                 )))
             }
         };
 
-        Some(Ok(query_str))
+        let mut url = self.token_endpoint_url().to_owned();
+        url.set_query(Some(query_str.as_str()));
+
+        let request = match Request::builder().uri(url.as_str()).body(vec![]) {
+            Ok(x) => x,
+            Err(err) => {
+                return Some(Err(Box::new(
+                    AccessTokenRequestBuildingError::MakeRequestFailed(err),
+                )))
+            }
+        };
+
+        Some(Ok(request))
     }
 }
 
@@ -151,7 +162,7 @@ pub struct AuthorizationRequestQuery {
 }
 
 #[derive(thiserror::Error, Debug)]
-pub enum AuthorizationRequestQuerySerializerError {
+pub enum AuthorizationRequestQuerySerializingError {
     #[error("RedirectUriMissing")]
     RedirectUriMissing,
     #[error("ScopeMissing")]
@@ -161,7 +172,7 @@ pub enum AuthorizationRequestQuerySerializerError {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct AccessTokenRequestBody {
+pub struct AccessTokenRequestQuery {
     pub appid: String,
     pub secret: String,
     pub code: String,
@@ -169,9 +180,11 @@ pub struct AccessTokenRequestBody {
 }
 
 #[derive(thiserror::Error, Debug)]
-pub enum AccessTokenRequestBodySerializerError {
+pub enum AccessTokenRequestBuildingError {
     #[error("ClientIdMissing")]
     ClientIdMissing,
-    #[error("SerRequestBodyFailed {0}")]
-    SerRequestBodyFailed(SerdeUrlencodedSerError),
+    #[error("SerRequestQueryFailed {0}")]
+    SerRequestQueryFailed(SerdeQsError),
+    #[error("MakeRequestFailed {0}")]
+    MakeRequestFailed(HttpError),
 }
