@@ -1,6 +1,8 @@
 use std::{fmt, str};
 
-use http_api_client::RetryableClient;
+use http_api_client::{
+    ClientRespondEndpointError, RetryableClient, RetryableClientRespondEndpointUntilDoneError,
+};
 use oauth2_core::{
     device_authorization_grant::{
         device_access_token_response::{
@@ -57,8 +59,16 @@ where
             .client
             .respond_endpoint(&device_authorization_endpoint)
             .await
-            .map_err(|err| {
-                FlowExecuteError::DeviceAuthorizationEndpointRespondFailed(err.to_string())
+            .map_err(|err| match err {
+                ClientRespondEndpointError::RespondFailed(err) => {
+                    FlowExecuteError::DeviceAuthorizationEndpointRespondFailed(err.to_string())
+                }
+                ClientRespondEndpointError::EndpointRenderRequestFailed(err) => {
+                    FlowExecuteError::DeviceAuthorizationEndpointError(err)
+                }
+                ClientRespondEndpointError::EndpointParseResponseFailed(err) => {
+                    FlowExecuteError::DeviceAuthorizationEndpointError(err)
+                }
             })?;
 
         let device_authorization_successful_body =
@@ -86,8 +96,21 @@ where
             .client
             .respond_endpoint_until_done(&device_access_token_endpoint)
             .await
-            .map_err(|err| {
-                FlowExecuteError::DeviceAccessTokenEndpointRespondFailed(err.to_string())
+            .map_err(|err| match err {
+                RetryableClientRespondEndpointUntilDoneError::RespondFailed(err) => {
+                    FlowExecuteError::DeviceAccessTokenEndpointRespondFailed(err.to_string())
+                }
+                RetryableClientRespondEndpointUntilDoneError::EndpointRenderRequestFailed(err) => {
+                    FlowExecuteError::DeviceAccessTokenEndpointError(err)
+                }
+                RetryableClientRespondEndpointUntilDoneError::EndpointParseResponseFailed(err) => {
+                    FlowExecuteError::DeviceAccessTokenEndpointError(err)
+                }
+                RetryableClientRespondEndpointUntilDoneError::ReachedMaxRetries => {
+                    FlowExecuteError::DeviceAccessTokenEndpointRespondFailed(
+                        "ReachedMaxRetries".to_owned(),
+                    )
+                }
             })?;
 
         let device_access_token_successful_body =
@@ -99,17 +122,17 @@ where
 
 #[derive(thiserror::Error, Debug)]
 pub enum FlowExecuteError {
-    #[error("DeviceAuthorizationEndpointError {0}")]
-    DeviceAuthorizationEndpointError(DeviceAuthorizationEndpointError),
     #[error("DeviceAuthorizationEndpointRespondFailed {0}")]
     DeviceAuthorizationEndpointRespondFailed(String),
+    #[error("DeviceAuthorizationEndpointError {0}")]
+    DeviceAuthorizationEndpointError(DeviceAuthorizationEndpointError),
     #[error("DeviceAuthorizationFailed {0:?}")]
     DeviceAuthorizationFailed(DARES_ErrorBody),
     //
-    #[error("DeviceAccessTokenEndpointError {0}")]
-    DeviceAccessTokenEndpointError(DeviceAccessTokenEndpointError),
     #[error("DeviceAccessTokenEndpointRespondFailed {0}")]
     DeviceAccessTokenEndpointRespondFailed(String),
+    #[error("DeviceAccessTokenEndpointError {0}")]
+    DeviceAccessTokenEndpointError(DeviceAccessTokenEndpointError),
     #[error("DeviceAccessTokenFailed {0:?}")]
     DeviceAccessTokenFailed(DATRES_ErrorBody),
 }

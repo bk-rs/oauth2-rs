@@ -1,15 +1,24 @@
 use std::{fmt, str};
 
-use http_api_client::Client;
+use http_api_client::{Client, ClientRespondEndpointError};
 use http_api_endpoint::Endpoint;
 use oauth2_core::{
-    authorization_code_grant::authorization_request::State, Provider,
-    ProviderExtAuthorizationCodeGrant,
+    authorization_code_grant::{
+        access_token_response::{
+            ErrorBody as ATRES_ErrorBody, SuccessfulBody as ATRES_SuccessfulBody,
+        },
+        authorization_request::State,
+        authorization_response::ErrorQuery as ARES_ErrorQuery,
+    },
+    Provider, ProviderExtAuthorizationCodeGrant,
 };
-use serde::Serialize;
+use serde::{de::DeserializeOwned, Serialize};
 use url::{ParseError as UrlParseError, Url};
 
-use super::{AuthorizationEndpoint, AuthorizationEndpointError};
+use super::{
+    parse_redirect_uri_query, AccessTokenEndpoint, AccessTokenEndpointError, AuthorizationEndpoint,
+    AuthorizationEndpointError, ParseRedirectUriQueryError,
+};
 
 pub struct Flow<C>
 where
@@ -43,6 +52,68 @@ where
     {
         build_authorization_url(provider, scopes, state)
     }
+
+    pub async fn handle_callback<P>(
+        &self,
+        provider: &'a P,
+        query: impl AsRef<str>,
+        state: impl Into<Option<State>>,
+    ) -> Result<ATRES_SuccessfulBody<<P as Provider>::Scope>, FlowHandleCallbackError>
+    where
+        P: ProviderExtAuthorizationCodeGrant + Send + Sync,
+        <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
+        <P as Provider>::Scope: DeserializeOwned + Send + Sync,
+    {
+        let query = parse_redirect_uri_query(query.as_ref())
+            .map_err(FlowHandleCallbackError::ParseRedirectUriQueryError)?;
+
+        let query = query.map_err(FlowHandleCallbackError::AuthorizationFailed)?;
+
+        if state.into() != query.state {
+            return Err(FlowHandleCallbackError::StateMismatch);
+        }
+
+        let access_token_endpoint = AccessTokenEndpoint::new(provider, query.code);
+
+        let access_token_ret = self
+            .client
+            .respond_endpoint(&access_token_endpoint)
+            .await
+            .map_err(|err| match err {
+                ClientRespondEndpointError::RespondFailed(err) => {
+                    FlowHandleCallbackError::AccessTokenEndpointRespondFailed(err.to_string())
+                }
+                ClientRespondEndpointError::EndpointRenderRequestFailed(err) => {
+                    FlowHandleCallbackError::AccessTokenEndpointError(err)
+                }
+                ClientRespondEndpointError::EndpointParseResponseFailed(err) => {
+                    FlowHandleCallbackError::AccessTokenEndpointError(err)
+                }
+            })?;
+
+        let access_token_successful_body =
+            access_token_ret.map_err(FlowHandleCallbackError::AccessTokenFailed)?;
+
+        Ok(access_token_successful_body)
+    }
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum FlowHandleCallbackError {
+    #[error("ParseRedirectUriQueryError {0}")]
+    ParseRedirectUriQueryError(ParseRedirectUriQueryError),
+    //
+    #[error("AuthorizationFailed {0:?}")]
+    AuthorizationFailed(ARES_ErrorQuery),
+    #[error("StateMismatch")]
+    StateMismatch,
+    //
+    #[error("AccessTokenEndpointRespondFailed {0}")]
+    AccessTokenEndpointRespondFailed(String),
+    #[error("AccessTokenEndpointError {0}")]
+    AccessTokenEndpointError(AccessTokenEndpointError),
+    #[error("AccessTokenFailed {0:?}")]
+    AccessTokenFailed(ATRES_ErrorBody),
 }
 
 //

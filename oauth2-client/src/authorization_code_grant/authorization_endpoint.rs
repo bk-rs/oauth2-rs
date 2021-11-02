@@ -56,7 +56,7 @@ where
         let query = REQ_Query::new(
             self.provider
                 .client_id()
-                .ok_or_else(|| AuthorizationEndpointError::MissingClientId)?,
+                .ok_or_else(|| AuthorizationEndpointError::ClientIdMissing)?,
             self.provider.redirect_uri().map(|x| x.url().to_owned()),
             self.scopes.to_owned().map(Into::into),
             self.state.to_owned(),
@@ -87,8 +87,8 @@ where
 
 #[derive(thiserror::Error, Debug)]
 pub enum AuthorizationEndpointError {
-    #[error("MissingClientId")]
-    MissingClientId,
+    #[error("ClientIdMissing")]
+    ClientIdMissing,
     #[error("SerRequestQueryFailed {0}")]
     SerRequestQueryFailed(SerdeQsError),
     #[error("MakeRequestFailed {0}")]
