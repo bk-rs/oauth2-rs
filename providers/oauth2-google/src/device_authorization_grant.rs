@@ -27,21 +27,21 @@ impl GoogleProviderForTvAndDeviceApps {
 impl Provider for GoogleProviderForTvAndDeviceApps {
     type Scope = GoogleScope;
 
-    fn client_id(&self) -> Option<ClientId> {
-        Some(self.client_id.to_owned())
+    fn client_id(&self) -> Option<&ClientId> {
+        Some(&self.client_id)
     }
 
-    fn client_secret(&self) -> Option<ClientSecret> {
-        Some(self.client_secret.to_owned())
+    fn client_secret(&self) -> Option<&ClientSecret> {
+        Some(&self.client_secret)
     }
 
-    fn token_endpoint_url(&self) -> Url {
-        self.token_endpoint_url.to_owned()
+    fn token_endpoint_url(&self) -> &Url {
+        &self.token_endpoint_url
     }
 }
 impl ProviderExtDeviceAuthorizationGrant for GoogleProviderForTvAndDeviceApps {
-    fn device_authorization_endpoint_url(&self) -> Url {
-        self.device_authorization_endpoint_url.to_owned()
+    fn device_authorization_endpoint_url(&self) -> &Url {
+        &self.device_authorization_endpoint_url
     }
 
     fn device_access_token_request_body_extensions(&self) -> Option<Map<String, Value>> {

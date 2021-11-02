@@ -70,7 +70,7 @@ where
     ) -> Result<Request<Body>, Self::RenderRequestError> {
         let mut body = BodyWithDeviceAuthorizationGrant::new(
             self.device_code.to_owned(),
-            self.provider.client_id(),
+            self.provider.client_id().cloned(),
         );
         body._extensions = self.provider.device_access_token_request_body_extensions();
 

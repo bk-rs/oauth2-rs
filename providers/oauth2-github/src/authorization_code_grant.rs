@@ -33,24 +33,24 @@ impl GithubProviderWithWebApplication {
 impl Provider for GithubProviderWithWebApplication {
     type Scope = GithubScope;
 
-    fn client_id(&self) -> Option<ClientId> {
-        Some(self.client_id.to_owned())
+    fn client_id(&self) -> Option<&ClientId> {
+        Some(&self.client_id)
     }
 
-    fn client_secret(&self) -> Option<ClientSecret> {
-        Some(self.client_secret.to_owned())
+    fn client_secret(&self) -> Option<&ClientSecret> {
+        Some(&self.client_secret)
     }
 
-    fn token_endpoint_url(&self) -> Url {
-        self.token_endpoint_url.to_owned()
+    fn token_endpoint_url(&self) -> &Url {
+        &self.token_endpoint_url
     }
 }
 impl ProviderExtAuthorizationCodeGrant for GithubProviderWithWebApplication {
-    fn redirect_uri(&self) -> Option<RedirectUri> {
-        Some(self.redirect_uri.to_owned())
+    fn redirect_uri(&self) -> Option<&RedirectUri> {
+        Some(&self.redirect_uri)
     }
 
-    fn authorization_endpoint_url(&self) -> Url {
-        self.authorization_endpoint_url.to_owned()
+    fn authorization_endpoint_url(&self) -> &Url {
+        &self.authorization_endpoint_url
     }
 }

@@ -57,7 +57,7 @@ where
 
     fn render_request(&self) -> Result<Request<Body>, Self::RenderRequestError> {
         let mut body = REQ_Body::new(
-            self.provider.client_id(),
+            self.provider.client_id().cloned(),
             self.scopes.to_owned().map(Into::into),
         );
         body._extensions = self.provider.device_authorization_request_body_extensions();

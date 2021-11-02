@@ -25,20 +25,20 @@ impl GithubProviderWithDevice {
 impl Provider for GithubProviderWithDevice {
     type Scope = GithubScope;
 
-    fn client_id(&self) -> Option<ClientId> {
-        Some(self.client_id.to_owned())
+    fn client_id(&self) -> Option<&ClientId> {
+        Some(&self.client_id)
     }
 
-    fn client_secret(&self) -> Option<ClientSecret> {
+    fn client_secret(&self) -> Option<&ClientSecret> {
         None
     }
 
-    fn token_endpoint_url(&self) -> Url {
-        self.token_endpoint_url.to_owned()
+    fn token_endpoint_url(&self) -> &Url {
+        &self.token_endpoint_url
     }
 }
 impl ProviderExtDeviceAuthorizationGrant for GithubProviderWithDevice {
-    fn device_authorization_endpoint_url(&self) -> Url {
-        self.device_authorization_endpoint_url.to_owned()
+    fn device_authorization_endpoint_url(&self) -> &Url {
+        &self.device_authorization_endpoint_url
     }
 }

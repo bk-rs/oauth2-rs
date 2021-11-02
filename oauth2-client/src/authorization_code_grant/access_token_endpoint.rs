@@ -27,6 +27,7 @@ use serde_urlencoded::ser::Error as SerdeUrlencodedSerError;
 pub struct AccessTokenEndpoint<'a, P>
 where
     P: ProviderExtAuthorizationCodeGrant,
+    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     provider: &'a P,
     code: Code,
@@ -34,6 +35,7 @@ where
 impl<'a, P> AccessTokenEndpoint<'a, P>
 where
     P: ProviderExtAuthorizationCodeGrant,
+    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     pub fn new(provider: &'a P, code: Code) -> Self {
         Self { provider, code }
@@ -55,7 +57,7 @@ where
         let mut body = BodyWithAuthorizationCodeGrant::new(
             self.code.to_owned(),
             self.provider.redirect_uri().map(|x| x.url().to_owned()),
-            self.provider.client_id(),
+            self.provider.client_id().cloned(),
         );
         body._extensions = self.provider.access_token_request_body_extensions();
 

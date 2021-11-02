@@ -4,7 +4,7 @@ use crate::{
 };
 
 pub trait ProviderExtDeviceAuthorizationGrant: Provider {
-    fn device_authorization_endpoint_url(&self) -> Url;
+    fn device_authorization_endpoint_url(&self) -> &Url;
 
     fn device_authorization_request_body_extensions(&self) -> Option<Map<String, Value>> {
         None

@@ -19,6 +19,7 @@ use serde_qs::Error as SerdeQsError;
 pub struct AuthorizationEndpoint<'a, P>
 where
     P: ProviderExtAuthorizationCodeGrant,
+    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     provider: &'a P,
     scopes: Option<Vec<<P as Provider>::Scope>>,
@@ -27,6 +28,7 @@ where
 impl<'a, P> AuthorizationEndpoint<'a, P>
 where
     P: ProviderExtAuthorizationCodeGrant,
+    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     pub fn new(
         provider: &'a P,
@@ -56,6 +58,7 @@ where
         let mut query = REQ_Query::new(
             self.provider
                 .client_id()
+                .cloned()
                 .ok_or_else(|| AuthorizationEndpointError::ClientIdMissing)?,
             self.provider.redirect_uri().map(|x| x.url().to_owned()),
             self.scopes.to_owned().map(Into::into),
@@ -63,10 +66,18 @@ where
         );
         query._extensions = self.provider.authorization_request_query_extensions();
 
-        let query_str = serde_qs::to_string(&query)
-            .map_err(AuthorizationEndpointError::SerRequestQueryFailed)?;
+        let query_str = if let Some(query_str_ret) =
+            self.provider.authorization_request_query_serializer(&query)
+        {
+            query_str_ret.map_err(|err| {
+                AuthorizationEndpointError::CustomSerRequestQueryFailed(err.to_string())
+            })?
+        } else {
+            serde_qs::to_string(&query)
+                .map_err(AuthorizationEndpointError::SerRequestQueryFailed)?
+        };
 
-        let mut url = self.provider.authorization_endpoint_url();
+        let mut url = self.provider.authorization_endpoint_url().to_owned();
         url.set_query(Some(query_str.as_str()));
 
         let request = Request::builder()
@@ -92,6 +103,8 @@ pub enum AuthorizationEndpointError {
     ClientIdMissing,
     #[error("SerRequestQueryFailed {0}")]
     SerRequestQueryFailed(SerdeQsError),
+    #[error("CustomSerRequestQueryFailed {0}")]
+    CustomSerRequestQueryFailed(String),
     #[error("MakeRequestFailed {0}")]
     MakeRequestFailed(HttpError),
 }
