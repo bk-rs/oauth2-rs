@@ -58,6 +58,8 @@ YOUR_GMAIL
 
 ### Create credentials
 
+Open https://console.cloud.google.com/apis/credentials
+
 Click "Create credentials" => "OAuth client ID"
 
 ```

@@ -1,0 +1,18 @@
+[package]
+name = "oauth2_client_web_app_flow_demo"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+oauth2-client = { version = "^0.0", path = "../oauth2-client", default-features = false, features = ["with-authorization-code-grant", "with-flow"] }
+
+oauth2-github = { version = "^0.0", path = "../providers/oauth2-github", default-features = false, features = ["with-authorization-code-grant"] }
+oauth2-google = { version = "^0.0", path = "../providers/oauth2-google", default-features = false, features = ["with-authorization-code-grant"] }
+
+tokio = { version = "1.12", default-features = false, features = ["macros", "rt-multi-thread"] }
+http-api-isahc-client = { version = "0.1", features = ["with-sleep-via-tokio"] }
+
+serde = { version = "1.0", default-features = false, features = ["derive"] }
+toml = { version = "0.5" }
+
+pretty_env_logger = { version = "0.4" }

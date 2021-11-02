@@ -12,12 +12,13 @@ use oauth2_google::{GoogleProviderForTvAndDeviceApps, GoogleScope};
 async fn main() -> Result<(), Box<dyn error::Error>> {
     pretty_env_logger::init();
 
-    run().await
-}
-
-async fn run() -> Result<(), Box<dyn error::Error>> {
     let client_id = env::args().nth(1).unwrap();
     let client_secret = env::args().nth(2).unwrap();
+
+    run(client_id, client_secret).await
+}
+
+async fn run(client_id: String, client_secret: String) -> Result<(), Box<dyn error::Error>> {
     let scopes = vec![GoogleScope::Email, GoogleScope::DriveFile];
 
     let client = IsahcClient::new()?;

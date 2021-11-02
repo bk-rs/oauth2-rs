@@ -12,11 +12,12 @@ use oauth2_github::{GithubProviderWithDevice, GithubScope};
 async fn main() -> Result<(), Box<dyn error::Error>> {
     pretty_env_logger::init();
 
-    run().await
+    let client_id = env::args().nth(1).unwrap();
+
+    run(client_id).await
 }
 
-async fn run() -> Result<(), Box<dyn error::Error>> {
-    let client_id = env::args().nth(1).unwrap();
+async fn run(client_id: String) -> Result<(), Box<dyn error::Error>> {
     let scopes = vec![GithubScope::PublicRepo, GithubScope::UserEmail];
 
     let client = IsahcClient::new()?;

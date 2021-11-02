@@ -3,6 +3,7 @@ members = [
     "oauth2-cli",
     "oauth2-client",
     "oauth2_client_device_flow_demo",
+    "oauth2_client_web_app_flow_demo",
     "oauth2-core",
     "oauth2-lite",
     "oauth2-server",

@@ -12,6 +12,8 @@ pub mod authorization_code_grant;
 #[cfg(feature = "with-device-authorization-grant")]
 pub mod device_authorization_grant;
 
+#[cfg(feature = "with-authorization-code-grant")]
+pub use authorization_code_grant::GoogleProviderForWebServerApps;
 #[cfg(feature = "with-device-authorization-grant")]
 pub use device_authorization_grant::GoogleProviderForTvAndDeviceApps;
 
