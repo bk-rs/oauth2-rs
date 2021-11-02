@@ -20,6 +20,7 @@ use super::{
     DeviceAuthorizationEndpointError,
 };
 
+#[derive(Debug, Clone)]
 pub struct Flow<C>
 where
     C: RetryableClient,

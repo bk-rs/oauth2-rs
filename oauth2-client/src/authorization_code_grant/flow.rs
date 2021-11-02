@@ -19,6 +19,7 @@ use super::{
     AuthorizationEndpointError, ParseRedirectUriQueryError,
 };
 
+#[derive(Debug, Clone)]
 pub struct Flow<C>
 where
     C: Client,

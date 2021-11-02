@@ -12,6 +12,8 @@ oauth2-google = { version = "^0.0", path = "../providers/oauth2-google", default
 tokio = { version = "1.12", default-features = false, features = ["macros", "rt-multi-thread"] }
 http-api-isahc-client = { version = "0.1", features = ["with-sleep-via-tokio"] }
 
+warp = { version = "0.3", default-features = false }
+
 serde = { version = "1.0", default-features = false, features = ["derive"] }
 toml = { version = "0.5" }
 

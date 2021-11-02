@@ -2,14 +2,16 @@
 cp clients.toml.example clients.toml
 
 RUST_BACKTRACE=1 RUST_LOG=debug,isahc=off cargo run -p oauth2_client_web_app_flow_demo
+
+open http://127.0.0.1/auth/github
 */
 
-use std::{collections::HashMap, env, error, fs, path::PathBuf};
+use std::{collections::HashMap, env, error, fs, path::PathBuf, sync::Arc};
 
 use http_api_isahc_client::IsahcClient;
 use oauth2_client::{
     authorization_code_grant::Flow,
-    provider::{ClientId, ClientSecret, RedirectUri},
+    provider::{serde_enum_str::Deserialize_enum_str, ClientId, ClientSecret, RedirectUri},
 };
 use oauth2_github::{GithubProviderWithWebApplication, GithubScope};
 use oauth2_google::{GoogleProviderForWebServerApps, GoogleScope};
@@ -29,6 +31,8 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     let clients_config_str = fs::read_to_string(clients_config_file)?;
     let clients_config: ClientsConfig = toml::from_str(&clients_config_str)?;
 
+    println!("{:?}", clients_config);
+
     run(clients_config).await
 }
 
@@ -46,13 +50,11 @@ struct ClientConfig {
 }
 
 async fn run(clients_config: ClientsConfig) -> Result<(), Box<dyn error::Error>> {
-    let client = IsahcClient::new()?;
-    let flow = Flow::new(client);
-
     let provider_map: HashMap<ProviderKey, ProviderValue> = vec![
         (
             ProviderKey::Github,
             ProviderValue::Github((
+                Flow::new(IsahcClient::new()?),
                 GithubProviderWithWebApplication::new(
                     clients_config.github.client_id.to_owned(),
                     clients_config.github.client_secret.to_owned(),
@@ -64,6 +66,7 @@ async fn run(clients_config: ClientsConfig) -> Result<(), Box<dyn error::Error>>
         (
             ProviderKey::Google,
             ProviderValue::Google((
+                Flow::new(IsahcClient::new()?),
                 GoogleProviderForWebServerApps::new(
                     clients_config.google.client_id.to_owned(),
                     clients_config.google.client_secret.to_owned(),
@@ -76,16 +79,103 @@ async fn run(clients_config: ClientsConfig) -> Result<(), Box<dyn error::Error>>
     .into_iter()
     .collect();
 
+    println!("{:?}", provider_map);
+
+    let ctx = Arc::new(Context { provider_map });
+
+    let routes = filters::filters(ctx.clone());
+    warp::serve(routes).run(([127, 0, 0, 1], 80)).await;
+
     Ok(())
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
-enum ProviderKey {
+pub struct Context {
+    pub provider_map: HashMap<ProviderKey, ProviderValue>,
+}
+
+#[derive(Deserialize_enum_str, Debug, Copy, Clone, PartialEq, Eq, Hash)]
+pub enum ProviderKey {
+    #[serde(rename = "github")]
     Github,
+    #[serde(rename = "google")]
     Google,
 }
+
 #[derive(Debug, Clone)]
-enum ProviderValue {
-    Github((GithubProviderWithWebApplication, Vec<GithubScope>)),
-    Google((GoogleProviderForWebServerApps, Vec<GoogleScope>)),
+pub enum ProviderValue {
+    Github(
+        (
+            Flow<IsahcClient>,
+            GithubProviderWithWebApplication,
+            Vec<GithubScope>,
+        ),
+    ),
+    Google(
+        (
+            Flow<IsahcClient>,
+            GoogleProviderForWebServerApps,
+            Vec<GoogleScope>,
+        ),
+    ),
+}
+
+pub mod filters {
+    use super::{Context, ProviderKey};
+
+    use std::sync::Arc;
+
+    use warp::{
+        http::{StatusCode, Uri},
+        Filter,
+    };
+
+    pub fn filters(
+        ctx: Arc<Context>,
+    ) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
+        let ctx_t = ctx.clone();
+
+        warp::path!("auth" / ProviderKey)
+            .and(warp::any().map(move || ctx_t.clone()))
+            .and_then(auth_handler)
+            .or(warp::path!("auth" / ProviderKey / "callback")
+                .and(
+                    warp::query::raw()
+                        .map(Some)
+                        .or(warp::any().map(|| None))
+                        .unify(),
+                )
+                .and(warp::any().map(move || ctx.clone()))
+                .and_then(auth_callback_handler))
+    }
+
+    async fn auth_handler(
+        provider_key: ProviderKey,
+        ctx: Arc<Context>,
+    ) -> Result<Box<dyn warp::Reply>, warp::Rejection> {
+        let provider_value = ctx.provider_map.get(&provider_key).unwrap();
+
+        let state = "TODO".to_owned();
+
+        let url = match provider_value {
+            crate::ProviderValue::Github((flow, provider, scopes)) => flow
+                .build_authorization_url(provider, scopes.to_owned(), state)
+                .unwrap(),
+            crate::ProviderValue::Google((flow, provider, scopes)) => flow
+                .build_authorization_url(provider, scopes.to_owned(), state)
+                .unwrap(),
+        };
+
+        Ok(Box::new(warp::redirect::temporary(
+            url.as_str().parse::<Uri>().unwrap(),
+        )))
+    }
+
+    async fn auth_callback_handler(
+        provider_key: ProviderKey,
+        query_raw: Option<String>,
+        ctx: Arc<Context>,
+    ) -> Result<Box<dyn warp::Reply>, warp::Rejection> {
+        // TODO
+        Ok(Box::new(StatusCode::BAD_REQUEST))
+    }
 }
