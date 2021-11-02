@@ -6,11 +6,11 @@ pub mod access_token_response;
 pub mod provider;
 
 //
-pub use provider::Provider;
 #[cfg(feature = "with-authorization-code-grant")]
-pub use provider::ProviderExtAuthorizationCodeGrant;
+pub use authorization_code_grant::provider_ext::ProviderExtAuthorizationCodeGrant;
 #[cfg(feature = "with-device-authorization-grant")]
-pub use provider::ProviderExtDeviceAuthorizationGrant;
+pub use device_authorization_grant::provider_ext::ProviderExtDeviceAuthorizationGrant;
+pub use provider::Provider;
 
 //
 //

@@ -53,7 +53,7 @@ where
     type ParseResponseError = Infallible;
 
     fn render_request(&self) -> Result<Request<Body>, Self::RenderRequestError> {
-        let query = REQ_Query::new(
+        let mut query = REQ_Query::new(
             self.provider
                 .client_id()
                 .ok_or_else(|| AuthorizationEndpointError::ClientIdMissing)?,
@@ -61,6 +61,7 @@ where
             self.scopes.to_owned().map(Into::into),
             self.state.to_owned(),
         );
+        query._extensions = self.provider.authorization_request_query_extensions();
 
         let query_str = serde_qs::to_string(&query)
             .map_err(AuthorizationEndpointError::SerRequestQueryFailed)?;

@@ -3,3 +3,5 @@
 pub mod access_token_response;
 pub mod authorization_request;
 pub mod authorization_response;
+
+pub mod provider_ext;
