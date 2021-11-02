@@ -28,7 +28,6 @@ use serde_urlencoded::ser::Error as SerdeUrlencodedSerError;
 pub struct DeviceAuthorizationEndpoint<'a, P>
 where
     P: ProviderExtDeviceAuthorizationGrant,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     provider: &'a P,
     scopes: Option<Vec<<P as Provider>::Scope>>,
@@ -36,7 +35,6 @@ where
 impl<'a, P> DeviceAuthorizationEndpoint<'a, P>
 where
     P: ProviderExtDeviceAuthorizationGrant,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     pub fn new(provider: &'a P, scopes: impl Into<Option<Vec<<P as Provider>::Scope>>>) -> Self {
         Self {

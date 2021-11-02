@@ -19,7 +19,6 @@ use serde_qs::Error as SerdeQsError;
 pub struct AuthorizationEndpoint<'a, P>
 where
     P: ProviderExtAuthorizationCodeGrant,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     provider: &'a P,
     scopes: Option<Vec<<P as Provider>::Scope>>,
@@ -28,7 +27,6 @@ where
 impl<'a, P> AuthorizationEndpoint<'a, P>
 where
     P: ProviderExtAuthorizationCodeGrant,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     pub fn new(
         provider: &'a P,

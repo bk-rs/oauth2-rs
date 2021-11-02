@@ -27,7 +27,6 @@ use serde_urlencoded::ser::Error as SerdeUrlencodedSerError;
 pub struct AccessTokenEndpoint<'a, P>
 where
     P: ProviderExtAuthorizationCodeGrant,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     provider: &'a P,
     code: Code,
@@ -35,7 +34,6 @@ where
 impl<'a, P> AccessTokenEndpoint<'a, P>
 where
     P: ProviderExtAuthorizationCodeGrant,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     pub fn new(provider: &'a P, code: Code) -> Self {
         Self { provider, code }

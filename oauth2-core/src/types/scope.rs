@@ -27,7 +27,6 @@ impl<T> From<Vec<T>> for ScopeParameter<T> {
 impl<T> Serialize for ScopeParameter<T>
 where
     T: Scope,
-    <T as str::FromStr>::Err: fmt::Display,
 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
