@@ -16,7 +16,7 @@ use crate::authorization_code_grant::authorization_response::Code;
     feature = "with-authorization-code-grant",
     feature = "with-device-authorization-grant"
 ))]
-use crate::types::ClientId;
+use crate::types::{ClientId, ClientSecret};
 
 pub const METHOD: Method = Method::POST;
 pub const CONTENT_TYPE: Mime = mime::APPLICATION_WWW_FORM_URLENCODED;
@@ -46,16 +46,25 @@ pub struct BodyWithAuthorizationCodeGrant {
     pub redirect_uri: Option<Url>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub client_id: Option<ClientId>,
+    // Note: Not in rfc6749, but usually need.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub client_secret: Option<ClientSecret>,
 
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     _extensions: Option<Map<String, Value>>,
 }
 impl BodyWithAuthorizationCodeGrant {
-    pub fn new(code: Code, redirect_uri: Option<Url>, client_id: Option<ClientId>) -> Self {
+    pub fn new(
+        code: Code,
+        redirect_uri: Option<Url>,
+        client_id: Option<ClientId>,
+        client_secret: Option<ClientSecret>,
+    ) -> Self {
         Self {
             code,
             redirect_uri,
             client_id,
+            client_secret,
             _extensions: None,
         }
     }
@@ -77,15 +86,23 @@ pub struct BodyWithDeviceAuthorizationGrant {
     pub device_code: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub client_id: Option<ClientId>,
+    // Note: Not in rfc6749, but may need.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub client_secret: Option<ClientSecret>,
 
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     _extensions: Option<Map<String, Value>>,
 }
 impl BodyWithDeviceAuthorizationGrant {
-    pub fn new(device_code: String, client_id: Option<ClientId>) -> Self {
+    pub fn new(
+        device_code: String,
+        client_id: Option<ClientId>,
+        client_secret: Option<ClientSecret>,
+    ) -> Self {
         Self {
             device_code,
             client_id,
+            client_secret,
             _extensions: None,
         }
     }
@@ -148,18 +165,16 @@ mod tests {
     fn ser_de_extensions_with_device_authorization_grant() {
         //
         let mut extensions = Map::new();
-        extensions.insert(
-            "client_secret".to_owned(),
-            Value::String("your_client_secret".to_owned()),
-        );
+        extensions.insert("foo".to_owned(), Value::String("bar".to_owned()));
         let mut body = BodyWithDeviceAuthorizationGrant::new(
             "your_device_code".to_owned(),
             Some("your_client_id".to_owned()),
+            Some("your_client_secret".to_owned()),
         );
         body.set_extensions(extensions.to_owned());
         let body = Body::DeviceAuthorizationGrant(body);
         let body_str = serde_urlencoded::to_string(body).unwrap();
-        assert_eq!(body_str, "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Adevice_code&device_code=your_device_code&client_id=your_client_id&client_secret=your_client_secret");
+        assert_eq!(body_str, "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Adevice_code&device_code=your_device_code&client_id=your_client_id&client_secret=your_client_secret&foo=bar");
 
         match serde_urlencoded::from_str::<Body>(body_str.as_str()) {
             Ok(Body::DeviceAuthorizationGrant(body)) => {

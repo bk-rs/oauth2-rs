@@ -72,6 +72,7 @@ where
         let mut body = BodyWithDeviceAuthorizationGrant::new(
             self.device_code.to_owned(),
             self.provider.client_id().cloned(),
+            self.provider.client_secret().cloned(),
         );
         if let Some(extensions) = self.provider.device_access_token_request_body_extensions() {
             body.set_extensions(extensions);

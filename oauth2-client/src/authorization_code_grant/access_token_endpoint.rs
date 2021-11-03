@@ -59,6 +59,7 @@ where
             self.code.to_owned(),
             self.provider.redirect_uri().map(|x| x.url().to_owned()),
             self.provider.client_id().cloned(),
+            self.provider.client_secret().cloned(),
         );
         if let Some(extensions) = self.provider.access_token_request_body_extensions() {
             body.set_extensions(extensions);

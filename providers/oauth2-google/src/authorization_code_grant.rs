@@ -53,3 +53,31 @@ impl ProviderExtAuthorizationCodeGrant for GoogleProviderForWebServerApps {
         &self.authorization_endpoint_url
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use std::error;
+
+    use oauth2_client::{
+        authorization_code_grant::AccessTokenEndpoint, http_api_endpoint::Endpoint as _,
+    };
+
+    #[test]
+    fn access_token_request() -> Result<(), Box<dyn error::Error>> {
+        let provider = GoogleProviderForWebServerApps::new(
+            "CLIENT_ID".to_owned(),
+            "CLIENT_SECRET".to_owned(),
+            RedirectUri::new("https://client.example.com/cb")?,
+        )?;
+
+        let endpoint = AccessTokenEndpoint::new(&provider, "CODE".to_owned());
+
+        let request = endpoint.render_request()?;
+
+        assert_eq!(request.body(), b"grant_type=authorization_code&code=CODE&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&client_id=CLIENT_ID&client_secret=CLIENT_SECRET");
+
+        Ok(())
+    }
+}

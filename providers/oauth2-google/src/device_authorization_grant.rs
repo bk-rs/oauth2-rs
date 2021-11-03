@@ -1,5 +1,5 @@
 use oauth2_client::{
-    provider::{ClientId, ClientSecret, Map, Url, UrlParseError, Value},
+    provider::{ClientId, ClientSecret, Url, UrlParseError},
     Provider, ProviderExtDeviceAuthorizationGrant,
 };
 
@@ -42,13 +42,36 @@ impl ProviderExtDeviceAuthorizationGrant for GoogleProviderForTvAndDeviceApps {
     fn device_authorization_endpoint_url(&self) -> &Url {
         &self.device_authorization_endpoint_url
     }
+}
 
-    fn device_access_token_request_body_extensions(&self) -> Option<Map<String, Value>> {
-        let mut map = Map::new();
-        map.insert(
-            "client_secret".to_owned(),
-            Value::String(self.client_secret.to_owned()),
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use std::{error, time::Duration};
+
+    use oauth2_client::{
+        device_authorization_grant::DeviceAccessTokenEndpoint,
+        http_api_endpoint::RetryableEndpoint as _,
+    };
+
+    #[test]
+    fn access_token_request() -> Result<(), Box<dyn error::Error>> {
+        let provider = GoogleProviderForTvAndDeviceApps::new(
+            "CLIENT_ID".to_owned(),
+            "CLIENT_SECRET".to_owned(),
+        )?;
+
+        let endpoint = DeviceAccessTokenEndpoint::new(
+            &provider,
+            "DEVICE_CODE".to_owned(),
+            Duration::from_secs(5),
         );
-        Some(map)
+
+        let request = endpoint.render_request(None)?;
+
+        assert_eq!(request.body(), b"grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Adevice_code&device_code=DEVICE_CODE&client_id=CLIENT_ID&client_secret=CLIENT_SECRET");
+
+        Ok(())
     }
 }

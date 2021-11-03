@@ -1,5 +1,5 @@
 use oauth2_client::{
-    provider::{ClientId, ClientSecret, Map, RedirectUri, Url, UrlParseError, Value},
+    provider::{ClientId, ClientSecret, RedirectUri, Url, UrlParseError},
     Provider, ProviderExtAuthorizationCodeGrant,
 };
 
@@ -52,15 +52,6 @@ impl ProviderExtAuthorizationCodeGrant for GithubProviderWithWebApplication {
     fn authorization_endpoint_url(&self) -> &Url {
         &self.authorization_endpoint_url
     }
-
-    fn access_token_request_body_extensions(&self) -> Option<Map<String, Value>> {
-        let mut map = Map::new();
-        map.insert(
-            "client_secret".to_owned(),
-            Value::String(self.client_secret.to_owned()),
-        );
-        Some(map)
-    }
 }
 
 #[cfg(test)]
@@ -70,7 +61,8 @@ mod tests {
     use std::error;
 
     use oauth2_client::{
-        authorization_code_grant::AuthorizationEndpoint, http_api_endpoint::Endpoint as _,
+        authorization_code_grant::{AccessTokenEndpoint, AuthorizationEndpoint},
+        http_api_endpoint::Endpoint as _,
     };
 
     #[test]
@@ -90,6 +82,23 @@ mod tests {
         let request = endpoint.render_request()?;
 
         assert_eq!(request.uri(), "https://github.com/login/oauth/authorize?response_type=code&client_id=CLIENT_ID&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&scope=user%3Aemail&state=ixax8kolzut108e1q5bgtm1er9xmklkn");
+
+        Ok(())
+    }
+
+    #[test]
+    fn access_token_request() -> Result<(), Box<dyn error::Error>> {
+        let provider = GithubProviderWithWebApplication::new(
+            "CLIENT_ID".to_owned(),
+            "CLIENT_SECRET".to_owned(),
+            RedirectUri::new("https://client.example.com/cb")?,
+        )?;
+
+        let endpoint = AccessTokenEndpoint::new(&provider, "CODE".to_owned());
+
+        let request = endpoint.render_request()?;
+
+        assert_eq!(request.body(), b"grant_type=authorization_code&code=CODE&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&client_id=CLIENT_ID&client_secret=CLIENT_SECRET");
 
         Ok(())
     }
