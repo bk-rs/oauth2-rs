@@ -140,11 +140,14 @@ pub enum ProviderValue {
 }
 
 pub mod filters {
-    use super::{Context, ProviderKey};
+    use super::{Context, IsahcClient, ProviderKey};
 
     use std::sync::Arc;
 
     use log::info;
+    use oauth2_client::user_info::provider_ext::{
+        AccessTokenResponseSuccessfulBodySource, ProviderExtUserInfo as _,
+    };
     use warp::{http::Uri, Filter};
 
     pub fn filters(
@@ -210,7 +213,24 @@ pub mod filters {
 
                 info!("{:?} {:?}", provider_key, access_token_body);
 
-                Ok(warp::reply::html(format!("{:?}", access_token_body)))
+                let client_2 = IsahcClient::new().unwrap();
+                let client_3 = IsahcClient::new().unwrap();
+                let user_info = provider
+                    .fetch_user_info(
+                        AccessTokenResponseSuccessfulBodySource::AuthorizationCodeGrant,
+                        &access_token_body,
+                        &client_2,
+                        &client_3,
+                    )
+                    .await
+                    .unwrap();
+
+                info!("{:?} {:?}", provider_key, user_info);
+
+                Ok(warp::reply::html(format!(
+                    "{:?} {:?}",
+                    access_token_body, user_info
+                )))
             }
             crate::ProviderValue::Google((flow, provider, _scopes)) => {
                 let access_token_body = flow
@@ -220,7 +240,24 @@ pub mod filters {
 
                 info!("{:?} {:?}", provider_key, access_token_body);
 
-                Ok(warp::reply::html(format!("{:?}", access_token_body)))
+                let client_2 = IsahcClient::new().unwrap();
+                let client_3 = IsahcClient::new().unwrap();
+                let user_info = provider
+                    .fetch_user_info(
+                        AccessTokenResponseSuccessfulBodySource::AuthorizationCodeGrant,
+                        &access_token_body,
+                        &client_2,
+                        &client_3,
+                    )
+                    .await
+                    .unwrap();
+
+                info!("{:?} {:?}", provider_key, user_info);
+
+                Ok(warp::reply::html(format!(
+                    "{:?} {:?}",
+                    access_token_body, user_info
+                )))
             }
         }
     }

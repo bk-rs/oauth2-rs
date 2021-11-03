@@ -1,0 +1,11 @@
+[package]
+name = "oauth2-signin"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+oauth2-client = { version = "^0.0", path = "../oauth2-client", default-features = false, features = [
+    "with-authorization-code-grant",
+    "with-flow",
+    "with-user-info",
+] }
