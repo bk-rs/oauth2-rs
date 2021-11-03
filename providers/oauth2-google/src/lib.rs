@@ -19,6 +19,13 @@ pub use authorization_code_grant::{
 #[cfg(feature = "with-device-authorization-grant")]
 pub use device_authorization_grant::GoogleProviderForTvAndDeviceApps;
 
+#[cfg(any(
+    feature = "with-authorization-code-grant",
+    feature = "with-device-authorization-grant"
+))]
+#[cfg(feature = "with-user-info")]
+pub mod user_info;
+
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
 pub enum GoogleScope {
     //

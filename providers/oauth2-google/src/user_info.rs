@@ -14,10 +14,10 @@ use oauth2_client::{
     Provider,
 };
 
-pub const USER_INFO_URL: &str = "https://api.github.com/user";
+pub const USER_INFO_URL: &str = "https://www.googleapis.com/oauth2/v3/userinfo";
 
 //
-pub struct GithubUserInfoEndpoint<'a, P>
+pub struct GoogleOauth2V3UserInfoEndpoint<'a, P>
 where
     P: Provider,
     <P::Scope as str::FromStr>::Err: fmt::Display,
@@ -25,7 +25,7 @@ where
     pub token_source: AccessTokenResponseSuccessfulBodySource,
     pub token: &'a AccessTokenResponseSuccessfulBody<<P as Provider>::Scope>,
 }
-impl<'a, P> GithubUserInfoEndpoint<'a, P>
+impl<'a, P> GoogleOauth2V3UserInfoEndpoint<'a, P>
 where
     P: Provider,
     <P::Scope as str::FromStr>::Err: fmt::Display,
@@ -41,23 +41,26 @@ where
     }
 }
 
-impl<'a, P> Endpoint for GithubUserInfoEndpoint<'a, P>
+impl<'a, P> Endpoint for GoogleOauth2V3UserInfoEndpoint<'a, P>
 where
     P: Provider,
     <P::Scope as str::FromStr>::Err: fmt::Display,
 {
-    type RenderRequestError = GithubUserInfoEndpointError;
+    type RenderRequestError = GoogleUserInfoEndpointError;
 
-    type ParseResponseOutput = GithubUserInfo;
-    type ParseResponseError = GithubUserInfoEndpointError;
+    type ParseResponseOutput = GoogleOauth2V3UserInfo;
+    type ParseResponseError = GoogleUserInfoEndpointError;
 
     fn render_request(&self) -> Result<Request<Body>, Self::RenderRequestError> {
         let request = Request::builder()
             .uri(USER_INFO_URL)
-            .header(AUTHORIZATION, format!("token {}", &self.token.access_token))
+            .header(
+                AUTHORIZATION,
+                format!("Bearer {}", &self.token.access_token),
+            )
             .header(ACCEPT, MIME_APPLICATION_JSON)
             .body(vec![])
-            .map_err(GithubUserInfoEndpointError::MakeRequestFailed)?;
+            .map_err(GoogleUserInfoEndpointError::MakeRequestFailed)?;
 
         Ok(request)
     }
@@ -66,27 +69,26 @@ where
         &self,
         response: Response<Body>,
     ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
-        let body = serde_json::from_slice::<GithubUserInfo>(&response.body())
-            .map_err(GithubUserInfoEndpointError::DeResponseBodyFailed)?;
+        let body = serde_json::from_slice::<GoogleOauth2V3UserInfo>(&response.body())
+            .map_err(GoogleUserInfoEndpointError::DeResponseBodyFailed)?;
 
         Ok(body)
     }
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct GithubUserInfo {
-    pub login: String,
-    pub id: usize,
-    pub name: String,
+pub struct GoogleOauth2V3UserInfo {
+    pub sub: String,
+    pub picture: String,
     pub email: String,
 }
-impl UserInfo for GithubUserInfo {
+impl UserInfo for GoogleOauth2V3UserInfo {
     fn uid(&self) -> String {
-        self.id.to_string()
+        self.sub.to_owned()
     }
 
     fn name(&self) -> Option<String> {
-        Some(self.name.to_owned())
+        None
     }
 
     fn email(&self) -> Option<String> {
@@ -95,7 +97,7 @@ impl UserInfo for GithubUserInfo {
 }
 
 #[derive(thiserror::Error, Debug)]
-pub enum GithubUserInfoEndpointError {
+pub enum GoogleUserInfoEndpointError {
     #[error("MakeRequestFailed {0}")]
     MakeRequestFailed(HttpError),
     //
@@ -111,10 +113,10 @@ pub enum GithubUserInfoEndpointError {
 //
 #[cfg(feature = "with-authorization-code-grant")]
 #[async_trait]
-impl ProviderExtUserInfo for super::authorization_code_grant::GithubProviderWithWebApplication {
-    type Output = GithubUserInfo;
+impl ProviderExtUserInfo for super::authorization_code_grant::GoogleProviderForWebServerApps {
+    type Output = GoogleOauth2V3UserInfo;
 
-    type Error = GithubUserInfoEndpointError;
+    type Error = GoogleUserInfoEndpointError;
 
     async fn fetch_user_info<C2, C3>(
         &self,
@@ -129,14 +131,14 @@ impl ProviderExtUserInfo for super::authorization_code_grant::GithubProviderWith
         C2: Client + Send + Sync,
         C3: Client + Send + Sync,
     {
-        let endpoint = GithubUserInfoEndpoint::<Self>::new(token_source, token);
+        let endpoint = GoogleOauth2V3UserInfoEndpoint::<Self>::new(token_source, token);
 
         let user_info = client
             .respond_endpoint(&endpoint)
             .await
             .map_err(|err| match err {
                 ClientRespondEndpointError::RespondFailed(err) => {
-                    GithubUserInfoEndpointError::RespondFailed(Box::new(err))
+                    GoogleUserInfoEndpointError::RespondFailed(Box::new(err))
                 }
                 ClientRespondEndpointError::EndpointRenderRequestFailed(err) => err,
                 ClientRespondEndpointError::EndpointParseResponseFailed(err) => err,
@@ -152,12 +154,12 @@ mod tests {
 
     #[test]
     fn de_user_info() {
-        match serde_json::from_str::<GithubUserInfo>(include_str!(
-            "../tests/response_body_json_files/user.json"
+        match serde_json::from_str::<GoogleOauth2V3UserInfo>(include_str!(
+            "../tests/response_body_json_files/oauth2_v3.json"
         )) {
             Ok(user_info) => {
-                assert_eq!(user_info.uid(), "610852");
-                assert_eq!(user_info.name(), Some("vkill".to_owned()));
+                assert_eq!(user_info.uid(), "110578243643543721809");
+                assert_eq!(user_info.name(), None);
                 assert_eq!(user_info.email(), Some("vkill.net@gmail.com".to_owned()));
             }
             Err(err) => panic!("{}", err),
