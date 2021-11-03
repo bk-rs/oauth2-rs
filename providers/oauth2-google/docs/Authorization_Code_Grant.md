@@ -4,7 +4,7 @@ Ref [Using OAuth 2.0 for Web Server Applications](https://developers.google.com/
 
 ## Prerequisites
 
-Project name: "oauth2-lite-demo"
+Project name: "oauth2-rs-demo"
 
 ### Enable APIs
 
@@ -21,9 +21,9 @@ Click "Create credentials" => "OAuth client ID"
 ```
 Application type: Web application
 
-Name: oauth2-lite-web-app
+Name: oauth2-rs-web-app
 
-redirect URIs: https://oauth2-lite.lvh.me/auth/google/callback
+redirect URIs: https://oauth2-rs.lvh.me/auth/google/callback
 ```
 
 Download JSON (file name is client_secret_YOUR_CLIENT_ID.json)

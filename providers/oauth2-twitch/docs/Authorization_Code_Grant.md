@@ -13,10 +13,10 @@ Open https://dev.twitch.tv/console/apps
 Click "Register Your Application"
 
 ```
-Name: oauth2-lite-demo
+Name: oauth2-rs-demo
 
 # Note: Must use HTTPS protocol
-OAuth Redirect URLs: https://oauth2-lite.lvh.me/auth/twitch/callback
+OAuth Redirect URLs: https://oauth2-rs.lvh.me/auth/twitch/callback
 
 Category: Website Integration
 ```

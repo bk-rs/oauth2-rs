@@ -5,7 +5,9 @@ CAROOT=$(pwd)/mkcert mkcert -install
 
 RUST_BACKTRACE=1 RUST_LOG=trace cargo run -p oauth2_client_web_app_flow_demo
 
-open http://oauth2-lite.lvh.me/auth/github
+open http://oauth2-rs.lvh.me/auth/github
+
+open https://oauth2-rs.lvh.me/auth/google
 */
 
 use std::{collections::HashMap, env, error, fs, path::PathBuf, sync::Arc};

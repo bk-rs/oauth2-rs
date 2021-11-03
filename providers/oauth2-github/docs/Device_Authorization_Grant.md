@@ -11,11 +11,11 @@ Open https://github.com/settings/developers
 Click "New OAuth App"
 
 ```
-Application name: oauth2-lite-demo
+Application name: oauth2-rs-demo
 
-Homepage URL: http://oauth2-lite.lvh.me
+Homepage URL: http://oauth2-rs.lvh.me
 
-Authorization callback URL: http://oauth2-lite.lvh.me/auth/github/callback
+Authorization callback URL: http://oauth2-rs.lvh.me/auth/github/callback
 ```
 
 Click "Generate a new client secret" in app detail page

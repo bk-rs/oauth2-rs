@@ -4,7 +4,7 @@ Ref [OAuth 2.0 for TV and Limited-Input Device Applications](https://developers.
 
 ## Prerequisites
 
-Project name: "oauth2-lite-demo"
+Project name: "oauth2-rs-demo"
 
 ### Enable APIs
 
@@ -25,11 +25,11 @@ In tab "OAuth consent screen"
 ```
 App information:
 
-    name: oauth2-lite-demo
+    name: oauth2-rs-demo
 
 App domain:
 
-    home page: http://oauth2-lite.lvh.me
+    home page: http://oauth2-rs.lvh.me
 
 Authorized domains:
 
@@ -65,7 +65,7 @@ Click "Create credentials" => "OAuth client ID"
 ```
 Application type: TVs and Limited Input devices
 
-Name: oauth2-lite-device
+Name: oauth2-rs-device
 ```
 
 Download JSON (file name is client_secret_YOUR_CLIENT_ID.json)
