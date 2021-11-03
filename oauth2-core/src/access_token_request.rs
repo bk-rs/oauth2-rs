@@ -144,7 +144,7 @@ mod tests_with_authorization_code_grant {
     }
 }
 
-#[cfg(feature = "with-authorization-code-grant")]
+#[cfg(feature = "with-device-authorization-grant")]
 #[cfg(test)]
 mod tests_with_device_authorization_grant {
     use super::*;
