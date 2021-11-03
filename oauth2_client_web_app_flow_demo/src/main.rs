@@ -19,7 +19,9 @@ use oauth2_client::{
     provider::{serde_enum_str::Deserialize_enum_str, ClientId, ClientSecret, RedirectUri},
 };
 use oauth2_github::{GithubProviderWithWebApplication, GithubScope};
-use oauth2_google::{GoogleProviderForWebServerApps, GoogleScope};
+use oauth2_google::{
+    GoogleProviderForWebServerApps, GoogleProviderForWebServerAppsAccessType, GoogleScope,
+};
 use serde::Deserialize;
 
 #[tokio::main]
@@ -80,7 +82,11 @@ async fn run(
                     clients_config.google.client_id.to_owned(),
                     clients_config.google.client_secret.to_owned(),
                     clients_config.google.redirect_uri.to_owned(),
-                )?,
+                )?
+                .configure(|mut x| {
+                    x.access_type = Some(GoogleProviderForWebServerAppsAccessType::Offline);
+                    x.include_granted_scopes = Some(true);
+                }),
                 vec![GoogleScope::Email, GoogleScope::DriveFile],
             )),
         ),
@@ -176,6 +182,8 @@ pub mod filters {
                 .build_authorization_url(provider, scopes.to_owned(), state)
                 .unwrap(),
         };
+
+        info!("{:?} {:?}", provider_key, url.as_str());
 
         Ok(warp::redirect::temporary(
             url.as_str().parse::<Uri>().unwrap(),

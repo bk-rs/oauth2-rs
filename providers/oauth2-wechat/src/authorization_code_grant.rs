@@ -21,7 +21,7 @@ pub struct WeChatProviderWithWebApplication {
     appid: ClientId,
     secret: ClientSecret,
     redirect_uri: RedirectUri,
-    wechat_redirect: Option<bool>,
+    pub wechat_redirect: Option<bool>,
     //
     token_endpoint_url: Url,
     authorization_endpoint_url: Url,
@@ -42,8 +42,12 @@ impl WeChatProviderWithWebApplication {
         })
     }
 
-    pub fn enable_wechat_redirect(&mut self) {
-        self.wechat_redirect = Some(true);
+    pub fn configure<F>(mut self, mut f: F) -> Self
+    where
+        F: FnMut(&mut Self),
+    {
+        f(&mut self);
+        self
     }
 }
 impl Provider for WeChatProviderWithWebApplication {
@@ -317,12 +321,14 @@ mod tests {
 
     #[test]
     fn authorization_request() -> Result<(), Box<dyn error::Error>> {
-        let mut provider = WeChatProviderWithWebApplication::new(
+        let provider = WeChatProviderWithWebApplication::new(
             "APPID".to_owned(),
             "SECRET".to_owned(),
             RedirectUri::new("https://client.example.com/cb")?,
-        )?;
-        provider.enable_wechat_redirect();
+        )?
+        .configure(|x| {
+            x.wechat_redirect = Some(true);
+        });
 
         let endpoint = AuthorizationEndpoint::new(
             &provider,
