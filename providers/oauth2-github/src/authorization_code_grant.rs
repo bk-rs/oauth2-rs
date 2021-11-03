@@ -1,5 +1,5 @@
 use oauth2_client::{
-    provider::{ClientId, ClientSecret, RedirectUri, Url, UrlParseError},
+    provider::{ClientId, ClientSecret, Map, RedirectUri, Url, UrlParseError, Value},
     Provider, ProviderExtAuthorizationCodeGrant,
 };
 
@@ -51,6 +51,15 @@ impl ProviderExtAuthorizationCodeGrant for GithubProviderWithWebApplication {
 
     fn authorization_endpoint_url(&self) -> &Url {
         &self.authorization_endpoint_url
+    }
+
+    fn access_token_request_body_extensions(&self) -> Option<Map<String, Value>> {
+        let mut map = Map::new();
+        map.insert(
+            "client_secret".to_owned(),
+            Value::String(self.client_secret.to_owned()),
+        );
+        Some(map)
     }
 }
 

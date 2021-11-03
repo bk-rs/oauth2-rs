@@ -69,8 +69,14 @@ where
 
         let query = query.map_err(FlowHandleCallbackError::AuthorizationFailed)?;
 
-        if state.into() != query.state {
-            return Err(FlowHandleCallbackError::StateMismatch);
+        if let Some(ref state) = state.into() {
+            if let Some(query_state) = &query.state {
+                if state != query_state {
+                    return Err(FlowHandleCallbackError::StateMismatch);
+                }
+            } else {
+                return Err(FlowHandleCallbackError::StateMissing);
+            }
         }
 
         let access_token_endpoint = AccessTokenEndpoint::new(provider, query.code);
@@ -107,6 +113,8 @@ pub enum FlowHandleCallbackError {
     AuthorizationFailed(A_RES_ErrorQuery),
     #[error("StateMismatch")]
     StateMismatch,
+    #[error("StateMissing")]
+    StateMissing,
     //
     #[error("AccessTokenEndpointRespondFailed {0}")]
     AccessTokenEndpointRespondFailed(Box<dyn error::Error>),

@@ -1,9 +1,9 @@
 /*
 cp clients.toml.example clients.toml
 
-RUST_BACKTRACE=1 RUST_LOG=debug,isahc=off cargo run -p oauth2_client_web_app_flow_demo
+RUST_BACKTRACE=1 RUST_LOG=trace cargo run -p oauth2_client_web_app_flow_demo
 
-open http://127.0.0.1/auth/github
+open http://oauth2-lite.lvh.me/auth/github
 */
 
 use std::{collections::HashMap, env, error, fs, path::PathBuf, sync::Arc};
@@ -30,8 +30,6 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
 
     let clients_config_str = fs::read_to_string(clients_config_file)?;
     let clients_config: ClientsConfig = toml::from_str(&clients_config_str)?;
-
-    println!("{:?}", clients_config);
 
     run(clients_config).await
 }
@@ -79,8 +77,6 @@ async fn run(clients_config: ClientsConfig) -> Result<(), Box<dyn error::Error>>
     .into_iter()
     .collect();
 
-    println!("{:?}", provider_map);
-
     let ctx = Arc::new(Context { provider_map });
 
     let routes = filters::filters(ctx.clone());
@@ -124,10 +120,8 @@ pub mod filters {
 
     use std::sync::Arc;
 
-    use warp::{
-        http::{StatusCode, Uri},
-        Filter,
-    };
+    use log::info;
+    use warp::{http::Uri, Filter};
 
     pub fn filters(
         ctx: Arc<Context>,
@@ -151,7 +145,7 @@ pub mod filters {
     async fn auth_handler(
         provider_key: ProviderKey,
         ctx: Arc<Context>,
-    ) -> Result<Box<dyn warp::Reply>, warp::Rejection> {
+    ) -> Result<impl warp::Reply, warp::Rejection> {
         let provider_value = ctx.provider_map.get(&provider_key).unwrap();
 
         let state = "TODO".to_owned();
@@ -165,17 +159,43 @@ pub mod filters {
                 .unwrap(),
         };
 
-        Ok(Box::new(warp::redirect::temporary(
+        Ok(warp::redirect::temporary(
             url.as_str().parse::<Uri>().unwrap(),
-        )))
+        ))
     }
 
     async fn auth_callback_handler(
         provider_key: ProviderKey,
         query_raw: Option<String>,
         ctx: Arc<Context>,
-    ) -> Result<Box<dyn warp::Reply>, warp::Rejection> {
-        // TODO
-        Ok(Box::new(StatusCode::BAD_REQUEST))
+    ) -> Result<impl warp::Reply, warp::Rejection> {
+        let query_raw = query_raw.unwrap();
+
+        let provider_value = ctx.provider_map.get(&provider_key).unwrap();
+
+        let state = "TODO".to_owned();
+
+        match provider_value {
+            crate::ProviderValue::Github((flow, provider, _scopes)) => {
+                let access_token_body = flow
+                    .handle_callback(provider, query_raw, state)
+                    .await
+                    .unwrap();
+
+                info!("{:?} {:?}", provider_key, access_token_body);
+
+                Ok(warp::reply::html(format!("{:?}", access_token_body)))
+            }
+            crate::ProviderValue::Google((flow, provider, _scopes)) => {
+                let access_token_body = flow
+                    .handle_callback(provider, query_raw, state)
+                    .await
+                    .unwrap();
+
+                info!("{:?} {:?}", provider_key, access_token_body);
+
+                Ok(warp::reply::html(format!("{:?}", access_token_body)))
+            }
+        }
     }
 }
