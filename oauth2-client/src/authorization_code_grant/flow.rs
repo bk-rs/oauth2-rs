@@ -37,7 +37,7 @@ where
 
 impl<'a, C> Flow<C>
 where
-    C: Client + Send + Sync,
+    C: Client,
 {
     pub fn build_authorization_url<P>(
         &self,
@@ -46,14 +46,19 @@ where
         state: impl Into<Option<State>>,
     ) -> Result<Url, FlowBuildAuthorizationUrlError>
     where
-        P: ProviderExtAuthorizationCodeGrant + Send + Sync,
+        P: ProviderExtAuthorizationCodeGrant,
         <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
-        <P as Provider>::Scope: Serialize + Send + Sync,
+        <P as Provider>::Scope: Serialize,
     {
         // Step 1
         build_authorization_url(provider, scopes, state)
     }
+}
 
+impl<'a, C> Flow<C>
+where
+    C: Client + Send + Sync,
+{
     pub async fn handle_callback<P>(
         &self,
         provider: &'a P,
@@ -135,9 +140,9 @@ pub fn build_authorization_url<'a, P>(
     state: impl Into<Option<State>>,
 ) -> Result<Url, FlowBuildAuthorizationUrlError>
 where
-    P: ProviderExtAuthorizationCodeGrant + Send + Sync,
+    P: ProviderExtAuthorizationCodeGrant,
     <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
-    <P as Provider>::Scope: Serialize + Send + Sync,
+    <P as Provider>::Scope: Serialize,
 {
     let scopes = scopes.into().or(provider.scopes_default());
 

@@ -19,3 +19,6 @@ pub use provider::Provider;
 pub use authorization_code_grant::provider_ext::ProviderExtAuthorizationCodeGrant;
 #[cfg(feature = "with-device-authorization-grant")]
 pub use device_authorization_grant::provider_ext::ProviderExtDeviceAuthorizationGrant;
+
+#[cfg(feature = "with-user-info")]
+pub use user_info::provider_ext::ProviderExtUserInfo;

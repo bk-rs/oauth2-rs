@@ -15,4 +15,6 @@ pub use authorization_endpoint::{
 #[cfg(feature = "with-flow")]
 pub mod flow;
 #[cfg(feature = "with-flow")]
-pub use flow::{build_authorization_url, Flow, FlowBuildAuthorizationUrlError};
+pub use flow::{
+    build_authorization_url, Flow, FlowBuildAuthorizationUrlError, FlowHandleCallbackError,
+};

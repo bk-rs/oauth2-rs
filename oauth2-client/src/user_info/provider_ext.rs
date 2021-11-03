@@ -16,7 +16,7 @@ pub trait ProviderExtUserInfo: Provider {
         token_source: AccessTokenResponseSuccessfulBodySource,
         token: &AccessTokenResponseSuccessfulBody<<Self as Provider>::Scope>,
         client: &C2,
-        another_client: &C3,
+        _: &C3,
     ) -> Result<Self::Output, Self::Error>
     where
         <Self::Scope as str::FromStr>::Err: fmt::Display,

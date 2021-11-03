@@ -3,7 +3,7 @@ pub use http_api_endpoint::{
     http::{self, Error as HttpError},
     Body, Request, Response,
 };
-pub use serde;
+pub use serde::{self, de::DeserializeOwned, Serialize};
 pub use serde_enum_str;
 pub use serde_json::{self, Error as SerdeJsonError, Map, Value};
 pub use serde_urlencoded::{self, ser::Error as SerdeUrlencodedSerError};
