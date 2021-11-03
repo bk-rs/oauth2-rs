@@ -6,6 +6,10 @@
 use http::Method;
 use mime::Mime;
 use serde::{Deserialize, Serialize};
+#[cfg(any(
+    feature = "with-authorization-code-grant",
+    feature = "with-device-authorization-grant"
+))]
 use serde_json::{Map, Value};
 #[cfg(any(feature = "with-authorization-code-grant",))]
 use url::Url;
@@ -53,6 +57,7 @@ pub struct BodyWithAuthorizationCodeGrant {
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     _extensions: Option<Map<String, Value>>,
 }
+#[cfg(feature = "with-authorization-code-grant")]
 impl BodyWithAuthorizationCodeGrant {
     pub fn new(
         code: Code,
@@ -93,6 +98,7 @@ pub struct BodyWithDeviceAuthorizationGrant {
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     _extensions: Option<Map<String, Value>>,
 }
+#[cfg(feature = "with-device-authorization-grant")]
 impl BodyWithDeviceAuthorizationGrant {
     pub fn new(
         device_code: String,
@@ -115,13 +121,13 @@ impl BodyWithDeviceAuthorizationGrant {
     }
 }
 
+#[cfg(feature = "with-authorization-code-grant")]
 #[cfg(test)]
-mod tests {
+mod tests_with_authorization_code_grant {
     use super::*;
 
-    #[cfg(feature = "with-authorization-code-grant")]
     #[test]
-    fn ser_de_with_authorization_code_grant() {
+    fn ser_de() {
         let body_str = "grant_type=authorization_code&code=SplxlOBeZQQYbYS6WxSbIA&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb";
         match serde_urlencoded::from_str::<Body>(body_str) {
             Ok(Body::AuthorizationCodeGrant(body)) => {
@@ -136,10 +142,15 @@ mod tests {
             Err(err) => panic!("{}", err),
         }
     }
+}
 
-    #[cfg(feature = "with-device-authorization-grant")]
+#[cfg(feature = "with-authorization-code-grant")]
+#[cfg(test)]
+mod tests_with_device_authorization_grant {
+    use super::*;
+
     #[test]
-    fn ser_de_with_device_authorization_grant() {
+    fn ser_de() {
         let body_str = "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Adevice_code&device_code=GmRhmhcxhwAzkoEqiMEg_DnyEysNkuNhszIySk9eS&client_id=1406020730";
         match serde_urlencoded::from_str::<Body>(body_str) {
             Ok(Body::DeviceAuthorizationGrant(body)) => {
@@ -160,9 +171,8 @@ mod tests {
         }
     }
 
-    #[cfg(feature = "with-device-authorization-grant")]
     #[test]
-    fn ser_de_extensions_with_device_authorization_grant() {
+    fn ser_de_extensions() {
         //
         let mut extensions = Map::new();
         extensions.insert("foo".to_owned(), Value::String("bar".to_owned()));
