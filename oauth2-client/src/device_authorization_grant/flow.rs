@@ -1,7 +1,8 @@
 use std::{error, fmt, io, str};
 
 use http_api_client::{
-    ClientRespondEndpointError, RetryableClient, RetryableClientRespondEndpointUntilDoneError,
+    Client, ClientRespondEndpointError, RetryableClient,
+    RetryableClientRespondEndpointUntilDoneError,
 };
 use oauth2_core::device_authorization_grant::{
     device_access_token_response::{
@@ -21,24 +22,31 @@ use super::{
 };
 
 #[derive(Debug, Clone)]
-pub struct Flow<C>
+pub struct Flow<C1, C2>
 where
-    C: RetryableClient,
+    C1: Client,
+    C2: RetryableClient,
 {
-    client: C,
+    client_with_auth: C1,
+    client_with_token: C2,
 }
-impl<C> Flow<C>
+impl<C1, C2> Flow<C1, C2>
 where
-    C: RetryableClient,
+    C1: Client,
+    C2: RetryableClient,
 {
-    pub fn new(client: C) -> Self {
-        Self { client }
+    pub fn new(client_with_auth: C1, client_with_token: C2) -> Self {
+        Self {
+            client_with_auth,
+            client_with_token,
+        }
     }
 }
 
-impl<'a, C> Flow<C>
+impl<'a, C1, C2> Flow<C1, C2>
 where
-    C: RetryableClient + Send + Sync,
+    C1: Client + Send + Sync,
+    C2: RetryableClient + Send + Sync,
 {
     pub async fn execute<P, UI>(
         &self,
@@ -56,7 +64,7 @@ where
         let device_authorization_endpoint = DeviceAuthorizationEndpoint::new(provider, scopes);
 
         let device_authorization_ret = self
-            .client
+            .client_with_auth
             .respond_endpoint(&device_authorization_endpoint)
             .await
             .map_err(|err| match err {
@@ -93,7 +101,7 @@ where
         );
 
         let device_access_token_ret = self
-            .client
+            .client_with_token
             .respond_endpoint_until_done(&device_access_token_endpoint)
             .await
             .map_err(|err| match err {

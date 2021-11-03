@@ -20,8 +20,7 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
 async fn run(client_id: String) -> Result<(), Box<dyn error::Error>> {
     let scopes = vec![GithubScope::PublicRepo, GithubScope::UserEmail];
 
-    let client = IsahcClient::new()?;
-    let flow = Flow::new(client);
+    let flow = Flow::new(IsahcClient::new()?, IsahcClient::new()?);
     let provider = GithubProviderWithDevice::new(client_id)?;
 
     let access_token_body = flow

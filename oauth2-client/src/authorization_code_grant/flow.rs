@@ -24,14 +24,14 @@ pub struct Flow<C>
 where
     C: Client,
 {
-    client: C,
+    client_with_token: C,
 }
 impl<C> Flow<C>
 where
     C: Client,
 {
-    pub fn new(client: C) -> Self {
-        Self { client }
+    pub fn new(client_with_token: C) -> Self {
+        Self { client_with_token }
     }
 }
 
@@ -50,6 +50,7 @@ where
         <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
         <P as Provider>::Scope: Serialize + Send + Sync,
     {
+        // Step 1
         build_authorization_url(provider, scopes, state)
     }
 
@@ -64,6 +65,7 @@ where
         <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
         <P as Provider>::Scope: DeserializeOwned + Send + Sync,
     {
+        // Step 3
         let query = parse_redirect_uri_query(query.as_ref())
             .map_err(FlowHandleCallbackError::ParseRedirectUriQueryError)?;
 
@@ -82,7 +84,7 @@ where
         let access_token_endpoint = AccessTokenEndpoint::new(provider, query.code);
 
         let access_token_ret = self
-            .client
+            .client_with_token
             .respond_endpoint(&access_token_endpoint)
             .await
             .map_err(|err| match err {

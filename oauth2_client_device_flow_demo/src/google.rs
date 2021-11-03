@@ -21,8 +21,7 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
 async fn run(client_id: String, client_secret: String) -> Result<(), Box<dyn error::Error>> {
     let scopes = vec![GoogleScope::Email, GoogleScope::DriveFile];
 
-    let client = IsahcClient::new()?;
-    let flow = Flow::new(client);
+    let flow = Flow::new(IsahcClient::new()?, IsahcClient::new()?);
     let provider = GoogleProviderForTvAndDeviceApps::new(client_id, client_secret)?;
 
     let access_token_body = flow
