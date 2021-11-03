@@ -1,0 +1,9 @@
+[github]
+client_id = "xxx"
+client_secret = "xxx"
+redirect_uri = "http://oauth2-lite.lvh.me/auth/github/callback"
+
+[google]
+client_id = "xxx"
+client_secret = "xxx"
+redirect_uri = "https://oauth2-lite.lvh.me/auth/google/callback"

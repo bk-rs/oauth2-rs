@@ -1,5 +1,7 @@
 /*
-cp clients.toml.example clients.toml
+cp config/clients.toml.example config/clients.toml
+
+CAROOT=$(pwd)/mkcert mkcert -install
 
 RUST_BACKTRACE=1 RUST_LOG=trace cargo run -p oauth2_client_web_app_flow_demo
 
@@ -8,6 +10,7 @@ open http://oauth2-lite.lvh.me/auth/github
 
 use std::{collections::HashMap, env, error, fs, path::PathBuf, sync::Arc};
 
+use futures_util::future;
 use http_api_isahc_client::IsahcClient;
 use oauth2_client::{
     authorization_code_grant::Flow,
@@ -26,12 +29,14 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     } else {
         PathBuf::new()
     };
-    let clients_config_file = manifest_path.join("clients.toml");
+    let clients_config_path = manifest_path.join("config/clients.toml");
+    let tls_cert_path = manifest_path.join("mkcert/oauth2-rs.lvh.me.pem");
+    let tls_key_path = manifest_path.join("mkcert/oauth2-rs.lvh.me-key.pem");
 
-    let clients_config_str = fs::read_to_string(clients_config_file)?;
+    let clients_config_str = fs::read_to_string(clients_config_path)?;
     let clients_config: ClientsConfig = toml::from_str(&clients_config_str)?;
 
-    run(clients_config).await
+    run(clients_config, tls_cert_path, tls_key_path).await
 }
 
 #[derive(Deserialize, Debug)]
@@ -47,7 +52,11 @@ struct ClientConfig {
     redirect_uri: RedirectUri,
 }
 
-async fn run(clients_config: ClientsConfig) -> Result<(), Box<dyn error::Error>> {
+async fn run(
+    clients_config: ClientsConfig,
+    tls_cert_path: PathBuf,
+    tls_key_path: PathBuf,
+) -> Result<(), Box<dyn error::Error>> {
     let provider_map: HashMap<ProviderKey, ProviderValue> = vec![
         (
             ProviderKey::Github,
@@ -80,7 +89,14 @@ async fn run(clients_config: ClientsConfig) -> Result<(), Box<dyn error::Error>>
     let ctx = Arc::new(Context { provider_map });
 
     let routes = filters::filters(ctx.clone());
-    warp::serve(routes).run(([127, 0, 0, 1], 80)).await;
+    let server_http = warp::serve(routes.clone()).run(([127, 0, 0, 1], 80));
+    let server_https = warp::serve(routes)
+        .tls()
+        .cert_path(tls_cert_path)
+        .key_path(tls_key_path)
+        .run(([127, 0, 0, 1], 443));
+
+    future::join(server_http, server_https).await;
 
     Ok(())
 }
