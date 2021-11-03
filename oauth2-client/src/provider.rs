@@ -1,4 +1,5 @@
 pub use http_api_endpoint::{
+    self,
     http::{self, Error as HttpError},
     Body, Request, Response,
 };

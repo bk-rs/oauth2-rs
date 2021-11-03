@@ -61,6 +61,8 @@ where
         UI: FnOnce(UserCode, VerificationUri, Option<VerificationUriComplete>),
     {
         // Step 1
+        let scopes = scopes.into().or(provider.scopes_default());
+
         let device_authorization_endpoint = DeviceAuthorizationEndpoint::new(provider, scopes);
 
         let device_authorization_ret = self

@@ -70,6 +70,10 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
         Some(&self.redirect_uri)
     }
 
+    fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
+        Some(vec![WeChatScope::SnsapiLogin])
+    }
+
     fn authorization_endpoint_url(&self) -> &Url {
         &self.authorization_endpoint_url
     }

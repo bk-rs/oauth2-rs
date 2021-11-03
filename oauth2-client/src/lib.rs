@@ -9,6 +9,9 @@ pub mod authorization_code_grant;
 #[cfg(feature = "with-device-authorization-grant")]
 pub mod device_authorization_grant;
 
+#[cfg(feature = "with-user-info")]
+pub mod user_info;
+
 //
 pub use provider::Provider;
 

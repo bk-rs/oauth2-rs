@@ -49,6 +49,10 @@ impl ProviderExtAuthorizationCodeGrant for GithubProviderWithWebApplication {
         Some(&self.redirect_uri)
     }
 
+    fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
+        Some(vec![GithubScope::ReadUser, GithubScope::UserEmail])
+    }
+
     fn authorization_endpoint_url(&self) -> &Url {
         &self.authorization_endpoint_url
     }

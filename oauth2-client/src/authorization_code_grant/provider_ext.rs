@@ -27,6 +27,10 @@ where
 {
     fn redirect_uri(&self) -> Option<&RedirectUri>;
 
+    fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
+        None
+    }
+
     fn authorization_endpoint_url(&self) -> &Url;
 
     fn authorization_request_query_extensions(&self) -> Option<Map<String, Value>> {

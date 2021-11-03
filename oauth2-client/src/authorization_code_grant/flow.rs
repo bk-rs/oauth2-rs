@@ -139,6 +139,8 @@ where
     <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
     <P as Provider>::Scope: Serialize + Send + Sync,
 {
+    let scopes = scopes.into().or(provider.scopes_default());
+
     let authorization_endpoint = AuthorizationEndpoint::new(provider, scopes, state);
 
     let authorization_endpoint_request = authorization_endpoint

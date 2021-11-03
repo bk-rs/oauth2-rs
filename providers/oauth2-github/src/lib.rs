@@ -7,6 +7,8 @@ pub const TOKEN_URL: &str = "https://github.com/login/oauth/access_token";
 pub const AUTHORIZATION_URL: &str = "https://github.com/login/oauth/authorize";
 pub const DEVICE_AUTHORIZATION_URL: &str = "https://github.com/login/device/code";
 
+pub const USER_INFO_URL: &str = "https://api.github.com/user";
+
 #[cfg(feature = "with-authorization-code-grant")]
 pub mod authorization_code_grant;
 #[cfg(feature = "with-device-authorization-grant")]
@@ -16,6 +18,13 @@ pub mod device_authorization_grant;
 pub use authorization_code_grant::GithubProviderWithWebApplication;
 #[cfg(feature = "with-device-authorization-grant")]
 pub use device_authorization_grant::GithubProviderWithDevice;
+
+#[cfg(any(
+    feature = "with-authorization-code-grant",
+    feature = "with-device-authorization-grant"
+))]
+#[cfg(feature = "with-user-info")]
+pub mod user_info;
 
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
 pub enum GithubScope {
