@@ -99,7 +99,7 @@ where
             body.refresh_token.to_owned(),
             body.scope
                 .to_owned()
-                .map(|x| x.0.iter().map(|y| y.to_string()).collect::<Vec<_>>().into()),
+                .map(|x| ScopeParameter::<String>::from(&x)),
         );
         if let Some(extensions) = body.extensions() {
             this.set_extensions(extensions.to_owned());

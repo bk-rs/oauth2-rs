@@ -89,12 +89,36 @@ where
             .split(split_char)
             .map(|x| T::from_str(x))
             .collect::<Result<Vec<_>, _>>()
-            .map_err(|err| de::Error::custom(err.to_string()))?;
+            .map_err(|err| de::Error::custom(ScopeFromStrError(err.to_string())))?;
         Ok(ScopeParameter(inner))
     }
 }
 
 //
+impl<T> From<&ScopeParameter<T>> for ScopeParameter<String>
+where
+    T: Scope,
+{
+    fn from(v: &ScopeParameter<T>) -> Self {
+        v.0.iter().map(|y| y.to_string()).collect::<Vec<_>>().into()
+    }
+}
+
+impl<T> ScopeParameter<T>
+where
+    T: Scope,
+    <T as str::FromStr>::Err: fmt::Display,
+{
+    pub fn try_from_t_with_string(v: &ScopeParameter<String>) -> Result<Self, ScopeFromStrError> {
+        Ok(v.0
+            .iter()
+            .map(|y| T::from_str(y))
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|err| ScopeFromStrError(err.to_string()))?
+            .into())
+    }
+}
+
 #[derive(Debug)]
 pub struct ScopeFromStrError(pub String);
 impl fmt::Display for ScopeFromStrError {

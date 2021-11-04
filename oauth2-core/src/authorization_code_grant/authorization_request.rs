@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 use url::Url;
 
-use crate::types::{ClientId, Scope, ScopeParameter, State};
+use crate::types::{ClientId, Scope, ScopeFromStrError, ScopeParameter, State};
 
 pub const METHOD: Method = Method::GET;
 pub const RESPONSE_TYPE: &str = "code";
@@ -58,15 +58,9 @@ where
         self._extensions.as_ref()
     }
 
-    pub fn try_from_t_with_string(query: &Query<String>) -> Result<Self, String> {
+    pub fn try_from_t_with_string(query: &Query<String>) -> Result<Self, ScopeFromStrError> {
         let scope = if let Some(x) = &query.scope {
-            Some(
-                x.0.iter()
-                    .map(|y| SCOPE::from_str(y))
-                    .collect::<Result<Vec<_>, _>>()
-                    .map_err(|err| err.to_string())?
-                    .into(),
-            )
+            Some(ScopeParameter::<SCOPE>::try_from_t_with_string(x)?)
         } else {
             None
         };
@@ -95,7 +89,7 @@ where
             query
                 .scope
                 .to_owned()
-                .map(|x| x.0.iter().map(|y| y.to_string()).collect::<Vec<_>>().into()),
+                .map(|x| ScopeParameter::<String>::from(&x)),
             query.state.to_owned(),
         );
         if let Some(extensions) = query.extensions() {

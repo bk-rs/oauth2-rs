@@ -142,7 +142,7 @@ where
             match AuthorizationRequestQuery::<<P as Provider>::Scope>::try_from_t_with_string(query)
             {
                 Ok(x) => x,
-                Err(err) => return Some(Err(Box::new(ScopeFromStrError(err)))),
+                Err(err) => return Some(Err(Box::new(err))),
             };
 
         self.inner.authorization_request_query_serializing(&query)
