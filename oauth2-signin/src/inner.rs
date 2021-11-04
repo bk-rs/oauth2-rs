@@ -128,8 +128,7 @@ impl SigninFlow {
         scopes: impl Into<Option<Vec<String>>>,
         state: impl Into<Option<State>>,
     ) -> Result<Url, FlowBuildAuthorizationUrlError> {
-        // self.flow
-        //     .build_authorization_url(self.provider.as_ref(), scopes, state)
-        todo!()
+        self.flow
+            .build_authorization_url_with_dyn_provider(self.provider.as_ref(), scopes, state)
     }
 }

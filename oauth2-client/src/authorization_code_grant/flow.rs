@@ -18,7 +18,7 @@ use crate::{Provider, ProviderExtAuthorizationCodeGrant};
 
 use super::{
     parse_redirect_uri_query, AccessTokenEndpoint, AccessTokenEndpointError, AuthorizationEndpoint,
-    AuthorizationEndpointError, ParseRedirectUriQueryError,
+    AuthorizationEndpointError, AuthorizationEndpointWithDynProvider, ParseRedirectUriQueryError,
 };
 
 #[derive(Debug, Clone)]
@@ -54,6 +54,16 @@ where
     {
         // Step 1
         build_authorization_url(provider, scopes, state)
+    }
+
+    pub fn build_authorization_url_with_dyn_provider(
+        &self,
+        provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = String>,
+        scopes: impl Into<Option<Vec<String>>>,
+        state: impl Into<Option<State>>,
+    ) -> Result<Url, FlowBuildAuthorizationUrlError> {
+        // Step 1
+        build_authorization_url_with_dyn_provider(provider, scopes, state)
     }
 }
 
@@ -149,6 +159,27 @@ where
     let scopes = scopes.into().or(provider.scopes_default());
 
     let authorization_endpoint = AuthorizationEndpoint::new(provider, scopes, state);
+
+    let authorization_endpoint_request = authorization_endpoint
+        .render_request()
+        .map_err(FlowBuildAuthorizationUrlError::AuthorizationEndpointError)?;
+
+    let url = authorization_endpoint_request.uri();
+
+    let url = Url::parse(url.to_string().as_str())
+        .map_err(FlowBuildAuthorizationUrlError::ToUrlFailed)?;
+
+    Ok(url)
+}
+
+pub fn build_authorization_url_with_dyn_provider<'a>(
+    provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = String>,
+    scopes: impl Into<Option<Vec<String>>>,
+    state: impl Into<Option<State>>,
+) -> Result<Url, FlowBuildAuthorizationUrlError> {
+    let scopes = scopes.into().or(provider.scopes_default());
+
+    let authorization_endpoint = AuthorizationEndpointWithDynProvider::new(provider, scopes, state);
 
     let authorization_endpoint_request = authorization_endpoint
         .render_request()

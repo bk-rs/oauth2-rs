@@ -45,12 +45,86 @@ where
     }
 }
 
+pub struct AuthorizationEndpointWithDynProvider<'a> {
+    provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = String>,
+    scopes: Option<Vec<String>>,
+    state: Option<State>,
+}
+impl<'a> AuthorizationEndpointWithDynProvider<'a> {
+    pub fn new(
+        provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = String>,
+        scopes: impl Into<Option<Vec<String>>>,
+        state: impl Into<Option<State>>,
+    ) -> Self {
+        Self {
+            provider,
+            scopes: scopes.into(),
+            state: state.into(),
+        }
+    }
+}
+
 impl<'a, P> Endpoint for AuthorizationEndpoint<'a, P>
 where
     P: ProviderExtAuthorizationCodeGrant,
     <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
     <P as Provider>::Scope: Serialize,
 {
+    type RenderRequestError = AuthorizationEndpointError;
+
+    type ParseResponseOutput = ();
+    type ParseResponseError = Infallible;
+
+    fn render_request(&self) -> Result<Request<Body>, Self::RenderRequestError> {
+        let mut query = REQ_Query::new(
+            self.provider
+                .client_id()
+                .cloned()
+                .ok_or_else(|| AuthorizationEndpointError::ClientIdMissing)?,
+            self.provider.redirect_uri().map(|x| x.url().to_owned()),
+            self.scopes.to_owned().map(Into::into),
+            self.state.to_owned(),
+        );
+        if let Some(extensions) = self.provider.authorization_request_query_extensions() {
+            query.set_extensions(extensions);
+        }
+
+        let query_str = if let Some(query_str_ret) = self
+            .provider
+            .authorization_request_query_serializing(&query)
+        {
+            query_str_ret
+                .map_err(|err| AuthorizationEndpointError::CustomSerRequestQueryFailed(err))?
+        } else {
+            serde_qs::to_string(&query)
+                .map_err(AuthorizationEndpointError::SerRequestQueryFailed)?
+        };
+
+        let mut url = self.provider.authorization_endpoint_url().to_owned();
+        url.set_query(Some(query_str.as_str()));
+
+        //
+        self.provider.authorization_request_url_modifying(&mut url);
+
+        //
+        let request = Request::builder()
+            .method(REQ_METHOD)
+            .uri(url.as_str())
+            .body(vec![])
+            .map_err(AuthorizationEndpointError::MakeRequestFailed)?;
+
+        Ok(request)
+    }
+
+    fn parse_response(
+        &self,
+        _response: Response<Body>,
+    ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
+        unreachable!()
+    }
+}
+
+impl<'a> Endpoint for AuthorizationEndpointWithDynProvider<'a> {
     type RenderRequestError = AuthorizationEndpointError;
 
     type ParseResponseOutput = ();
