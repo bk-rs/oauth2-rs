@@ -9,7 +9,7 @@ use oauth2_core::{
             ErrorQuery as RES_ErrorQuery, SuccessfulQuery as RES_SuccessfulQuery,
         },
     },
-    types::State,
+    types::{Scope, State},
 };
 use serde::Serialize;
 use serde_json::{Map, Value};
@@ -45,15 +45,23 @@ where
     }
 }
 
-pub struct AuthorizationEndpointWithDynProvider<'a> {
-    provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = String>,
-    scopes: Option<Vec<String>>,
+pub struct AuthorizationEndpointWithDynProvider<'a, SCOPE>
+where
+    SCOPE: Scope,
+    <SCOPE as str::FromStr>::Err: fmt::Display,
+{
+    provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
+    scopes: Option<Vec<SCOPE>>,
     state: Option<State>,
 }
-impl<'a> AuthorizationEndpointWithDynProvider<'a> {
+impl<'a, SCOPE> AuthorizationEndpointWithDynProvider<'a, SCOPE>
+where
+    SCOPE: Scope,
+    <SCOPE as str::FromStr>::Err: fmt::Display,
+{
     pub fn new(
-        provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = String>,
-        scopes: impl Into<Option<Vec<String>>>,
+        provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
+        scopes: impl Into<Option<Vec<SCOPE>>>,
         state: impl Into<Option<State>>,
     ) -> Self {
         Self {
@@ -124,7 +132,12 @@ where
     }
 }
 
-impl<'a> Endpoint for AuthorizationEndpointWithDynProvider<'a> {
+impl<'a, SCOPE> Endpoint for AuthorizationEndpointWithDynProvider<'a, SCOPE>
+where
+    SCOPE: Scope,
+    <SCOPE as str::FromStr>::Err: fmt::Display,
+    SCOPE: Serialize,
+{
     type RenderRequestError = AuthorizationEndpointError;
 
     type ParseResponseOutput = ();

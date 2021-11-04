@@ -9,7 +9,7 @@ use oauth2_core::{
         },
         authorization_response::ErrorQuery as A_RES_ErrorQuery,
     },
-    types::State,
+    types::{Scope, State},
 };
 use serde::{de::DeserializeOwned, Serialize};
 use url::{ParseError as UrlParseError, Url};
@@ -56,12 +56,17 @@ where
         build_authorization_url(provider, scopes, state)
     }
 
-    pub fn build_authorization_url_with_dyn_provider(
+    pub fn build_authorization_url_with_dyn_provider<SCOPE>(
         &self,
-        provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = String>,
-        scopes: impl Into<Option<Vec<String>>>,
+        provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
+        scopes: impl Into<Option<Vec<SCOPE>>>,
         state: impl Into<Option<State>>,
-    ) -> Result<Url, FlowBuildAuthorizationUrlError> {
+    ) -> Result<Url, FlowBuildAuthorizationUrlError>
+    where
+        SCOPE: Scope,
+        <SCOPE as str::FromStr>::Err: fmt::Display,
+        SCOPE: Serialize,
+    {
         // Step 1
         build_authorization_url_with_dyn_provider(provider, scopes, state)
     }
@@ -172,11 +177,16 @@ where
     Ok(url)
 }
 
-pub fn build_authorization_url_with_dyn_provider<'a>(
-    provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = String>,
-    scopes: impl Into<Option<Vec<String>>>,
+pub fn build_authorization_url_with_dyn_provider<'a, SCOPE>(
+    provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
+    scopes: impl Into<Option<Vec<SCOPE>>>,
     state: impl Into<Option<State>>,
-) -> Result<Url, FlowBuildAuthorizationUrlError> {
+) -> Result<Url, FlowBuildAuthorizationUrlError>
+where
+    SCOPE: Scope,
+    <SCOPE as str::FromStr>::Err: fmt::Display,
+    SCOPE: Serialize,
+{
     let scopes = scopes.into().or(provider.scopes_default());
 
     let authorization_endpoint = AuthorizationEndpointWithDynProvider::new(provider, scopes, state);
