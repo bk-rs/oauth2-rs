@@ -117,7 +117,7 @@ mod tests {
     use std::error;
 
     use oauth2_client::{
-        authorization_code_grant::{AccessTokenEndpoint, AuthorizationEndpoint},
+        authorization_code_grant::{authorization_endpoint, AccessTokenEndpoint},
         re_exports::Endpoint as _,
     };
 
@@ -133,13 +133,11 @@ mod tests {
             x.include_granted_scopes = Some(true);
         });
 
-        let endpoint = AuthorizationEndpoint::new(
+        let request = authorization_endpoint::render_request(
             &provider,
             vec![GoogleScope::Email],
             "ixax8kolzut108e1q5bgtm1er9xmklkn".to_owned(),
-        );
-
-        let request = endpoint.render_request()?;
+        )?;
 
         assert_eq!(request.uri(), "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=APPID&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&scope=email&state=ixax8kolzut108e1q5bgtm1er9xmklkn&access_type=offline&include_granted_scopes=true");
 

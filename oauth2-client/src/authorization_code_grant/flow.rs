@@ -1,7 +1,6 @@
 use std::{error, fmt, str};
 
 use http_api_client::{Client, ClientRespondEndpointError};
-use http_api_endpoint::Endpoint;
 use oauth2_core::{
     authorization_code_grant::{
         access_token_response::{
@@ -17,8 +16,8 @@ use url::{ParseError as UrlParseError, Url};
 use crate::{Provider, ProviderExtAuthorizationCodeGrant};
 
 use super::{
-    parse_redirect_uri_query, AccessTokenEndpoint, AccessTokenEndpointError, AuthorizationEndpoint,
-    AuthorizationEndpointError, ParseRedirectUriQueryError,
+    authorization_endpoint, parse_redirect_uri_query, AccessTokenEndpoint,
+    AccessTokenEndpointError, AuthorizationEndpointError, ParseRedirectUriQueryError,
 };
 
 #[derive(Debug, Clone)]
@@ -142,17 +141,14 @@ pub fn build_authorization_url<'a, SCOPE>(
     state: impl Into<Option<State>>,
 ) -> Result<Url, FlowBuildAuthorizationUrlError>
 where
-    SCOPE: Scope,
+    SCOPE: Scope + Serialize,
     <SCOPE as str::FromStr>::Err: fmt::Display,
-    SCOPE: Serialize,
 {
     let scopes = scopes.into().or(provider.scopes_default());
 
-    let authorization_endpoint = AuthorizationEndpoint::new(provider, scopes, state);
-
-    let authorization_endpoint_request = authorization_endpoint
-        .render_request()
-        .map_err(FlowBuildAuthorizationUrlError::AuthorizationEndpointError)?;
+    let authorization_endpoint_request =
+        authorization_endpoint::render_request(provider, scopes, state)
+            .map_err(FlowBuildAuthorizationUrlError::AuthorizationEndpointError)?;
 
     let url = authorization_endpoint_request.uri();
 
