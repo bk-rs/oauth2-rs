@@ -5,7 +5,7 @@ pub mod access_token_endpoint;
 pub mod authorization_endpoint;
 pub mod provider_ext;
 
-pub use access_token_endpoint::{AccessTokenEndpoint, AccessTokenEndpointError};
+pub use access_token_endpoint::AccessTokenEndpointError;
 pub use authorization_endpoint::{
     parse_redirect_uri_query, AuthorizationEndpointError, ParseRedirectUriQueryError,
 };

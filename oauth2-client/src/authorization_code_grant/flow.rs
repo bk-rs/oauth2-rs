@@ -1,6 +1,6 @@
 use std::{error, fmt, str};
 
-use http_api_client::{Client, ClientRespondEndpointError};
+use http_api_client::Client;
 use oauth2_core::{
     authorization_code_grant::{
         access_token_response::{
@@ -16,7 +16,7 @@ use url::{ParseError as UrlParseError, Url};
 use crate::{Provider, ProviderExtAuthorizationCodeGrant};
 
 use super::{
-    authorization_endpoint, parse_redirect_uri_query, AccessTokenEndpoint,
+    access_token_endpoint, authorization_endpoint, parse_redirect_uri_query,
     AccessTokenEndpointError, AuthorizationEndpointError, ParseRedirectUriQueryError,
 };
 
@@ -87,23 +87,21 @@ where
             }
         }
 
-        let access_token_endpoint = AccessTokenEndpoint::new(provider, query.code);
+        let access_token_endpoint_request =
+            access_token_endpoint::render_request(provider, query.code)
+                .map_err(FlowHandleCallbackError::AccessTokenEndpointError)?;
 
-        let access_token_ret = self
+        let access_token_endpoint_response = self
             .client_with_token
-            .respond_endpoint(&access_token_endpoint)
+            .respond(access_token_endpoint_request)
             .await
-            .map_err(|err| match err {
-                ClientRespondEndpointError::RespondFailed(err) => {
-                    FlowHandleCallbackError::AccessTokenEndpointRespondFailed(Box::new(err))
-                }
-                ClientRespondEndpointError::EndpointRenderRequestFailed(err) => {
-                    FlowHandleCallbackError::AccessTokenEndpointError(err)
-                }
-                ClientRespondEndpointError::EndpointParseResponseFailed(err) => {
-                    FlowHandleCallbackError::AccessTokenEndpointError(err)
-                }
+            .map_err(|err| {
+                FlowHandleCallbackError::AccessTokenEndpointRespondFailed(Box::new(err))
             })?;
+
+        let access_token_ret =
+            access_token_endpoint::parse_response(provider, access_token_endpoint_response)
+                .map_err(FlowHandleCallbackError::AccessTokenEndpointError)?;
 
         let access_token_successful_body =
             access_token_ret.map_err(FlowHandleCallbackError::AccessTokenFailed)?;
