@@ -2,15 +2,13 @@ use std::{error, str::FromStr};
 
 use oauth2_client::{
     authorization_code_grant::provider_ext::{
-        serde_qs, AccessTokenResponseErrorBody, AccessTokenResponseSuccessfulBody,
-        AuthorizationRequestQuery, SerdeQsError,
+        AccessTokenResponseErrorBody, AccessTokenResponseSuccessfulBody, AuthorizationRequestQuery,
     },
     re_exports::{
-        oauth2_core::access_token_request::GRANT_TYPE_WITH_AUTHORIZATION_CODE_GRANT,
-        serde::{Deserialize, Serialize},
-        serde_json, thiserror, AccessTokenRequestBody, AccessTokenResponseErrorBodyError,
-        AccessTokenType, Body, ClientId, ClientSecret, HttpError, Map, RedirectUri, Request,
-        Response, SerdeJsonError, Url, UrlParseError, Value,
+        oauth2_core::access_token_request::GRANT_TYPE_WITH_AUTHORIZATION_CODE_GRANT, serde_json,
+        serde_qs, thiserror, AccessTokenRequestBody, AccessTokenResponseErrorBodyError,
+        AccessTokenType, Body, ClientId, ClientSecret, Deserialize, HttpError, Map, RedirectUri,
+        Request, Response, SerdeJsonError, SerdeQsError, Serialize, Url, UrlParseError, Value,
     },
     Provider, ProviderExtAuthorizationCodeGrant,
 };

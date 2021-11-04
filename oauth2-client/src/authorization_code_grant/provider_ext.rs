@@ -7,7 +7,6 @@ pub use oauth2_core::authorization_code_grant::{
     },
     authorization_request::Query as AuthorizationRequestQuery,
 };
-pub use serde_qs::{self, Error as SerdeQsError};
 
 use crate::{
     re_exports::{AccessTokenRequestBody, Body, Map, RedirectUri, Request, Response, Url, Value},

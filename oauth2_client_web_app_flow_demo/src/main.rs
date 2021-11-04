@@ -16,7 +16,7 @@ use futures_util::future;
 use http_api_isahc_client::IsahcClient;
 use oauth2_client::{
     authorization_code_grant::Flow,
-    re_exports::{serde_enum_str::Deserialize_enum_str, ClientId, ClientSecret, RedirectUri},
+    re_exports::{ClientId, ClientSecret, Deserialize_enum_str, RedirectUri},
 };
 use oauth2_github::{GithubProviderWithWebApplication, GithubScope};
 use oauth2_google::{

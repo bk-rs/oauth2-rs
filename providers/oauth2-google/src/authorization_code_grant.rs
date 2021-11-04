@@ -1,7 +1,6 @@
 use oauth2_client::{
     re_exports::{
-        serde_enum_str::Serialize_enum_str, ClientId, ClientSecret, Map, RedirectUri, Url,
-        UrlParseError, Value,
+        ClientId, ClientSecret, Map, RedirectUri, Serialize_enum_str, Url, UrlParseError, Value,
     },
     Provider, ProviderExtAuthorizationCodeGrant,
 };

@@ -1,7 +1,4 @@
-use oauth2_client::re_exports::{
-    serde_enum_str::{Deserialize_enum_str, Serialize_enum_str},
-    Scope,
-};
+use oauth2_client::re_exports::{Deserialize_enum_str, Scope, Serialize_enum_str};
 
 pub const TOKEN_URL: &str = "https://oauth2.googleapis.com/token";
 pub const AUTHORIZATION_URL: &str = "https://accounts.google.com/o/oauth2/v2/auth";

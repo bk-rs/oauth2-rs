@@ -1,12 +1,10 @@
 use std::error;
 
 use oauth2_client::{
-    additional_endpoints::{
-        async_trait, AccessTokenObtainFrom, Client, ClientRespondEndpointError, UserInfo,
-        UserInfoEndpoint,
-    },
+    additional_endpoints::{AccessTokenObtainFrom, UserInfo, UserInfoEndpoint},
     re_exports::{
-        serde_json, thiserror, AccessTokenResponseSuccessfulBody, HttpError, SerdeJsonError,
+        async_trait, serde_json, thiserror, AccessTokenResponseSuccessfulBody, Client,
+        ClientRespondEndpointError, HttpError, SerdeJsonError,
     },
 };
 

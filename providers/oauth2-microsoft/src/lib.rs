@@ -1,7 +1,4 @@
-use oauth2_client::re_exports::{
-    serde_enum_str::{Deserialize_enum_str, Serialize_enum_str},
-    Scope,
-};
+use oauth2_client::re_exports::{Deserialize_enum_str, Scope, Serialize_enum_str};
 
 #[cfg(feature = "with-device-authorization-grant")]
 pub mod device_authorization_grant;
