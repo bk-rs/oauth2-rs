@@ -1,15 +1,18 @@
 use std::{error, fmt, str};
 
-pub use oauth2_core::authorization_code_grant::{
-    access_token_response::{
-        ErrorBody as AccessTokenResponseErrorBody,
-        SuccessfulBody as AccessTokenResponseSuccessfulBody,
+pub use oauth2_core::{
+    access_token_request::BodyWithAuthorizationCodeGrant as AccessTokenRequestBody,
+    authorization_code_grant::{
+        access_token_response::{
+            ErrorBody as AccessTokenResponseErrorBody,
+            SuccessfulBody as AccessTokenResponseSuccessfulBody,
+        },
+        authorization_request::Query as AuthorizationRequestQuery,
     },
-    authorization_request::Query as AuthorizationRequestQuery,
 };
 
 use crate::{
-    re_exports::{AccessTokenRequestBody, Body, Map, RedirectUri, Request, Response, Url, Value},
+    re_exports::{Body, Map, RedirectUri, Request, Response, Url, Value},
     Provider,
 };
 
