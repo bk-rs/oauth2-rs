@@ -21,8 +21,8 @@ pub use device_authorization_grant::GithubProviderWithDevice;
     feature = "with-authorization-code-grant",
     feature = "with-device-authorization-grant"
 ))]
-#[cfg(feature = "with-user-info")]
-pub mod user_info;
+#[cfg(feature = "with-additional-endpoints")]
+pub mod additional_endpoints;
 
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
 pub enum GithubScope {

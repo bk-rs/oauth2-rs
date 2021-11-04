@@ -19,17 +19,16 @@ all-features = true
 default = [
     "with-authorization-code-grant",
     "with-device-authorization-grant",
+    "with-additional-endpoints",
     # 
     "with-flow",
-    "with-user-info",
 ]
 
 with-authorization-code-grant = ["oauth2-core/with-authorization-code-grant", "serde_qs"]
 with-device-authorization-grant = ["oauth2-core/with-device-authorization-grant"]
+with-additional-endpoints = ["http-api-client"]
 
 with-flow = ["http-api-client"]
-
-with-user-info = ["http-api-client"]
 
 [dependencies]
 oauth2-core = { version = "^0.0", path = "../oauth2-core" }

@@ -9,8 +9,8 @@ pub mod authorization_code_grant;
 #[cfg(feature = "with-device-authorization-grant")]
 pub mod device_authorization_grant;
 
-#[cfg(feature = "with-user-info")]
-pub mod user_info;
+#[cfg(feature = "with-additional-endpoints")]
+pub mod additional_endpoints;
 
 //
 pub use provider::Provider;
@@ -19,6 +19,3 @@ pub use provider::Provider;
 pub use authorization_code_grant::provider_ext::ProviderExtAuthorizationCodeGrant;
 #[cfg(feature = "with-device-authorization-grant")]
 pub use device_authorization_grant::provider_ext::ProviderExtDeviceAuthorizationGrant;
-
-#[cfg(feature = "with-user-info")]
-pub use user_info::provider_ext::ProviderExtUserInfo;

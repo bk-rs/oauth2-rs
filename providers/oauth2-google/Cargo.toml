@@ -19,13 +19,12 @@ all-features = true
 default = [
     "with-authorization-code-grant",
     "with-device-authorization-grant",
-    # 
-    "with-user-info",
+    "with-additional-endpoints",
 ]
 
 with-authorization-code-grant = ["oauth2-client/with-authorization-code-grant"]
 with-device-authorization-grant = ["oauth2-client/with-device-authorization-grant"]
-with-user-info = ["oauth2-client/with-user-info"]
+with-additional-endpoints = ["oauth2-client/with-additional-endpoints"]
 
 [dependencies]
 oauth2-client = { version = "^0.0", default-features = false, path = "../../oauth2-client" }
