@@ -40,7 +40,7 @@ impl SigninFlowMap {
 pub struct SigninFlow {
     pub flow: Flow<HttpClient>,
     pub provider: Box<dyn ProviderExtAuthorizationCodeGrant<Scope = String>>,
-    pub scopes: Option<Vec<String>>,
+    pub default_scopes: Option<Vec<String>>,
     pub user_info_endpoint: Box<dyn UserInfoEndpoint>,
     pub client_with_user_info: HttpClient,
     pub another_client_with_user_info: HttpClient,
@@ -50,7 +50,7 @@ impl SigninFlow {
     pub fn new<P, UIEP>(
         client: HttpClient,
         provider: P,
-        scopes: impl Into<Option<Vec<<P as Provider>::Scope>>>,
+        default_scopes: impl Into<Option<Vec<<P as Provider>::Scope>>>,
         user_info_endpoint: UIEP,
     ) -> Self
     where
@@ -63,7 +63,7 @@ impl SigninFlow {
             provider: Box::new(ProviderExtAuthorizationCodeGrantStringScopeWrapper::new(
                 provider,
             )),
-            scopes: scopes
+            default_scopes: default_scopes
                 .into()
                 .map(|x| x.into_iter().map(|y| y.to_string()).collect()),
             user_info_endpoint: Box::new(user_info_endpoint),
@@ -77,11 +77,22 @@ impl SigninFlow {
 impl SigninFlow {
     pub fn build_authorization_url(
         &self,
-        scopes: impl Into<Option<Vec<String>>>,
         state: impl Into<Option<State>>,
     ) -> Result<Url, FlowBuildAuthorizationUrlError> {
         self.flow
-            .build_authorization_url_with_dyn_provider(self.provider.as_ref(), scopes, state)
+            .build_authorization_url_with_dyn_provider(self.provider.as_ref(), None, state)
+    }
+
+    pub fn build_authorization_url_with_custom_scopes(
+        &self,
+        custom_scopes: Vec<String>,
+        state: impl Into<Option<State>>,
+    ) -> Result<Url, FlowBuildAuthorizationUrlError> {
+        self.flow.build_authorization_url_with_dyn_provider(
+            self.provider.as_ref(),
+            Some(custom_scopes),
+            state,
+        )
     }
 }
 
@@ -124,16 +135,16 @@ mod tests {
             ),
         )?;
 
-        let github_auth_url = map.get("github").unwrap().build_authorization_url(
-            vec!["foo".to_owned(), "bar".to_owned()],
-            "STATE".to_owned(),
-        )?;
+        let github_auth_url = map
+            .get("github")
+            .unwrap()
+            .build_authorization_url_with_custom_scopes(
+                vec![GithubScope::User.to_string(), "custom".to_owned()],
+                "STATE".to_owned(),
+            )?;
         println!("github_auth_url {}", github_auth_url);
 
-        let google_auth_url = map
-            .get("google")
-            .unwrap()
-            .build_authorization_url(None, None)?;
+        let google_auth_url = map.get("google").unwrap().build_authorization_url(None)?;
         println!("google_auth_url {}", google_auth_url);
 
         Ok(())
