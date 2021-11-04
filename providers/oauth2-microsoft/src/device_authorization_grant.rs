@@ -1,5 +1,5 @@
 use oauth2_client::{
-    provider::{ClientId, ClientSecret, Url, UrlParseError},
+    re_exports::{ClientId, ClientSecret, Url, UrlParseError},
     Provider, ProviderExtDeviceAuthorizationGrant,
 };
 

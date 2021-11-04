@@ -1,5 +1,5 @@
 use oauth2_client::{
-    provider::{
+    re_exports::{
         serde_enum_str::Serialize_enum_str, ClientId, ClientSecret, Map, RedirectUri, Url,
         UrlParseError, Value,
     },
@@ -119,7 +119,7 @@ mod tests {
 
     use oauth2_client::{
         authorization_code_grant::{AccessTokenEndpoint, AuthorizationEndpoint},
-        http_api_endpoint::Endpoint as _,
+        re_exports::Endpoint as _,
     };
 
     #[test]

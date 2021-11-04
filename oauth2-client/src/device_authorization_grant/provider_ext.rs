@@ -1,5 +1,5 @@
 use crate::{
-    provider::{Map, Url, Value},
+    re_exports::{Map, Url, Value},
     Provider,
 };
 

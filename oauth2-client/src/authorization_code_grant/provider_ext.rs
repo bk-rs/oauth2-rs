@@ -1,23 +1,16 @@
 use std::{error, fmt, str};
 
-pub use oauth2_core::{
-    access_token_request::{
-        BodyWithAuthorizationCodeGrant as AccessTokenRequestBody,
-        GRANT_TYPE_WITH_AUTHORIZATION_CODE_GRANT,
+pub use oauth2_core::authorization_code_grant::{
+    access_token_response::{
+        ErrorBody as AccessTokenResponseErrorBody,
+        SuccessfulBody as AccessTokenResponseSuccessfulBody,
     },
-    access_token_response::ErrorBodyError as AccessTokenResponseErrorBodyError,
-    authorization_code_grant::{
-        access_token_response::{
-            ErrorBody as AccessTokenResponseErrorBody,
-            SuccessfulBody as AccessTokenResponseSuccessfulBody,
-        },
-        authorization_request::Query as AuthorizationRequestQuery,
-    },
+    authorization_request::Query as AuthorizationRequestQuery,
 };
 pub use serde_qs::{self, Error as SerdeQsError};
 
 use crate::{
-    provider::{Body, Map, RedirectUri, Request, Response, Url, Value},
+    re_exports::{AccessTokenRequestBody, Body, Map, RedirectUri, Request, Response, Url, Value},
     Provider,
 };
 

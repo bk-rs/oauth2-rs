@@ -1,4 +1,4 @@
-use oauth2_client::provider::{
+use oauth2_client::re_exports::{
     serde_enum_str::{Deserialize_enum_str, Serialize_enum_str},
     Scope,
 };

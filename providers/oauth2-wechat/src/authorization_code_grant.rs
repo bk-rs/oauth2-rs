@@ -2,14 +2,15 @@ use std::{error, str::FromStr};
 
 use oauth2_client::{
     authorization_code_grant::provider_ext::{
-        serde_qs, AccessTokenRequestBody, AccessTokenResponseErrorBody,
-        AccessTokenResponseErrorBodyError, AccessTokenResponseSuccessfulBody,
-        AuthorizationRequestQuery, SerdeQsError, GRANT_TYPE_WITH_AUTHORIZATION_CODE_GRANT,
+        serde_qs, AccessTokenResponseErrorBody, AccessTokenResponseSuccessfulBody,
+        AuthorizationRequestQuery, SerdeQsError,
     },
-    provider::{
+    re_exports::{
+        oauth2_core::access_token_request::GRANT_TYPE_WITH_AUTHORIZATION_CODE_GRANT,
         serde::{Deserialize, Serialize},
-        serde_json, thiserror, AccessTokenType, Body, ClientId, ClientSecret, HttpError, Map,
-        RedirectUri, Request, Response, SerdeJsonError, Url, UrlParseError, Value,
+        serde_json, thiserror, AccessTokenRequestBody, AccessTokenResponseErrorBodyError,
+        AccessTokenType, Body, ClientId, ClientSecret, HttpError, Map, RedirectUri, Request,
+        Response, SerdeJsonError, Url, UrlParseError, Value,
     },
     Provider, ProviderExtAuthorizationCodeGrant,
 };
@@ -319,8 +320,7 @@ mod tests {
 
     use oauth2_client::{
         authorization_code_grant::{AccessTokenEndpoint, AuthorizationEndpoint},
-        http_api_endpoint::Endpoint as _,
-        provider::Response,
+        re_exports::{Endpoint as _, Response},
     };
 
     #[test]

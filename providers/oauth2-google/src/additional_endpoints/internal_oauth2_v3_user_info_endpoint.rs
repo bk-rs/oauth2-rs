@@ -1,11 +1,8 @@
-use oauth2_client::{
-    additional_endpoints::Endpoint,
-    provider::{
-        http::header::{ACCEPT, AUTHORIZATION},
-        http_api_endpoint::MIME_APPLICATION_JSON,
-        serde::{Deserialize, Serialize},
-        serde_json, thiserror, Body, HttpError, Request, Response, SerdeJsonError,
-    },
+use oauth2_client::re_exports::{
+    http::header::{ACCEPT, AUTHORIZATION},
+    http_api_endpoint::MIME_APPLICATION_JSON,
+    serde::{Deserialize, Serialize},
+    serde_json, thiserror, Body, Endpoint, HttpError, Request, Response, SerdeJsonError,
 };
 
 pub const USER_INFO_URL: &str = "https://www.googleapis.com/oauth2/v3/userinfo";

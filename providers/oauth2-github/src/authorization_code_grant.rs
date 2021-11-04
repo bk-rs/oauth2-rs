@@ -1,5 +1,5 @@
 use oauth2_client::{
-    provider::{ClientId, ClientSecret, RedirectUri, Url, UrlParseError},
+    re_exports::{ClientId, ClientSecret, RedirectUri, Url, UrlParseError},
     Provider, ProviderExtAuthorizationCodeGrant,
 };
 
@@ -66,7 +66,7 @@ mod tests {
 
     use oauth2_client::{
         authorization_code_grant::{AccessTokenEndpoint, AuthorizationEndpoint},
-        http_api_endpoint::Endpoint as _,
+        re_exports::Endpoint as _,
     };
 
     #[test]

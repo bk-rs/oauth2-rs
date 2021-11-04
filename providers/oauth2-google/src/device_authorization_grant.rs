@@ -1,5 +1,5 @@
 use oauth2_client::{
-    provider::{ClientId, ClientSecret, Url, UrlParseError},
+    re_exports::{ClientId, ClientSecret, Url, UrlParseError},
     Provider, ProviderExtDeviceAuthorizationGrant,
 };
 
@@ -51,8 +51,7 @@ mod tests {
     use std::{error, time::Duration};
 
     use oauth2_client::{
-        device_authorization_grant::DeviceAccessTokenEndpoint,
-        http_api_endpoint::RetryableEndpoint as _,
+        device_authorization_grant::DeviceAccessTokenEndpoint, re_exports::RetryableEndpoint as _,
     };
 
     #[test]

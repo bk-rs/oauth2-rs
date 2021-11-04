@@ -2,10 +2,12 @@ use std::error;
 
 use oauth2_client::{
     additional_endpoints::{
-        async_trait, AccessTokenObtainFrom, AccessTokenResponseSuccessfulBody, Client,
-        ClientRespondEndpointError, UserInfo, UserInfoEndpoint,
+        async_trait, AccessTokenObtainFrom, Client, ClientRespondEndpointError, UserInfo,
+        UserInfoEndpoint,
     },
-    provider::{serde_json, thiserror, HttpError, SerdeJsonError},
+    re_exports::{
+        serde_json, thiserror, AccessTokenResponseSuccessfulBody, HttpError, SerdeJsonError,
+    },
 };
 
 use super::internal_user_endpoint::{User, UserEndpoint, UserEndpointError};

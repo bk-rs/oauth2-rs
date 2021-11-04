@@ -1,16 +1,4 @@
-pub use http_api_endpoint::{
-    self,
-    http::{self, Error as HttpError},
-    Body, Request, Response,
-};
-pub use serde::{self, de::DeserializeOwned, Serialize};
-pub use serde_enum_str;
-pub use serde_json::{self, Error as SerdeJsonError, Map, Value};
-pub use serde_urlencoded::{self, ser::Error as SerdeUrlencodedSerError};
-pub use thiserror;
-pub use url::{ParseError as UrlParseError, Url};
-
-pub use oauth2_core::types::{AccessTokenType, ClientId, ClientSecret, RedirectUri, Scope};
+use crate::re_exports::{ClientId, ClientSecret, Scope, Url};
 
 pub trait Provider {
     type Scope: Scope;

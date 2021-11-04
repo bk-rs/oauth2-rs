@@ -16,7 +16,7 @@ use futures_util::future;
 use http_api_isahc_client::IsahcClient;
 use oauth2_client::{
     authorization_code_grant::Flow,
-    provider::{serde_enum_str::Deserialize_enum_str, ClientId, ClientSecret, RedirectUri},
+    re_exports::{serde_enum_str::Deserialize_enum_str, ClientId, ClientSecret, RedirectUri},
 };
 use oauth2_github::{GithubProviderWithWebApplication, GithubScope};
 use oauth2_google::{
@@ -140,14 +140,11 @@ pub enum ProviderValue {
 }
 
 pub mod filters {
-    use super::{Context, IsahcClient, ProviderKey};
+    use super::{Context, ProviderKey};
 
     use std::sync::Arc;
 
     use log::info;
-    use oauth2_client::user_info::provider_ext::{
-        AccessTokenResponseSuccessfulBodySource, ProviderExtUserInfo as _,
-    };
     use warp::{http::Uri, Filter};
 
     pub fn filters(
@@ -213,24 +210,7 @@ pub mod filters {
 
                 info!("{:?} {:?}", provider_key, access_token_body);
 
-                let client_2 = IsahcClient::new().unwrap();
-                let client_3 = IsahcClient::new().unwrap();
-                let user_info = provider
-                    .fetch_user_info(
-                        AccessTokenResponseSuccessfulBodySource::AuthorizationCodeGrant,
-                        &access_token_body,
-                        &client_2,
-                        &client_3,
-                    )
-                    .await
-                    .unwrap();
-
-                info!("{:?} {:?}", provider_key, user_info);
-
-                Ok(warp::reply::html(format!(
-                    "{:?} {:?}",
-                    access_token_body, user_info
-                )))
+                Ok(warp::reply::html(format!("{:?}", access_token_body)))
             }
             crate::ProviderValue::Google((flow, provider, _scopes)) => {
                 let access_token_body = flow
@@ -240,24 +220,7 @@ pub mod filters {
 
                 info!("{:?} {:?}", provider_key, access_token_body);
 
-                let client_2 = IsahcClient::new().unwrap();
-                let client_3 = IsahcClient::new().unwrap();
-                let user_info = provider
-                    .fetch_user_info(
-                        AccessTokenResponseSuccessfulBodySource::AuthorizationCodeGrant,
-                        &access_token_body,
-                        &client_2,
-                        &client_3,
-                    )
-                    .await
-                    .unwrap();
-
-                info!("{:?} {:?}", provider_key, user_info);
-
-                Ok(warp::reply::html(format!(
-                    "{:?} {:?}",
-                    access_token_body, user_info
-                )))
+                Ok(warp::reply::html(format!("{:?}", access_token_body)))
             }
         }
     }

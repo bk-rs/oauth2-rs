@@ -1,6 +1,7 @@
 use std::error;
 
-use super::{async_trait, AccessTokenObtainFrom, AccessTokenResponseSuccessfulBody, Client};
+use super::{async_trait, AccessTokenObtainFrom, Client};
+use crate::re_exports::AccessTokenResponseSuccessfulBody;
 
 #[async_trait]
 pub trait RevokeAccessTokenEndpoint {
