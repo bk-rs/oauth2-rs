@@ -80,7 +80,7 @@ impl SigninFlow {
         state: impl Into<Option<State>>,
     ) -> Result<Url, FlowBuildAuthorizationUrlError> {
         self.flow
-            .build_authorization_url_with_dyn_provider(self.provider.as_ref(), None, state)
+            .build_authorization_url(self.provider.as_ref(), None, state)
     }
 
     pub fn build_authorization_url_with_custom_scopes(
@@ -88,11 +88,8 @@ impl SigninFlow {
         custom_scopes: Vec<String>,
         state: impl Into<Option<State>>,
     ) -> Result<Url, FlowBuildAuthorizationUrlError> {
-        self.flow.build_authorization_url_with_dyn_provider(
-            self.provider.as_ref(),
-            Some(custom_scopes),
-            state,
-        )
+        self.flow
+            .build_authorization_url(self.provider.as_ref(), Some(custom_scopes), state)
     }
 }
 

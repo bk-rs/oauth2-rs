@@ -15,37 +15,10 @@ use serde::Serialize;
 use serde_json::{Map, Value};
 use serde_qs::Error as SerdeQsError;
 
-use crate::{Provider, ProviderExtAuthorizationCodeGrant};
+use crate::ProviderExtAuthorizationCodeGrant;
 
 //
-pub struct AuthorizationEndpoint<'a, P>
-where
-    P: ProviderExtAuthorizationCodeGrant,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
-{
-    provider: &'a P,
-    scopes: Option<Vec<<P as Provider>::Scope>>,
-    state: Option<State>,
-}
-impl<'a, P> AuthorizationEndpoint<'a, P>
-where
-    P: ProviderExtAuthorizationCodeGrant,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
-{
-    pub fn new(
-        provider: &'a P,
-        scopes: impl Into<Option<Vec<<P as Provider>::Scope>>>,
-        state: impl Into<Option<State>>,
-    ) -> Self {
-        Self {
-            provider,
-            scopes: scopes.into(),
-            state: state.into(),
-        }
-    }
-}
-
-pub struct AuthorizationEndpointWithDynProvider<'a, SCOPE>
+pub struct AuthorizationEndpoint<'a, SCOPE>
 where
     SCOPE: Scope,
     <SCOPE as str::FromStr>::Err: fmt::Display,
@@ -54,7 +27,7 @@ where
     scopes: Option<Vec<SCOPE>>,
     state: Option<State>,
 }
-impl<'a, SCOPE> AuthorizationEndpointWithDynProvider<'a, SCOPE>
+impl<'a, SCOPE> AuthorizationEndpoint<'a, SCOPE>
 where
     SCOPE: Scope,
     <SCOPE as str::FromStr>::Err: fmt::Display,
@@ -72,67 +45,7 @@ where
     }
 }
 
-impl<'a, P> Endpoint for AuthorizationEndpoint<'a, P>
-where
-    P: ProviderExtAuthorizationCodeGrant,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
-    <P as Provider>::Scope: Serialize,
-{
-    type RenderRequestError = AuthorizationEndpointError;
-
-    type ParseResponseOutput = ();
-    type ParseResponseError = Infallible;
-
-    fn render_request(&self) -> Result<Request<Body>, Self::RenderRequestError> {
-        let mut query = REQ_Query::new(
-            self.provider
-                .client_id()
-                .cloned()
-                .ok_or_else(|| AuthorizationEndpointError::ClientIdMissing)?,
-            self.provider.redirect_uri().map(|x| x.url().to_owned()),
-            self.scopes.to_owned().map(Into::into),
-            self.state.to_owned(),
-        );
-        if let Some(extensions) = self.provider.authorization_request_query_extensions() {
-            query.set_extensions(extensions);
-        }
-
-        let query_str = if let Some(query_str_ret) = self
-            .provider
-            .authorization_request_query_serializing(&query)
-        {
-            query_str_ret
-                .map_err(|err| AuthorizationEndpointError::CustomSerRequestQueryFailed(err))?
-        } else {
-            serde_qs::to_string(&query)
-                .map_err(AuthorizationEndpointError::SerRequestQueryFailed)?
-        };
-
-        let mut url = self.provider.authorization_endpoint_url().to_owned();
-        url.set_query(Some(query_str.as_str()));
-
-        //
-        self.provider.authorization_request_url_modifying(&mut url);
-
-        //
-        let request = Request::builder()
-            .method(REQ_METHOD)
-            .uri(url.as_str())
-            .body(vec![])
-            .map_err(AuthorizationEndpointError::MakeRequestFailed)?;
-
-        Ok(request)
-    }
-
-    fn parse_response(
-        &self,
-        _response: Response<Body>,
-    ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
-        unreachable!()
-    }
-}
-
-impl<'a, SCOPE> Endpoint for AuthorizationEndpointWithDynProvider<'a, SCOPE>
+impl<'a, SCOPE> Endpoint for AuthorizationEndpoint<'a, SCOPE>
 where
     SCOPE: Scope,
     <SCOPE as str::FromStr>::Err: fmt::Display,

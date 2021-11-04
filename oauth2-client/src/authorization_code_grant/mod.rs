@@ -8,7 +8,7 @@ pub mod provider_ext;
 pub use access_token_endpoint::{AccessTokenEndpoint, AccessTokenEndpointError};
 pub use authorization_endpoint::{
     parse_redirect_uri_query, AuthorizationEndpoint, AuthorizationEndpointError,
-    AuthorizationEndpointWithDynProvider, ParseRedirectUriQueryError,
+    ParseRedirectUriQueryError,
 };
 
 //
