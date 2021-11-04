@@ -116,10 +116,7 @@ mod tests {
 
     use std::error;
 
-    use oauth2_client::{
-        authorization_code_grant::{authorization_endpoint, AccessTokenEndpoint},
-        re_exports::Endpoint as _,
-    };
+    use oauth2_client::authorization_code_grant::{access_token_endpoint, authorization_endpoint};
 
     #[test]
     fn authorization_request() -> Result<(), Box<dyn error::Error>> {
@@ -152,9 +149,7 @@ mod tests {
             RedirectUri::new("https://client.example.com/cb")?,
         )?;
 
-        let endpoint = AccessTokenEndpoint::new(&provider, "CODE".to_owned());
-
-        let request = endpoint.render_request()?;
+        let request = access_token_endpoint::render_request(&provider, "CODE".to_owned())?;
 
         assert_eq!(request.body(), b"grant_type=authorization_code&code=CODE&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&client_id=CLIENT_ID&client_secret=CLIENT_SECRET");
 

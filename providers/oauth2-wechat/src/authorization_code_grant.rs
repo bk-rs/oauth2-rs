@@ -318,8 +318,8 @@ mod tests {
     use std::error;
 
     use oauth2_client::{
-        authorization_code_grant::{authorization_endpoint, AccessTokenEndpoint},
-        re_exports::{Endpoint as _, Response},
+        authorization_code_grant::{access_token_endpoint, authorization_endpoint},
+        re_exports::Response,
     };
 
     #[test]
@@ -352,9 +352,7 @@ mod tests {
             RedirectUri::new("https://client.example.com/cb")?,
         )?;
 
-        let endpoint = AccessTokenEndpoint::new(&provider, "CODE".to_owned());
-
-        let request = endpoint.render_request()?;
+        let request = access_token_endpoint::render_request(&provider, "CODE".to_owned())?;
 
         assert_eq!(request.method(), "GET");
         assert_eq!(request.uri(), "https://api.weixin.qq.com/sns/oauth2/access_token?appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code");
@@ -370,8 +368,6 @@ mod tests {
             RedirectUri::new("https://client.example.com/cb")?,
         )?;
 
-        let endpoint = AccessTokenEndpoint::new(&provider, "CODE".to_owned());
-
         let response_body = r#"
         { 
             "access_token":"ACCESS_TOKEN", 
@@ -381,8 +377,10 @@ mod tests {
             "scope":"SCOPE",
             "unionid": "o6_bmasdasdsad6_2sgVt7hMZOPfL"
         }"#;
-        let body_ret = endpoint
-            .parse_response(Response::builder().body(response_body.as_bytes().to_vec())?)?;
+        let body_ret = access_token_endpoint::parse_response(
+            &provider,
+            Response::builder().body(response_body.as_bytes().to_vec())?,
+        )?;
 
         match body_ret {
             Ok(body) => {
