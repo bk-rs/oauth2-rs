@@ -9,78 +9,11 @@ pub(crate) use http_api_reqwest_client::ReqwestClient as HttpClient;
 ))]
 mod inner;
 
-// use std::{collections::HashMap, fmt, str};
-
-// use oauth2_client::{
-//     authorization_code_grant::{
-//         provider_ext::AccessTokenResponseSuccessfulBody, Flow, FlowBuildAuthorizationUrlError,
-//         FlowHandleCallbackError,
-//     },
-//     oauth2_core::authorization_code_grant::authorization_request::State,
-//     provider::{DeserializeOwned, Serialize, Url},
-//     user_info::provider_ext::{AccessTokenResponseSuccessfulBodySource, Client},
-//     Provider, ProviderExtAuthorizationCodeGrant, ProviderExtUserInfo,
-// };
-
-// #[derive(Debug, Clone)]
-// pub struct SigninFlowMap<P, C1, C2, C3>
-// where
-//     C1: Client,
-// {
-//     inner: HashMap<String, SigninFlow<P, C1, C2, C3>>,
-// }
-// impl<P, C1, C2, C3> SigninFlowMap<P, C1, C2, C3>
-// where
-//     C1: Client,
-// {
-//     pub fn new() -> Self {
-//         Self {
-//             inner: HashMap::new(),
-//         }
-//     }
-//     pub fn insert(
-//         &mut self,
-//         name: impl AsRef<str>,
-//         signin_provider: SigninFlow<P, C1, C2, C3>,
-//     ) -> Result<(), ()> {
-//         self.inner
-//             .insert(name.as_ref().to_owned(), signin_provider)
-//             .map(|_| ())
-//             .ok_or_else(|| ())
-//     }
-//     pub fn get(&self, name: impl AsRef<str>) -> Option<&SigninFlow<P, C1, C2, C3>> {
-//         self.inner.get(name.as_ref())
-//     }
-// }
-
-// #[derive(Debug, Clone)]
-// pub struct SigninFlow<P, C1, C2, C3>
-// where
-//     C1: Client,
-// {
-//     flow: Flow<C1>,
-//     provider: P,
-//     client_with_user_info: C2,
-//     another_client_with_user_info: C3,
-// }
-// impl<P, C1, C2, C3> SigninFlow<P, C1, C2, C3>
-// where
-//     C1: Client,
-// {
-//     pub fn new(
-//         flow: Flow<C1>,
-//         provider: P,
-//         client_with_user_info: C2,
-//         another_client_with_user_info: C3,
-//     ) -> Self {
-//         Self {
-//             flow,
-//             provider,
-//             client_with_user_info,
-//             another_client_with_user_info,
-//         }
-//     }
-// }
+#[cfg(any(
+    feature = "with-http-api-isahc-client",
+    feature = "http-api-reqwest-client"
+))]
+pub use inner::{SigninFlow, SigninFlowMap};
 
 // impl<P, C1, C2, C3> SigninFlow<P, C1, C2, C3>
 // where

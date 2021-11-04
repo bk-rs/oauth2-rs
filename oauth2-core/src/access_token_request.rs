@@ -15,7 +15,7 @@ use serde_json::{Map, Value};
 use url::Url;
 
 #[cfg(feature = "with-authorization-code-grant")]
-use crate::authorization_code_grant::authorization_response::Code;
+use crate::types::Code;
 #[cfg(any(
     feature = "with-authorization-code-grant",
     feature = "with-device-authorization-grant"

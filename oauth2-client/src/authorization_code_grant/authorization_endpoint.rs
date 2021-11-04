@@ -4,11 +4,12 @@ use http_api_endpoint::{http::Error as HttpError, Body, Endpoint, Request, Respo
 use oauth2_core::{
     access_token_response::GENERAL_ERROR_BODY_KEY_ERROR,
     authorization_code_grant::{
-        authorization_request::{Query as REQ_Query, State, METHOD as REQ_METHOD},
+        authorization_request::{Query as REQ_Query, METHOD as REQ_METHOD},
         authorization_response::{
             ErrorQuery as RES_ErrorQuery, SuccessfulQuery as RES_SuccessfulQuery,
         },
     },
+    types::State,
 };
 use serde::Serialize;
 use serde_json::{Map, Value};

@@ -7,11 +7,10 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 use url::Url;
 
-use crate::types::{ClientId, Scope, ScopeParameter};
+use crate::types::{ClientId, Scope, ScopeParameter, State};
 
 pub const METHOD: Method = Method::GET;
 pub const RESPONSE_TYPE: &str = "code";
-pub type State = String;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Query<SCOPE>

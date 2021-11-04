@@ -2,12 +2,14 @@ use std::{error, fmt, str};
 
 use http_api_client::{Client, ClientRespondEndpointError};
 use http_api_endpoint::Endpoint;
-use oauth2_core::authorization_code_grant::{
-    access_token_response::{
-        ErrorBody as AT_RES_ErrorBody, SuccessfulBody as AT_RES_SuccessfulBody,
+use oauth2_core::{
+    authorization_code_grant::{
+        access_token_response::{
+            ErrorBody as AT_RES_ErrorBody, SuccessfulBody as AT_RES_SuccessfulBody,
+        },
+        authorization_response::ErrorQuery as A_RES_ErrorQuery,
     },
-    authorization_request::State,
-    authorization_response::ErrorQuery as A_RES_ErrorQuery,
+    types::State,
 };
 use serde::{de::DeserializeOwned, Serialize};
 use url::{ParseError as UrlParseError, Url};

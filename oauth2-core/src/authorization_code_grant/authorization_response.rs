@@ -3,11 +3,10 @@
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 
-use crate::access_token_response::GeneralErrorBody;
-
-use super::authorization_request::State;
-
-pub type Code = String;
+use crate::{
+    access_token_response::GeneralErrorBody,
+    types::{Code, State},
+};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SuccessfulQuery {

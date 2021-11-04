@@ -13,10 +13,10 @@ use oauth2_core::{
         METHOD as REQ_METHOD,
     },
     access_token_response::{CONTENT_TYPE as RES_CONTENT_TYPE, GENERAL_ERROR_BODY_KEY_ERROR},
-    authorization_code_grant::{
-        access_token_response::{ErrorBody as RES_ErrorBody, SuccessfulBody as RES_SuccessfulBody},
-        authorization_response::Code,
+    authorization_code_grant::access_token_response::{
+        ErrorBody as RES_ErrorBody, SuccessfulBody as RES_SuccessfulBody,
     },
+    types::Code,
 };
 use serde::de::DeserializeOwned;
 use serde_json::{Error as SerdeJsonError, Map, Value};
