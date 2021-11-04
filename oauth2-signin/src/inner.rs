@@ -19,11 +19,15 @@ impl SigninFlowMap {
             inner: HashMap::new(),
         }
     }
-    pub fn insert(&mut self, name: impl AsRef<str>, signin_flow: SigninFlow) -> Result<(), ()> {
-        self.inner
-            .insert(name.as_ref().to_owned(), signin_flow)
-            .map(|_| ())
-            .ok_or_else(|| ())
+    pub fn insert(
+        &mut self,
+        name: impl AsRef<str>,
+        signin_flow: SigninFlow,
+    ) -> Result<(), &'static str> {
+        match self.inner.insert(name.as_ref().to_owned(), signin_flow) {
+            Some(_) => Err("name exists"),
+            None => Ok(()),
+        }
     }
     pub fn get(&self, name: impl AsRef<str>) -> Option<&SigninFlow> {
         self.inner.get(name.as_ref())
@@ -130,5 +134,60 @@ impl SigninFlow {
     ) -> Result<Url, FlowBuildAuthorizationUrlError> {
         self.flow
             .build_authorization_url_with_dyn_provider(self.provider.as_ref(), scopes, state)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use std::error;
+
+    use oauth2_github::{GithubProviderWithWebApplication, GithubScope, GithubUserInfoEndpoint};
+    use oauth2_google::{GoogleProviderForWebServerApps, GoogleScope, GoogleUserInfoEndpoint};
+
+    #[test]
+    fn simple() -> Result<(), Box<dyn error::Error>> {
+        let mut map = SigninFlowMap::new();
+        map.insert(
+            "github",
+            SigninFlow::new(
+                HttpClient::new()?,
+                GithubProviderWithWebApplication::new(
+                    "client_id".to_owned(),
+                    "client_secret".to_owned(),
+                    "https://client.example.com/cb".parse()?,
+                )?,
+                vec![GithubScope::User],
+                GithubUserInfoEndpoint,
+            ),
+        )?;
+        map.insert(
+            "google",
+            SigninFlow::new(
+                HttpClient::new()?,
+                GoogleProviderForWebServerApps::new(
+                    "client_id".to_owned(),
+                    "client_secret".to_owned(),
+                    "https://client.example.com/cb".parse()?,
+                )?,
+                vec![GoogleScope::Email],
+                GoogleUserInfoEndpoint,
+            ),
+        )?;
+
+        let github_auth_url = map.get("github").unwrap().build_authorization_url(
+            vec!["foo".to_owned(), "bar".to_owned()],
+            "STATE".to_owned(),
+        )?;
+        println!("github_auth_url {}", github_auth_url);
+
+        let google_auth_url = map
+            .get("google")
+            .unwrap()
+            .build_authorization_url(None, None)?;
+        println!("google_auth_url {}", google_auth_url);
+
+        Ok(())
     }
 }

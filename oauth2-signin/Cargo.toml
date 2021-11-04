@@ -27,3 +27,7 @@ skip_optional_dependencies = true
 skip_feature_sets = [
     ["with-http-api-isahc-client", "with-http-api-reqwest-client"],
 ]
+
+[dev-dependencies]
+oauth2-github = { version = "^0.0", path = "../providers/oauth2-github", default-features = false, features = ["with-authorization-code-grant", "with-additional-endpoints"] }
+oauth2-google = { version = "^0.0", path = "../providers/oauth2-google", default-features = false, features = ["with-authorization-code-grant", "with-additional-endpoints"] }

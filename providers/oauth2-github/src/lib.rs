@@ -14,12 +14,10 @@ pub use authorization_code_grant::GithubProviderWithWebApplication;
 #[cfg(feature = "with-device-authorization-grant")]
 pub use device_authorization_grant::GithubProviderWithDevice;
 
-#[cfg(any(
-    feature = "with-authorization-code-grant",
-    feature = "with-device-authorization-grant"
-))]
 #[cfg(feature = "with-additional-endpoints")]
 pub mod additional_endpoints;
+#[cfg(feature = "with-additional-endpoints")]
+pub use additional_endpoints::GithubUserInfoEndpoint;
 
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
 pub enum GithubScope {
