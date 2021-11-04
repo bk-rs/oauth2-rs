@@ -29,7 +29,7 @@ where
     pub scope: Option<ScopeParameter<SCOPE>>,
 
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
-    _extensions: Option<Map<String, Value>>,
+    pub _extensions: Option<Map<String, Value>>,
 }
 impl<SCOPE> GeneralSuccessfulBody<SCOPE>
 where
@@ -58,6 +58,53 @@ where
     }
     pub fn extensions(&self) -> Option<&Map<String, Value>> {
         self._extensions.as_ref()
+    }
+
+    pub fn try_from_t_with_string(body: &GeneralSuccessfulBody<String>) -> Result<Self, String> {
+        let scope = if let Some(x) = &body.scope {
+            Some(
+                x.0.iter()
+                    .map(|y| SCOPE::from_str(y))
+                    .collect::<Result<Vec<_>, _>>()
+                    .map_err(|err| err.to_string())?
+                    .into(),
+            )
+        } else {
+            None
+        };
+
+        let mut this = Self::new(
+            body.access_token.to_owned(),
+            body.token_type.to_owned(),
+            body.expires_in.to_owned(),
+            body.refresh_token.to_owned(),
+            scope,
+        );
+        if let Some(extensions) = body.extensions() {
+            this.set_extensions(extensions.to_owned());
+        }
+        Ok(this)
+    }
+}
+impl<SCOPE> From<&GeneralSuccessfulBody<SCOPE>> for GeneralSuccessfulBody<String>
+where
+    SCOPE: Scope,
+    <SCOPE as str::FromStr>::Err: fmt::Display,
+{
+    fn from(body: &GeneralSuccessfulBody<SCOPE>) -> Self {
+        let mut this = Self::new(
+            body.access_token.to_owned(),
+            body.token_type.to_owned(),
+            body.expires_in.to_owned(),
+            body.refresh_token.to_owned(),
+            body.scope
+                .to_owned()
+                .map(|x| x.0.iter().map(|y| y.to_string()).collect::<Vec<_>>().into()),
+        );
+        if let Some(extensions) = body.extensions() {
+            this.set_extensions(extensions.to_owned());
+        }
+        this
     }
 }
 

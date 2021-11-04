@@ -57,6 +57,52 @@ where
     pub fn extensions(&self) -> Option<&Map<String, Value>> {
         self._extensions.as_ref()
     }
+
+    pub fn try_from_t_with_string(query: &Query<String>) -> Result<Self, String> {
+        let scope = if let Some(x) = &query.scope {
+            Some(
+                x.0.iter()
+                    .map(|y| SCOPE::from_str(y))
+                    .collect::<Result<Vec<_>, _>>()
+                    .map_err(|err| err.to_string())?
+                    .into(),
+            )
+        } else {
+            None
+        };
+
+        let mut this = Self::new(
+            query.client_id.to_owned(),
+            query.redirect_uri.to_owned(),
+            scope,
+            query.state.to_owned(),
+        );
+        if let Some(extensions) = query.extensions() {
+            this.set_extensions(extensions.to_owned());
+        }
+        Ok(this)
+    }
+}
+impl<SCOPE> From<&Query<SCOPE>> for Query<String>
+where
+    SCOPE: Scope,
+    <SCOPE as str::FromStr>::Err: fmt::Display,
+{
+    fn from(query: &Query<SCOPE>) -> Self {
+        let mut this = Self::new(
+            query.client_id.to_owned(),
+            query.redirect_uri.to_owned(),
+            query
+                .scope
+                .to_owned()
+                .map(|x| x.0.iter().map(|y| y.to_string()).collect::<Vec<_>>().into()),
+            query.state.to_owned(),
+        );
+        if let Some(extensions) = query.extensions() {
+            this.set_extensions(extensions.to_owned());
+        }
+        this
+    }
 }
 
 #[cfg(test)]

@@ -4,7 +4,7 @@ pub mod scope;
 
 pub use access_token_type::AccessTokenType;
 pub use redirect_uri::RedirectUri;
-pub use scope::{Scope, ScopeParameter};
+pub use scope::{Scope, ScopeFromStrError, ScopeParameter};
 
 //
 //

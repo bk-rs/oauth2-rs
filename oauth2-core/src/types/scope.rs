@@ -1,6 +1,6 @@
 //! https://datatracker.ietf.org/doc/html/rfc6749#section-3.3
 
-use std::{cmp, fmt, marker::PhantomData, str};
+use std::{cmp, error, fmt, marker::PhantomData, str};
 
 use serde::{
     de::{self, Visitor},
@@ -93,3 +93,13 @@ where
         Ok(ScopeParameter(inner))
     }
 }
+
+//
+#[derive(Debug)]
+pub struct ScopeFromStrError(pub String);
+impl fmt::Display for ScopeFromStrError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+impl error::Error for ScopeFromStrError {}

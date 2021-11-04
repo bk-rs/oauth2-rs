@@ -2,9 +2,12 @@ use std::{collections::HashMap, fmt, str};
 
 use oauth2_client::{
     additional_endpoints::UserInfoEndpoint,
-    authorization_code_grant::{Flow, FlowBuildAuthorizationUrlError},
+    authorization_code_grant::{
+        provider_ext::ProviderExtAuthorizationCodeGrantStringScopeWrapper, Flow,
+        FlowBuildAuthorizationUrlError,
+    },
     oauth2_core::types::State,
-    re_exports::{ClientId, ClientSecret, RedirectUri, Url},
+    re_exports::Url,
     Provider, ProviderExtAuthorizationCodeGrant,
 };
 
@@ -34,63 +37,6 @@ impl SigninFlowMap {
     }
 }
 
-pub struct XProviderWithWebApplicationWrapper<P>
-where
-    P: ProviderExtAuthorizationCodeGrant,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
-{
-    inner: P,
-}
-
-impl<P> XProviderWithWebApplicationWrapper<P>
-where
-    P: ProviderExtAuthorizationCodeGrant,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
-{
-    pub fn new(provider: P) -> Self {
-        Self { inner: provider }
-    }
-}
-
-impl<P> Provider for XProviderWithWebApplicationWrapper<P>
-where
-    P: ProviderExtAuthorizationCodeGrant,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
-{
-    type Scope = String;
-
-    fn client_id(&self) -> Option<&ClientId> {
-        self.inner.client_id()
-    }
-
-    fn client_secret(&self) -> Option<&ClientSecret> {
-        self.inner.client_secret()
-    }
-
-    fn token_endpoint_url(&self) -> &Url {
-        self.inner.token_endpoint_url()
-    }
-}
-impl<P> ProviderExtAuthorizationCodeGrant for XProviderWithWebApplicationWrapper<P>
-where
-    P: ProviderExtAuthorizationCodeGrant,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
-{
-    fn redirect_uri(&self) -> Option<&RedirectUri> {
-        self.inner.redirect_uri()
-    }
-
-    fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
-        self.inner
-            .scopes_default()
-            .map(|x| x.into_iter().map(|y| y.to_string()).collect())
-    }
-
-    fn authorization_endpoint_url(&self) -> &Url {
-        self.inner.authorization_endpoint_url()
-    }
-}
-
 pub struct SigninFlow {
     pub flow: Flow<HttpClient>,
     pub provider: Box<dyn ProviderExtAuthorizationCodeGrant<Scope = String>>,
@@ -114,7 +60,9 @@ impl SigninFlow {
     {
         Self {
             flow: Flow::new(client.clone()),
-            provider: Box::new(XProviderWithWebApplicationWrapper::new(provider)),
+            provider: Box::new(ProviderExtAuthorizationCodeGrantStringScopeWrapper::new(
+                provider,
+            )),
             scopes: scopes
                 .into()
                 .map(|x| x.into_iter().map(|y| y.to_string()).collect()),
