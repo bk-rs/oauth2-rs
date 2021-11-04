@@ -1,10 +1,10 @@
-use std::error;
-
 use oauth2_client::{
-    additional_endpoints::{AccessTokenObtainFrom, UserInfo, UserInfoEndpoint},
+    additional_endpoints::{
+        AccessTokenObtainFrom, EndpointExecuteError, UserInfo, UserInfoEndpoint,
+    },
     re_exports::{
-        async_trait, serde_json, thiserror, AccessTokenResponseSuccessfulBody, Client,
-        ClientRespondEndpointError, HttpError, SerdeJsonError,
+        async_trait, serde_json, AccessTokenResponseSuccessfulBody, Client,
+        ClientRespondEndpointError,
     },
 };
 
@@ -15,9 +15,6 @@ pub struct GithubUserInfoEndpoint;
 
 #[async_trait]
 impl UserInfoEndpoint for GithubUserInfoEndpoint {
-    type Output = User;
-    type Error = GithubUserInfoEndpointError;
-
     fn can_execute(
         &self,
         _access_token_obtain_from: AccessTokenObtainFrom,
@@ -32,41 +29,30 @@ impl UserInfoEndpoint for GithubUserInfoEndpoint {
         access_token: &AccessTokenResponseSuccessfulBody<String>,
         client: &C1,
         _: &C2,
-    ) -> Result<Self::Output, Self::Error>
+    ) -> Result<UserInfo, EndpointExecuteError>
     where
         C1: Client + Send + Sync,
         C2: Client + Send + Sync,
     {
         let endpoint = UserEndpoint::new(&access_token.access_token);
 
-        let output = client
+        let user = client
             .respond_endpoint(&endpoint)
             .await
             .map_err(|err| match err {
                 ClientRespondEndpointError::RespondFailed(err) => {
-                    GithubUserInfoEndpointError::RespondFailed(Box::new(err))
+                    EndpointExecuteError::RespondFailed(Box::new(err))
                 }
                 ClientRespondEndpointError::EndpointRenderRequestFailed(err) => err.into(),
                 ClientRespondEndpointError::EndpointParseResponseFailed(err) => err.into(),
             })?;
 
-        Ok(output)
+        Ok(UserInfo::try_from(user).map_err(EndpointExecuteError::ToUserInfoFailed)?)
     }
 }
 
 //
-#[derive(thiserror::Error, Debug)]
-pub enum GithubUserInfoEndpointError {
-    #[error("MakeRequestFailed {0}")]
-    MakeRequestFailed(HttpError),
-    //
-    #[error("RespondFailed {0}")]
-    RespondFailed(Box<dyn error::Error>),
-    //
-    #[error("DeResponseBodyFailed {0}")]
-    DeResponseBodyFailed(SerdeJsonError),
-}
-impl From<UserEndpointError> for GithubUserInfoEndpointError {
+impl From<UserEndpointError> for EndpointExecuteError {
     fn from(err: UserEndpointError) -> Self {
         match err {
             UserEndpointError::MakeRequestFailed(err) => Self::MakeRequestFailed(err),
@@ -87,7 +73,7 @@ impl TryFrom<User> for UserInfo {
             raw: serde_json::to_value(user)
                 .map(|x| x.as_object().cloned())
                 .map_err(|err| err.to_string())?
-                .ok_or_else(|| "".to_owned())?,
+                .ok_or_else(|| "unreachable".to_owned())?,
         })
     }
 }

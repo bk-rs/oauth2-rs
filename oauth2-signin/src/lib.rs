@@ -1,3 +1,14 @@
+#[cfg(feature = "with-http-api-isahc-client")]
+pub(crate) use http_api_isahc_client::IsahcClient as HttpClient;
+#[cfg(feature = "http-api-reqwest-client")]
+pub(crate) use http_api_reqwest_client::ReqwestClient as HttpClient;
+
+#[cfg(any(
+    feature = "with-http-api-isahc-client",
+    feature = "http-api-reqwest-client"
+))]
+mod inner;
+
 // use std::{collections::HashMap, fmt, str};
 
 // use oauth2_client::{

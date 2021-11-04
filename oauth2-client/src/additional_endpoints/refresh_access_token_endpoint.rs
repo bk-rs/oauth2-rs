@@ -1,13 +1,8 @@
-use std::error;
-
-use super::AccessTokenObtainFrom;
+use super::{AccessTokenObtainFrom, EndpointExecuteError};
 use crate::re_exports::{async_trait, AccessTokenResponseSuccessfulBody, Client};
 
 #[async_trait]
 pub trait RefreshAccessTokenEndpoint {
-    type Output: TryInto<AccessTokenResponseSuccessfulBody<String>>;
-    type Error: error::Error + 'static;
-
     fn can_execute(
         &self,
         access_token_obtain_from: AccessTokenObtainFrom,
@@ -19,7 +14,8 @@ pub trait RefreshAccessTokenEndpoint {
         access_token_obtain_from: AccessTokenObtainFrom,
         access_token: &AccessTokenResponseSuccessfulBody<String>,
         client: &C,
-    ) -> Result<Self::Output, Self::Error>
+    ) -> Result<AccessTokenResponseSuccessfulBody<String>, EndpointExecuteError>
     where
-        C: Client + Send + Sync;
+        C: Client + Send + Sync,
+        Self: Sized;
 }

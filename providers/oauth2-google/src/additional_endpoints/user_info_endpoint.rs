@@ -1,10 +1,10 @@
-use std::error;
-
 use oauth2_client::{
-    additional_endpoints::{AccessTokenObtainFrom, UserInfo, UserInfoEndpoint},
+    additional_endpoints::{
+        AccessTokenObtainFrom, EndpointExecuteError, UserInfo, UserInfoEndpoint,
+    },
     re_exports::{
-        async_trait, serde_json, thiserror, AccessTokenResponseSuccessfulBody, Client,
-        ClientRespondEndpointError, HttpError, SerdeJsonError,
+        async_trait, serde_json, AccessTokenResponseSuccessfulBody, Client,
+        ClientRespondEndpointError,
     },
 };
 
@@ -17,9 +17,6 @@ pub struct GoogleUserInfoEndpoint;
 
 #[async_trait]
 impl UserInfoEndpoint for GoogleUserInfoEndpoint {
-    type Output = Oauth2V3UserInfo;
-    type Error = GoogleUserInfoEndpointError;
-
     fn can_execute(
         &self,
         _access_token_obtain_from: AccessTokenObtainFrom,
@@ -34,41 +31,30 @@ impl UserInfoEndpoint for GoogleUserInfoEndpoint {
         access_token: &AccessTokenResponseSuccessfulBody<String>,
         client: &C1,
         _: &C2,
-    ) -> Result<Self::Output, Self::Error>
+    ) -> Result<UserInfo, EndpointExecuteError>
     where
         C1: Client + Send + Sync,
         C2: Client + Send + Sync,
     {
         let endpoint = Oauth2V3UserInfoEndpoint::new(&access_token.access_token);
 
-        let output = client
+        let user_info = client
             .respond_endpoint(&endpoint)
             .await
             .map_err(|err| match err {
                 ClientRespondEndpointError::RespondFailed(err) => {
-                    GoogleUserInfoEndpointError::RespondFailed(Box::new(err))
+                    EndpointExecuteError::RespondFailed(Box::new(err))
                 }
                 ClientRespondEndpointError::EndpointRenderRequestFailed(err) => err.into(),
                 ClientRespondEndpointError::EndpointParseResponseFailed(err) => err.into(),
             })?;
 
-        Ok(output)
+        Ok(UserInfo::try_from(user_info).map_err(EndpointExecuteError::ToUserInfoFailed)?)
     }
 }
 
 //
-#[derive(thiserror::Error, Debug)]
-pub enum GoogleUserInfoEndpointError {
-    #[error("MakeRequestFailed {0}")]
-    MakeRequestFailed(HttpError),
-    //
-    #[error("RespondFailed {0}")]
-    RespondFailed(Box<dyn error::Error>),
-    //
-    #[error("DeResponseBodyFailed {0}")]
-    DeResponseBodyFailed(SerdeJsonError),
-}
-impl From<Oauth2V3UserInfoEndpointError> for GoogleUserInfoEndpointError {
+impl From<Oauth2V3UserInfoEndpointError> for EndpointExecuteError {
     fn from(err: Oauth2V3UserInfoEndpointError) -> Self {
         match err {
             Oauth2V3UserInfoEndpointError::MakeRequestFailed(err) => Self::MakeRequestFailed(err),
@@ -91,7 +77,7 @@ impl TryFrom<Oauth2V3UserInfo> for UserInfo {
             raw: serde_json::to_value(user_info)
                 .map(|x| x.as_object().cloned())
                 .map_err(|err| err.to_string())?
-                .ok_or_else(|| "".to_owned())?,
+                .ok_or_else(|| "unreachable".to_owned())?,
         })
     }
 }

@@ -3,9 +3,27 @@ name = "oauth2-signin"
 version = "0.0.0"
 edition = "2021"
 
+[package.metadata.docs.rs]
+features = ["with-http-api-isahc-client"]
+
+[features]
+default = ["with-http-api-isahc-client"]
+
+with-http-api-isahc-client = ["http-api-isahc-client"]
+with-http-api-reqwest-client = ["http-api-reqwest-client"]
+
 [dependencies]
 oauth2-client = { version = "^0.0", path = "../oauth2-client", default-features = false, features = [
     "with-authorization-code-grant",
-    "with-flow",
     "with-additional-endpoints",
+    "with-flow",
 ] }
+
+http-api-isahc-client = { version = "0.1", default-features = false, optional = true }
+http-api-reqwest-client = { version = "0.1", default-features = false, optional = true }
+
+[package.metadata.cargo-all-features]
+skip_optional_dependencies = true
+skip_feature_sets = [
+    ["with-http-api-isahc-client", "with-http-api-reqwest-client"],
+]
