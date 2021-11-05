@@ -26,7 +26,7 @@ default = [
 
 with-authorization-code-grant = ["oauth2-core/with-authorization-code-grant", "serde_qs"]
 with-device-authorization-grant = ["oauth2-core/with-device-authorization-grant"]
-with-additional-endpoints = ["http-api-client"]
+with-additional-endpoints = []
 
 with-flow = ["http-api-client"]
 
