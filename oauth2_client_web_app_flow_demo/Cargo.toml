@@ -5,10 +5,8 @@ edition = "2021"
 
 [dependencies]
 oauth2-signin = { version = "^0.0", path = "../oauth2-signin", features = [
-    "with-web-app",
-    # 
-    "with-web-app-github",
-    "with-web-app-google",
+    "with-github",
+    "with-google",
 ] }
 
 tokio = { version = "1.12", default-features = false, features = ["macros", "rt-multi-thread"] }

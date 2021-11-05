@@ -4,21 +4,15 @@ pub const TOKEN_URL: &str = "https://oauth2.googleapis.com/token";
 pub const AUTHORIZATION_URL: &str = "https://accounts.google.com/o/oauth2/v2/auth";
 pub const DEVICE_AUTHORIZATION_URL: &str = "https://oauth2.googleapis.com/device/code";
 
-#[cfg(feature = "with-authorization-code-grant")]
 pub mod authorization_code_grant;
-#[cfg(feature = "with-device-authorization-grant")]
 pub mod device_authorization_grant;
 
-#[cfg(feature = "with-authorization-code-grant")]
 pub use authorization_code_grant::{
     GoogleProviderForWebServerApps, GoogleProviderForWebServerAppsAccessType,
 };
-#[cfg(feature = "with-device-authorization-grant")]
 pub use device_authorization_grant::GoogleProviderForTvAndDeviceApps;
 
-#[cfg(feature = "with-additional-endpoints")]
 pub mod additional_endpoints;
-#[cfg(feature = "with-additional-endpoints")]
 pub use additional_endpoints::GoogleUserInfoEndpoint;
 
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]

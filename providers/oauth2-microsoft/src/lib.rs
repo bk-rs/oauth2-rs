@@ -1,9 +1,7 @@
 use oauth2_client::re_exports::{Deserialize_enum_str, Scope, Serialize_enum_str};
 
-#[cfg(feature = "with-device-authorization-grant")]
 pub mod device_authorization_grant;
 
-#[cfg(feature = "with-device-authorization-grant")]
 pub use device_authorization_grant::MicrosoftProviderWithDevice;
 
 pub fn token_url(tenant: impl AsRef<str>) -> String {

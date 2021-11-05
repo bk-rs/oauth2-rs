@@ -8,40 +8,26 @@ all-features = true
 
 [features]
 default = [
-    "with-web-app",
-    "with-web-app-github",
-    "with-web-app-google",
+    "with-github",
+    "with-google",
 ]
 
-with-web-app = ["oauth2-client/with-authorization-code-grant"]
-
-with-web-app-github = ["oauth2-github/with-authorization-code-grant"]
-with-web-app-google = ["oauth2-google/with-authorization-code-grant"]
+with-github = ["oauth2-github"]
+with-google = ["oauth2-google"]
 
 _priv = []
 
 [dependencies]
 oauth2-client = { version = "^0.0", path = "../oauth2-client", default-features = false, features = [
-    "with-additional-endpoints",
     "with-flow",
 ] }
 
-oauth2-github = { version = "^0.0", path = "../providers/oauth2-github", default-features = false, features = [
-    "with-additional-endpoints"
-], optional = true}
-oauth2-google = { version = "^0.0", path = "../providers/oauth2-google", default-features = false, features = [
-    "with-additional-endpoints"
-], optional = true }
+oauth2-github = { version = "^0.0", path = "../providers/oauth2-github", optional = true }
+oauth2-google = { version = "^0.0", path = "../providers/oauth2-google", optional = true }
 
 [dev-dependencies]
-oauth2-github = { version = "^0.0", path = "../providers/oauth2-github", default-features = false, features = [
-    "with-authorization-code-grant", 
-    "with-additional-endpoints"
-] }
-oauth2-google = { version = "^0.0", path = "../providers/oauth2-google", default-features = false, features = [
-    "with-authorization-code-grant", 
-    "with-additional-endpoints"
-] }
+oauth2-github = { version = "^0.0", path = "../providers/oauth2-github" }
+oauth2-google = { version = "^0.0", path = "../providers/oauth2-google" }
 
 http-api-isahc-client = { version = "0.1", default-features = false }
 
@@ -50,7 +36,7 @@ tokio = { version = "1.12", default-features = false, features = ["macros", "rt"
 [package.metadata.cargo-all-features]
 skip_optional_dependencies = true
 denylist = [
-    "with-web-app-github",
-    "with-web-app-google",
+    "with-github",
+    "with-google",
     "_priv",
 ]

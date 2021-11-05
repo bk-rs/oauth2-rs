@@ -6,20 +6,10 @@
 use http::Method;
 use mime::Mime;
 use serde::{Deserialize, Serialize};
-#[cfg(any(
-    feature = "with-authorization-code-grant",
-    feature = "with-device-authorization-grant"
-))]
 use serde_json::{Map, Value};
-#[cfg(any(feature = "with-authorization-code-grant",))]
 use url::Url;
 
-#[cfg(feature = "with-authorization-code-grant")]
 use crate::types::Code;
-#[cfg(any(
-    feature = "with-authorization-code-grant",
-    feature = "with-device-authorization-grant"
-))]
 use crate::types::{ClientId, ClientSecret};
 
 pub const METHOD: Method = Method::POST;
@@ -30,11 +20,9 @@ pub const GRANT_TYPE_WITH_AUTHORIZATION_CODE_GRANT: &str = "authorization_code";
 #[serde(tag = "grant_type")]
 pub enum Body {
     /// https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.3
-    #[cfg(feature = "with-authorization-code-grant")]
     #[serde(rename = "authorization_code")]
     AuthorizationCodeGrant(BodyWithAuthorizationCodeGrant),
     /// https://datatracker.ietf.org/doc/html/rfc8628#section-3.4
-    #[cfg(feature = "with-device-authorization-grant")]
     #[serde(rename = "urn:ietf:params:oauth:grant-type:device_code")]
     DeviceAuthorizationGrant(BodyWithDeviceAuthorizationGrant),
 }
@@ -42,7 +30,7 @@ pub enum Body {
 //
 //
 //
-#[cfg(feature = "with-authorization-code-grant")]
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct BodyWithAuthorizationCodeGrant {
     pub code: Code,
@@ -57,7 +45,7 @@ pub struct BodyWithAuthorizationCodeGrant {
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     _extensions: Option<Map<String, Value>>,
 }
-#[cfg(feature = "with-authorization-code-grant")]
+
 impl BodyWithAuthorizationCodeGrant {
     pub fn new(
         code: Code,
@@ -85,7 +73,7 @@ impl BodyWithAuthorizationCodeGrant {
 //
 //
 //
-#[cfg(feature = "with-device-authorization-grant")]
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct BodyWithDeviceAuthorizationGrant {
     pub device_code: String,
@@ -98,7 +86,7 @@ pub struct BodyWithDeviceAuthorizationGrant {
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     _extensions: Option<Map<String, Value>>,
 }
-#[cfg(feature = "with-device-authorization-grant")]
+
 impl BodyWithDeviceAuthorizationGrant {
     pub fn new(
         device_code: String,
@@ -121,7 +109,6 @@ impl BodyWithDeviceAuthorizationGrant {
     }
 }
 
-#[cfg(feature = "with-authorization-code-grant")]
 #[cfg(test)]
 mod tests_with_authorization_code_grant {
     use super::*;
@@ -144,7 +131,6 @@ mod tests_with_authorization_code_grant {
     }
 }
 
-#[cfg(feature = "with-device-authorization-grant")]
 #[cfg(test)]
 mod tests_with_device_authorization_grant {
     use super::*;

@@ -10,9 +10,9 @@ use oauth2_client::{
     re_exports::{Client, Url},
 };
 
-#[cfg(feature = "with-web-app-github")]
+#[cfg(feature = "with-github")]
 use super::{GithubProviderWithWebApplication, GithubScope, GithubUserInfoEndpoint};
-#[cfg(feature = "with-web-app-google")]
+#[cfg(feature = "with-google")]
 use super::{GoogleProviderForWebServerApps, GoogleScope, GoogleUserInfoEndpoint};
 
 use super::SigninFlowHandleCallbackRet;
@@ -22,7 +22,7 @@ pub enum SigninFlow<C>
 where
     C: Client,
 {
-    #[cfg(feature = "with-web-app-github")]
+    #[cfg(feature = "with-github")]
     Github {
         flow: Flow<C>,
         provider:
@@ -31,7 +31,7 @@ where
         user_info_endpoint: GithubUserInfoEndpoint,
         client_with_user_info: C,
     },
-    #[cfg(feature = "with-web-app-google")]
+    #[cfg(feature = "with-google")]
     Google {
         flow: Flow<C>,
         provider:
@@ -48,7 +48,7 @@ impl<C> SigninFlow<C>
 where
     C: Client,
 {
-    #[cfg(feature = "with-web-app-github")]
+    #[cfg(feature = "with-github")]
     pub fn with_github(
         client: C,
         provider: GithubProviderWithWebApplication,
@@ -69,7 +69,7 @@ where
         }
     }
 
-    #[cfg(feature = "with-web-app-google")]
+    #[cfg(feature = "with-google")]
     pub fn with_google(
         client: C,
         provider: GoogleProviderForWebServerApps,
@@ -100,7 +100,7 @@ where
         state: impl Into<Option<State>>,
     ) -> Result<Url, FlowBuildAuthorizationUrlError> {
         match self {
-            #[cfg(feature = "with-web-app-github")]
+            #[cfg(feature = "with-github")]
             Self::Github {
                 flow,
                 provider,
@@ -108,7 +108,7 @@ where
                 user_info_endpoint: _,
                 client_with_user_info: _,
             } => flow.build_authorization_url(provider, scopes.to_owned(), state),
-            #[cfg(feature = "with-web-app-google")]
+            #[cfg(feature = "with-google")]
             Self::Google {
                 flow,
                 provider,
@@ -127,7 +127,7 @@ where
         state: impl Into<Option<State>>,
     ) -> Result<Url, FlowBuildAuthorizationUrlError> {
         match self {
-            #[cfg(feature = "with-web-app-github")]
+            #[cfg(feature = "with-github")]
             Self::Github {
                 flow,
                 provider,
@@ -135,7 +135,7 @@ where
                 user_info_endpoint: _,
                 client_with_user_info: _,
             } => flow.build_authorization_url(provider, Some(custom_scopes), state),
-            #[cfg(feature = "with-web-app-google")]
+            #[cfg(feature = "with-google")]
             Self::Google {
                 flow,
                 provider,
@@ -154,7 +154,7 @@ where
         state: impl Into<Option<State>>,
     ) -> SigninFlowHandleCallbackRet {
         let access_token_ret = match self {
-            #[cfg(feature = "with-web-app-github")]
+            #[cfg(feature = "with-github")]
             Self::Github {
                 flow,
                 provider,
@@ -162,7 +162,7 @@ where
                 user_info_endpoint: _,
                 client_with_user_info: _,
             } => flow.handle_callback(provider, query, state).await,
-            #[cfg(feature = "with-web-app-google")]
+            #[cfg(feature = "with-google")]
             Self::Google {
                 flow,
                 provider,
@@ -182,7 +182,7 @@ where
         let access_token_obtain_from = AccessTokenObtainFrom::AuthorizationCodeGrant;
 
         let user_info_endpoint_can_execute = match self {
-            #[cfg(feature = "with-web-app-github")]
+            #[cfg(feature = "with-github")]
             Self::Github {
                 flow: _,
                 provider: _,
@@ -190,7 +190,7 @@ where
                 user_info_endpoint,
                 client_with_user_info: _,
             } => user_info_endpoint.can_execute(access_token_obtain_from, &access_token),
-            #[cfg(feature = "with-web-app-google")]
+            #[cfg(feature = "with-google")]
             Self::Google {
                 flow: _,
                 provider: _,
@@ -207,7 +207,7 @@ where
         }
 
         let user_info_endpoint_request_ret = match self {
-            #[cfg(feature = "with-web-app-github")]
+            #[cfg(feature = "with-github")]
             Self::Github {
                 flow: _,
                 provider: _,
@@ -215,7 +215,7 @@ where
                 user_info_endpoint,
                 client_with_user_info: _,
             } => user_info_endpoint.render_request(access_token_obtain_from, &access_token),
-            #[cfg(feature = "with-web-app-google")]
+            #[cfg(feature = "with-google")]
             Self::Google {
                 flow: _,
                 provider: _,
@@ -238,7 +238,7 @@ where
         };
 
         let user_info_endpoint_response_ret = match self {
-            #[cfg(feature = "with-web-app-github")]
+            #[cfg(feature = "with-github")]
             Self::Github {
                 flow: _,
                 provider: _,
@@ -250,7 +250,7 @@ where
                     .respond(user_info_endpoint_request)
                     .await
             }
-            #[cfg(feature = "with-web-app-google")]
+            #[cfg(feature = "with-google")]
             Self::Google {
                 flow: _,
                 provider: _,
@@ -277,7 +277,7 @@ where
         };
 
         let user_info_ret = match self {
-            #[cfg(feature = "with-web-app-github")]
+            #[cfg(feature = "with-github")]
             Self::Github {
                 flow: _,
                 provider: _,
@@ -290,7 +290,7 @@ where
                 &access_token,
                 user_info_endpoint_response,
             ),
-            #[cfg(feature = "with-web-app-google")]
+            #[cfg(feature = "with-google")]
             Self::Google {
                 flow: _,
                 provider: _,

@@ -16,14 +16,7 @@ readme = "README.md"
 all-features = true
 
 [features]
-default = [
-    "with-authorization-code-grant",
-    "with-device-authorization-grant"
-]
-
-with-authorization-code-grant = []
-with-device-authorization-grant = []
-with-implicit-grant = []
+default = []
 
 [dependencies]
 http = { version = "0.2", default-features = false }

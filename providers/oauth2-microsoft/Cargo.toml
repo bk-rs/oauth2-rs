@@ -12,18 +12,6 @@ keywords = []
 categories = []
 readme = "README.md"
 
-[package.metadata.docs.rs]
-all-features = true
-
-[features]
-default = [
-    "with-authorization-code-grant",
-    "with-device-authorization-grant"
-]
-
-with-authorization-code-grant = ["oauth2-client/with-authorization-code-grant"]
-with-device-authorization-grant = ["oauth2-client/with-device-authorization-grant"]
-
 [dependencies]
-oauth2-client = { version = "^0.0", default-features = false, path = "../../oauth2-client" }
+oauth2-client = { version = "^0.0", path = "../../oauth2-client", default-features = false }
 serde = { version = "1.0", default-features = false }

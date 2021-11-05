@@ -16,17 +16,7 @@ readme = "README.md"
 all-features = true
 
 [features]
-default = [
-    "with-authorization-code-grant",
-    "with-device-authorization-grant",
-    "with-additional-endpoints",
-    # 
-    "with-flow",
-]
-
-with-authorization-code-grant = ["oauth2-core/with-authorization-code-grant", "serde_qs"]
-with-device-authorization-grant = ["oauth2-core/with-device-authorization-grant"]
-with-additional-endpoints = []
+default = ["with-flow"]
 
 with-flow = ["http-api-client"]
 
@@ -40,7 +30,7 @@ serde = { version = "1.0", default-features = false, features = ["derive"] }
 serde-enum-str = { version = "0.2", default-features = false }
 serde_json = { version = "1.0", default-features = false, features = ["std"] }
 serde_urlencoded = { version = "0.7", default-features = false }
-serde_qs = { version = "0.8", default-features = false, optional = true }
+serde_qs = { version = "0.8", default-features = false }
 url = { version = "2.2", default-features = false }
 
 thiserror = { version = "1.0", default-features = false }
