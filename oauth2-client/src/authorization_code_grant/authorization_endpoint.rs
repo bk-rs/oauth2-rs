@@ -81,7 +81,7 @@ pub enum AuthorizationEndpointError {
     ClientIdMissing,
     //
     #[error("CustomSerRequestQueryFailed {0}")]
-    CustomSerRequestQueryFailed(Box<dyn error::Error>),
+    CustomSerRequestQueryFailed(Box<dyn error::Error + 'static>),
     //
     #[error("SerRequestQueryFailed {0}")]
     SerRequestQueryFailed(SerdeQsError),

@@ -38,7 +38,7 @@ where
     fn authorization_request_query_serializing(
         &self,
         _query: &AuthorizationRequestQuery<<Self as Provider>::Scope>,
-    ) -> Option<Result<String, Box<dyn error::Error>>> {
+    ) -> Option<Result<String, Box<dyn error::Error + 'static>>> {
         None
     }
 
@@ -51,7 +51,7 @@ where
     fn access_token_request_rendering(
         &self,
         _body: &AccessTokenRequestBody,
-    ) -> Option<Result<Request<Body>, Box<dyn error::Error>>> {
+    ) -> Option<Result<Request<Body>, Box<dyn error::Error + 'static>>> {
         None
     }
 
@@ -64,7 +64,7 @@ where
                 AccessTokenResponseSuccessfulBody<<Self as Provider>::Scope>,
                 AccessTokenResponseErrorBody,
             >,
-            Box<dyn error::Error>,
+            Box<dyn error::Error + 'static>,
         >,
     > {
         None
@@ -141,7 +141,7 @@ where
     fn authorization_request_query_serializing(
         &self,
         query: &AuthorizationRequestQuery<<Self as Provider>::Scope>,
-    ) -> Option<Result<String, Box<dyn error::Error>>> {
+    ) -> Option<Result<String, Box<dyn error::Error + 'static>>> {
         let query =
             match AuthorizationRequestQuery::<<P as Provider>::Scope>::try_from_t_with_string(query)
             {
@@ -163,7 +163,7 @@ where
     fn access_token_request_rendering(
         &self,
         body: &AccessTokenRequestBody,
-    ) -> Option<Result<Request<Body>, Box<dyn error::Error>>> {
+    ) -> Option<Result<Request<Body>, Box<dyn error::Error + 'static>>> {
         self.inner.access_token_request_rendering(body)
     }
 
@@ -176,7 +176,7 @@ where
                 AccessTokenResponseSuccessfulBody<<Self as Provider>::Scope>,
                 AccessTokenResponseErrorBody,
             >,
-            Box<dyn error::Error>,
+            Box<dyn error::Error + 'static>,
         >,
     > {
         self.inner.access_token_response_parsing(response).map(|x| {

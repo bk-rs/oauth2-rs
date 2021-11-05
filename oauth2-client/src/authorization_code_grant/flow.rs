@@ -170,7 +170,7 @@ pub enum FlowHandleCallbackError {
     StateMissing,
     //
     #[error("AccessTokenEndpointRespondFailed {0}")]
-    AccessTokenEndpointRespondFailed(Box<dyn error::Error>),
+    AccessTokenEndpointRespondFailed(Box<dyn error::Error + 'static>),
     #[error("AccessTokenEndpointError {0}")]
     AccessTokenEndpointError(AccessTokenEndpointError),
     #[error("AccessTokenFailed {0:?}")]

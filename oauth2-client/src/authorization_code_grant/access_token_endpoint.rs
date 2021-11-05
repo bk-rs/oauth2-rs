@@ -102,7 +102,7 @@ where
 #[derive(thiserror::Error, Debug)]
 pub enum AccessTokenEndpointError {
     #[error("CustomRenderingRequestFailed {0}")]
-    CustomRenderingRequestFailed(Box<dyn error::Error>),
+    CustomRenderingRequestFailed(Box<dyn error::Error + 'static>),
     //
     #[error("SerRequestBodyFailed {0}")]
     SerRequestBodyFailed(SerdeUrlencodedSerError),
@@ -110,7 +110,7 @@ pub enum AccessTokenEndpointError {
     MakeRequestFailed(HttpError),
     //
     #[error("CustomparsingResponseFailed {0}")]
-    CustomparsingResponseFailed(Box<dyn error::Error>),
+    CustomparsingResponseFailed(Box<dyn error::Error + 'static>),
     //
     #[error("DeResponseBodyFailed {0}")]
     DeResponseBodyFailed(SerdeJsonError),

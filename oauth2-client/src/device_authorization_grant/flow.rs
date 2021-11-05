@@ -133,14 +133,14 @@ where
 #[derive(thiserror::Error, Debug)]
 pub enum FlowExecuteError {
     #[error("DeviceAuthorizationEndpointRespondFailed {0}")]
-    DeviceAuthorizationEndpointRespondFailed(Box<dyn error::Error>),
+    DeviceAuthorizationEndpointRespondFailed(Box<dyn error::Error + 'static>),
     #[error("DeviceAuthorizationEndpointError {0}")]
     DeviceAuthorizationEndpointError(DeviceAuthorizationEndpointError),
     #[error("DeviceAuthorizationFailed {0:?}")]
     DeviceAuthorizationFailed(DA_RES_ErrorBody),
     //
     #[error("DeviceAccessTokenEndpointRespondFailed {0}")]
-    DeviceAccessTokenEndpointRespondFailed(Box<dyn error::Error>),
+    DeviceAccessTokenEndpointRespondFailed(Box<dyn error::Error + 'static>),
     #[error("DeviceAccessTokenEndpointError {0}")]
     DeviceAccessTokenEndpointError(DeviceAccessTokenEndpointError),
     #[error("DeviceAccessTokenFailed {0:?}")]

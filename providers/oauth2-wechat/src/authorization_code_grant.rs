@@ -81,12 +81,12 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
     fn authorization_request_query_serializing(
         &self,
         query: &AuthorizationRequestQuery<<Self as Provider>::Scope>,
-    ) -> Option<Result<String, Box<dyn error::Error>>> {
+    ) -> Option<Result<String, Box<dyn error::Error + 'static>>> {
         fn doing(
             query: &AuthorizationRequestQuery<
                 <WeChatProviderWithWebApplication as Provider>::Scope,
             >,
-        ) -> Result<String, Box<dyn error::Error>> {
+        ) -> Result<String, Box<dyn error::Error + 'static>> {
             let redirect_uri = query
                 .redirect_uri
                 .to_owned()
@@ -132,11 +132,11 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
     fn access_token_request_rendering(
         &self,
         body: &AccessTokenRequestBody,
-    ) -> Option<Result<Request<Body>, Box<dyn error::Error>>> {
+    ) -> Option<Result<Request<Body>, Box<dyn error::Error + 'static>>> {
         fn doing(
             this: &WeChatProviderWithWebApplication,
             body: &AccessTokenRequestBody,
-        ) -> Result<Request<Body>, Box<dyn error::Error>> {
+        ) -> Result<Request<Body>, Box<dyn error::Error + 'static>> {
             let appid = body
                 .client_id
                 .to_owned()
@@ -174,14 +174,14 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
                 AccessTokenResponseSuccessfulBody<<Self as Provider>::Scope>,
                 AccessTokenResponseErrorBody,
             >,
-            Box<dyn error::Error>,
+            Box<dyn error::Error + 'static>,
         >,
     > {
         fn doing(
             response: &Response<Body>,
         ) -> Result<
             Result<WeChatAccessTokenResponseSuccessfulBody, WeChatAccessTokenResponseErrorBody>,
-            Box<dyn error::Error>,
+            Box<dyn error::Error + 'static>,
         > {
             if response.status().is_success() {
                 let map = serde_json::from_slice::<Map<String, Value>>(&response.body())
