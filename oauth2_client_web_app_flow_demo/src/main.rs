@@ -14,6 +14,7 @@ use std::{collections::HashMap, env, error, fs, path::PathBuf, sync::Arc};
 
 use futures_util::future;
 use http_api_isahc_client::IsahcClient;
+use log::info;
 use oauth2_signin::{
     oauth2_client::re_exports::{ClientId, ClientSecret, RedirectUri},
     web_app::{
@@ -23,6 +24,7 @@ use oauth2_signin::{
     },
 };
 use serde::Deserialize;
+use warp::{http::Uri, Filter};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn error::Error>> {
@@ -54,6 +56,10 @@ struct ClientConfig {
     client_id: ClientId,
     client_secret: ClientSecret,
     redirect_uri: RedirectUri,
+}
+
+struct Context {
+    signin_flow_map: HashMap<&'static str, SigninFlow<IsahcClient>>,
 }
 
 async fn run(
@@ -95,7 +101,7 @@ async fn run(
 
     let ctx = Arc::new(Context { signin_flow_map });
 
-    let routes = filters::filters(ctx.clone());
+    let routes = filters(ctx.clone());
     let server_http = warp::serve(routes.clone()).run(([127, 0, 0, 1], 80));
     let server_https = warp::serve(routes)
         .tls()
@@ -108,69 +114,56 @@ async fn run(
     Ok(())
 }
 
-pub struct Context {
-    pub signin_flow_map: HashMap<&'static str, SigninFlow<IsahcClient>>,
+fn filters(
+    ctx: Arc<Context>,
+) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
+    let ctx_t = ctx.clone();
+
+    warp::path!("auth" / String)
+        .and(warp::any().map(move || ctx_t.clone()))
+        .and_then(auth_handler)
+        .or(warp::path!("auth" / String / "callback")
+            .and(
+                warp::query::raw()
+                    .map(Some)
+                    .or(warp::any().map(|| None))
+                    .unify(),
+            )
+            .and(warp::any().map(move || ctx.clone()))
+            .and_then(auth_callback_handler))
 }
 
-pub mod filters {
-    use super::*;
+async fn auth_handler(
+    provider: String,
+    ctx: Arc<Context>,
+) -> Result<impl warp::Reply, warp::Rejection> {
+    let flow = ctx.signin_flow_map.get(provider.as_str()).unwrap();
 
-    use std::sync::Arc;
+    let state = "TODO".to_owned();
 
-    use log::info;
-    use warp::{http::Uri, Filter};
+    let url = flow.build_authorization_url(state).unwrap();
 
-    pub fn filters(
-        ctx: Arc<Context>,
-    ) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
-        let ctx_t = ctx.clone();
+    info!("{} {:?}", provider, url.as_str());
 
-        warp::path!("auth" / String)
-            .and(warp::any().map(move || ctx_t.clone()))
-            .and_then(auth_handler)
-            .or(warp::path!("auth" / String / "callback")
-                .and(
-                    warp::query::raw()
-                        .map(Some)
-                        .or(warp::any().map(|| None))
-                        .unify(),
-                )
-                .and(warp::any().map(move || ctx.clone()))
-                .and_then(auth_callback_handler))
-    }
+    Ok(warp::redirect::temporary(
+        url.as_str().parse::<Uri>().unwrap(),
+    ))
+}
 
-    async fn auth_handler(
-        provider: String,
-        ctx: Arc<Context>,
-    ) -> Result<impl warp::Reply, warp::Rejection> {
-        let flow = ctx.signin_flow_map.get(provider.as_str()).unwrap();
+async fn auth_callback_handler(
+    provider: String,
+    query_raw: Option<String>,
+    ctx: Arc<Context>,
+) -> Result<impl warp::Reply, warp::Rejection> {
+    let query_raw = query_raw.unwrap();
 
-        let state = "TODO".to_owned();
+    let flow = ctx.signin_flow_map.get(provider.as_str()).unwrap();
 
-        let url = flow.build_authorization_url(state).unwrap();
+    let state = "TODO".to_owned();
 
-        info!("{} {:?}", provider, url.as_str());
+    let ret = flow.handle_callback(query_raw, state).await;
 
-        Ok(warp::redirect::temporary(
-            url.as_str().parse::<Uri>().unwrap(),
-        ))
-    }
+    info!("{} {:?}", provider, ret);
 
-    async fn auth_callback_handler(
-        provider: String,
-        query_raw: Option<String>,
-        ctx: Arc<Context>,
-    ) -> Result<impl warp::Reply, warp::Rejection> {
-        let query_raw = query_raw.unwrap();
-
-        let flow = ctx.signin_flow_map.get(provider.as_str()).unwrap();
-
-        let state = "TODO".to_owned();
-
-        let ret = flow.handle_callback(query_raw, state).await;
-
-        info!("{} {:?}", provider, ret);
-
-        Ok(warp::reply::html(format!("{:?}", ret)))
-    }
+    Ok(warp::reply::html(format!("{:?}", ret)))
 }
