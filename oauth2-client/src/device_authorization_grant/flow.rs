@@ -1,4 +1,4 @@
-use std::{error, fmt, io, str};
+use std::{fmt, str};
 
 use http_api_client::{
     Client, ClientRespondEndpointError, RetryableClient,
@@ -71,7 +71,7 @@ where
             .await
             .map_err(|err| match err {
                 ClientRespondEndpointError::RespondFailed(err) => {
-                    FlowExecuteError::DeviceAuthorizationEndpointRespondFailed(Box::new(err))
+                    FlowExecuteError::DeviceAuthorizationEndpointRespondFailed(err.to_string())
                 }
                 ClientRespondEndpointError::EndpointRenderRequestFailed(err) => {
                     FlowExecuteError::DeviceAuthorizationEndpointError(err)
@@ -108,7 +108,7 @@ where
             .await
             .map_err(|err| match err {
                 RetryableClientRespondEndpointUntilDoneError::RespondFailed(err) => {
-                    FlowExecuteError::DeviceAccessTokenEndpointRespondFailed(Box::new(err))
+                    FlowExecuteError::DeviceAccessTokenEndpointRespondFailed(err.to_string())
                 }
                 RetryableClientRespondEndpointUntilDoneError::EndpointRenderRequestFailed(err) => {
                     FlowExecuteError::DeviceAccessTokenEndpointError(err)
@@ -117,9 +117,9 @@ where
                     FlowExecuteError::DeviceAccessTokenEndpointError(err)
                 }
                 RetryableClientRespondEndpointUntilDoneError::ReachedMaxRetries => {
-                    FlowExecuteError::DeviceAccessTokenEndpointRespondFailed(Box::new(
-                        io::Error::new(io::ErrorKind::Other, "ReachedMaxRetries".to_owned()),
-                    ))
+                    FlowExecuteError::DeviceAccessTokenEndpointRespondFailed(
+                        "ReachedMaxRetries".to_owned(),
+                    )
                 }
             })?;
 
@@ -133,14 +133,14 @@ where
 #[derive(thiserror::Error, Debug)]
 pub enum FlowExecuteError {
     #[error("DeviceAuthorizationEndpointRespondFailed {0}")]
-    DeviceAuthorizationEndpointRespondFailed(Box<dyn error::Error + 'static>),
+    DeviceAuthorizationEndpointRespondFailed(String),
     #[error("DeviceAuthorizationEndpointError {0}")]
     DeviceAuthorizationEndpointError(DeviceAuthorizationEndpointError),
     #[error("DeviceAuthorizationFailed {0:?}")]
     DeviceAuthorizationFailed(DA_RES_ErrorBody),
     //
     #[error("DeviceAccessTokenEndpointRespondFailed {0}")]
-    DeviceAccessTokenEndpointRespondFailed(Box<dyn error::Error + 'static>),
+    DeviceAccessTokenEndpointRespondFailed(String),
     #[error("DeviceAccessTokenEndpointError {0}")]
     DeviceAccessTokenEndpointError(DeviceAccessTokenEndpointError),
     #[error("DeviceAccessTokenFailed {0:?}")]

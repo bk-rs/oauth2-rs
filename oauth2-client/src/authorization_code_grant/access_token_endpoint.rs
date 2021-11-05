@@ -1,4 +1,4 @@
-use std::{error, fmt, str};
+use std::{fmt, str};
 
 use http_api_endpoint::{
     http::{
@@ -44,8 +44,9 @@ where
     }
 
     if let Some(request_ret) = provider.access_token_request_rendering(&body) {
-        let request =
-            request_ret.map_err(AccessTokenEndpointError::CustomRenderingRequestFailed)?;
+        let request = request_ret.map_err(|err| {
+            AccessTokenEndpointError::CustomRenderingRequestFailed(err.to_string())
+        })?;
 
         return Ok(request);
     }
@@ -76,8 +77,9 @@ where
     <SCOPE as str::FromStr>::Err: fmt::Display,
 {
     if let Some(body_ret_ret) = provider.access_token_response_parsing(&response) {
-        let body_ret =
-            body_ret_ret.map_err(AccessTokenEndpointError::CustomparsingResponseFailed)?;
+        let body_ret = body_ret_ret.map_err(|err| {
+            AccessTokenEndpointError::CustomparsingResponseFailed(err.to_string())
+        })?;
 
         return Ok(body_ret);
     }
@@ -102,7 +104,7 @@ where
 #[derive(thiserror::Error, Debug)]
 pub enum AccessTokenEndpointError {
     #[error("CustomRenderingRequestFailed {0}")]
-    CustomRenderingRequestFailed(Box<dyn error::Error + 'static>),
+    CustomRenderingRequestFailed(String),
     //
     #[error("SerRequestBodyFailed {0}")]
     SerRequestBodyFailed(SerdeUrlencodedSerError),
@@ -110,7 +112,7 @@ pub enum AccessTokenEndpointError {
     MakeRequestFailed(HttpError),
     //
     #[error("CustomparsingResponseFailed {0}")]
-    CustomparsingResponseFailed(Box<dyn error::Error + 'static>),
+    CustomparsingResponseFailed(String),
     //
     #[error("DeResponseBodyFailed {0}")]
     DeResponseBodyFailed(SerdeJsonError),

@@ -1,4 +1,4 @@
-use std::{error, fmt, str};
+use std::{fmt, str};
 
 use http_api_client::Client;
 use oauth2_core::{
@@ -95,7 +95,7 @@ where
             .respond(access_token_endpoint_request)
             .await
             .map_err(|err| {
-                FlowHandleCallbackError::AccessTokenEndpointRespondFailed(Box::new(err))
+                FlowHandleCallbackError::AccessTokenEndpointRespondFailed(err.to_string())
             })?;
 
         let access_token_ret =
@@ -143,7 +143,7 @@ where
             .respond(access_token_endpoint_request)
             .await
             .map_err(|err| {
-                FlowHandleCallbackError::AccessTokenEndpointRespondFailed(Box::new(err))
+                FlowHandleCallbackError::AccessTokenEndpointRespondFailed(err.to_string())
             })?;
 
         let access_token_ret =
@@ -170,7 +170,7 @@ pub enum FlowHandleCallbackError {
     StateMissing,
     //
     #[error("AccessTokenEndpointRespondFailed {0}")]
-    AccessTokenEndpointRespondFailed(Box<dyn error::Error + 'static>),
+    AccessTokenEndpointRespondFailed(String),
     #[error("AccessTokenEndpointError {0}")]
     AccessTokenEndpointError(AccessTokenEndpointError),
     #[error("AccessTokenFailed {0:?}")]
