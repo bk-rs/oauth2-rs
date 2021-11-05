@@ -46,7 +46,7 @@ where
 
         let user = endpoint.parse_response(response)?;
 
-        Ok(UserInfo::try_from(user).map_err(EndpointParseResponseError::ToUserInfoFailed)?)
+        Ok(UserInfo::try_from(user).map_err(EndpointParseResponseError::ToOutputFailed)?)
     }
 }
 

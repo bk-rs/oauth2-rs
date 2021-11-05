@@ -16,7 +16,7 @@ pub enum EndpointParseResponseError {
     #[error("DeResponseBodyFailed {0}")]
     DeResponseBodyFailed(SerdeJsonError),
     #[error("ToUserInfoFailed {0}")]
-    ToUserInfoFailed(String),
+    ToOutputFailed(String),
     //
     #[error("Other {0}")]
     Other(Box<dyn error::Error>),
