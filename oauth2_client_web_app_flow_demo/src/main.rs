@@ -10,7 +10,7 @@ open http://oauth2-rs.lvh.me/auth/github
 open https://oauth2-rs.lvh.me/auth/google
 */
 
-use std::{collections::HashMap, env, error, fs, path::PathBuf, sync::Arc};
+use std::{env, error, fs, path::PathBuf, sync::Arc};
 
 use futures_util::future;
 use http_api_isahc_client::IsahcClient;
@@ -114,7 +114,7 @@ pub struct Context {
 }
 
 pub mod filters {
-    use super::Context;
+    use super::*;
 
     use std::sync::Arc;
 
@@ -124,11 +124,24 @@ pub mod filters {
     pub fn filters(
         ctx: Arc<Context>,
     ) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
+        let x = ctx.signin_flow_map.get("github").unwrap();
         let ctx_t = ctx.clone();
 
         warp::path!(String)
-            .and(warp::any().map(move || ctx_t.clone()))
-            .map(|x: String, ctx: Arc<Context>| Ok(warp::reply::html("")));
+            .and(warp::any().map(move || {
+                SigninFlow::new(
+                    IsahcClient::new().unwrap(),
+                    GithubProviderWithWebApplication::new(
+                        "".to_owned(),
+                        "".to_owned(),
+                        "".parse().unwrap(),
+                    )
+                    .unwrap(),
+                    None,
+                    GithubUserInfoEndpoint,
+                )
+            }))
+            .map(|x: String, ctx: SigninFlow<IsahcClient>| Ok(warp::reply::html("")));
 
         warp::path!("auth" / String)
             .and(warp::any().map(move || ctx_t.clone()))

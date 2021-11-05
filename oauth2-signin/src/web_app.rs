@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt, str};
+use std::{fmt, str};
 
 use oauth2_client::{
     additional_endpoints::{
@@ -14,37 +14,6 @@ use oauth2_client::{
 };
 
 #[derive(Clone)]
-pub struct SigninFlowMap<C>
-where
-    C: Client,
-{
-    inner: HashMap<String, SigninFlow<C>>,
-}
-impl<C> SigninFlowMap<C>
-where
-    C: Client,
-{
-    pub fn new() -> Self {
-        Self {
-            inner: HashMap::new(),
-        }
-    }
-    pub fn insert(
-        &mut self,
-        name: impl AsRef<str>,
-        signin_flow: SigninFlow<C>,
-    ) -> Result<(), &'static str> {
-        match self.inner.insert(name.as_ref().to_owned(), signin_flow) {
-            Some(_) => Err("name exists"),
-            None => Ok(()),
-        }
-    }
-    pub fn get(&self, name: impl AsRef<str>) -> Option<&SigninFlow<C>> {
-        self.inner.get(name.as_ref())
-    }
-}
-
-#[derive(Clone)]
 pub struct SigninFlow<C>
 where
     C: Client,
@@ -54,7 +23,6 @@ where
     pub scopes: Option<Vec<String>>,
     pub user_info_endpoint: Box<dyn UserInfoEndpoint<String>>,
     pub client_with_user_info: C,
-    pub another_client_with_user_info: C,
     _priv: (),
 }
 impl<C> SigninFlow<C>
@@ -83,7 +51,6 @@ where
                 .map(|x| x.iter().map(|y| y.to_string()).collect()),
             user_info_endpoint: Box::new(user_info_endpoint),
             client_with_user_info: client.clone(),
-            another_client_with_user_info: client.clone(),
             _priv: (),
         }
     }
@@ -193,7 +160,7 @@ pub enum SigninFlowHandleCallbackRet {
 mod tests {
     use super::*;
 
-    use std::error;
+    use std::{collections::HashMap, error};
 
     use oauth2_github::{GithubProviderWithWebApplication, GithubScope, GithubUserInfoEndpoint};
     use oauth2_google::{GoogleProviderForWebServerApps, GoogleScope, GoogleUserInfoEndpoint};
@@ -202,7 +169,7 @@ mod tests {
 
     #[test]
     fn test_build_authorization_url() -> Result<(), Box<dyn error::Error>> {
-        let mut map = SigninFlowMap::new();
+        let mut map = HashMap::new();
         map.insert(
             "github",
             SigninFlow::new(
@@ -215,7 +182,7 @@ mod tests {
                 vec![GithubScope::User],
                 GithubUserInfoEndpoint,
             ),
-        )?;
+        );
         map.insert(
             "google",
             SigninFlow::new(
@@ -228,7 +195,7 @@ mod tests {
                 vec![GoogleScope::Email],
                 GoogleUserInfoEndpoint,
             ),
-        )?;
+        );
 
         let github_auth_url = map
             .get("github")
@@ -247,7 +214,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_handle_callback() -> Result<(), Box<dyn error::Error>> {
-        let mut map = SigninFlowMap::new();
+        let mut map = HashMap::new();
         map.insert(
             "github",
             SigninFlow::new(
@@ -260,7 +227,7 @@ mod tests {
                 vec![GithubScope::User],
                 GithubUserInfoEndpoint,
             ),
-        )?;
+        );
 
         let _ = map
             .get("github")
