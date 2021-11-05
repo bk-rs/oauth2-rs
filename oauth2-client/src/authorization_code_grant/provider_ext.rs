@@ -4,13 +4,8 @@ use downcast_rs::{impl_downcast, DowncastSync};
 use dyn_clone::{clone_trait_object, DynClone};
 pub use oauth2_core::{
     access_token_request::BodyWithAuthorizationCodeGrant as AccessTokenRequestBody,
-    authorization_code_grant::{
-        access_token_response::{
-            ErrorBody as AccessTokenResponseErrorBody,
-            SuccessfulBody as AccessTokenResponseSuccessfulBody,
-        },
-        authorization_request::Query as AuthorizationRequestQuery,
-    },
+    authorization_code_grant::authorization_request::Query as AuthorizationRequestQuery,
+    re_exports::{AccessTokenResponseErrorBody, AccessTokenResponseSuccessfulBody},
     types::ScopeFromStrError,
 };
 

@@ -1,8 +1,7 @@
 use oauth2_client::re_exports::{
     http::header::{ACCEPT, AUTHORIZATION},
-    http_api_endpoint::MIME_APPLICATION_JSON,
     serde_json, thiserror, Body, Deserialize, Endpoint, HttpError, Request, Response,
-    SerdeJsonError, Serialize,
+    SerdeJsonError, Serialize, MIME_APPLICATION_JSON,
 };
 
 pub const USER_INFO_URL: &str = "https://api.github.com/user";

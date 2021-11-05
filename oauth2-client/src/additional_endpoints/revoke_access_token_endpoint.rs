@@ -2,6 +2,9 @@ use crate::re_exports::{AccessTokenResponseSuccessfulBody, Body, Request, Respon
 
 use super::{AccessTokenObtainFrom, EndpointParseResponseError, EndpointRenderRequestError};
 
+//
+//
+//
 pub trait RevokeAccessTokenEndpoint<SCOPE>
 where
     SCOPE: Scope,

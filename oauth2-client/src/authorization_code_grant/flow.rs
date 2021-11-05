@@ -6,10 +6,10 @@ use oauth2_core::{
         },
         authorization_response::ErrorQuery as A_RES_ErrorQuery,
     },
+    serde::{de::DeserializeOwned, Serialize},
     types::{Scope, State},
+    url::{ParseError as UrlParseError, Url},
 };
-use serde::{de::DeserializeOwned, Serialize};
-use url::{ParseError as UrlParseError, Url};
 
 use crate::{Provider, ProviderExtAuthorizationCodeGrant};
 
@@ -18,6 +18,9 @@ use super::{
     AccessTokenEndpointError, AuthorizationEndpointError, ParseRedirectUriQueryError,
 };
 
+//
+//
+//
 #[derive(Debug, Clone)]
 pub struct Flow<C>
 where

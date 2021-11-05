@@ -6,6 +6,9 @@ use super::{
     AccessTokenObtainFrom, EndpointParseResponseError, EndpointRenderRequestError, UserInfo,
 };
 
+//
+//
+//
 pub trait UserInfoEndpoint<SCOPE>: DynClone
 where
     SCOPE: Scope,

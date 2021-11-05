@@ -1,4 +1,4 @@
-use http_api_endpoint::{http::Error as HttpError, Body, Request, Response};
+use http_api_endpoint::{Body, Request, Response};
 use oauth2_core::{
     access_token_response::GENERAL_ERROR_BODY_KEY_ERROR,
     authorization_code_grant::{
@@ -7,14 +7,17 @@ use oauth2_core::{
             ErrorQuery as RES_ErrorQuery, SuccessfulQuery as RES_SuccessfulQuery,
         },
     },
+    http::Error as HttpError,
+    serde::Serialize,
     types::{Scope, State},
 };
-use serde::Serialize;
 use serde_json::{Map, Value};
 use serde_qs::Error as SerdeQsError;
 
 use crate::ProviderExtAuthorizationCodeGrant;
 
+//
+//
 //
 pub fn render_request<'a, SCOPE>(
     provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,

@@ -1,10 +1,4 @@
-use http_api_endpoint::{
-    http::{
-        header::{ACCEPT, CONTENT_TYPE},
-        Error as HttpError,
-    },
-    Body, Request, Response,
-};
+use http_api_endpoint::{Body, Request, Response};
 use oauth2_core::{
     access_token_request::{
         Body as REQ_Body, BodyWithAuthorizationCodeGrant, CONTENT_TYPE as REQ_CONTENT_TYPE,
@@ -14,14 +8,20 @@ use oauth2_core::{
     authorization_code_grant::access_token_response::{
         ErrorBody as RES_ErrorBody, SuccessfulBody as RES_SuccessfulBody,
     },
+    http::{
+        header::{ACCEPT, CONTENT_TYPE},
+        Error as HttpError,
+    },
+    serde::de::DeserializeOwned,
     types::{Code, Scope},
 };
-use serde::de::DeserializeOwned;
 use serde_json::{Error as SerdeJsonError, Map, Value};
 use serde_urlencoded::ser::Error as SerdeUrlencodedSerError;
 
 use crate::ProviderExtAuthorizationCodeGrant;
 
+//
+//
 //
 pub fn render_request<'a, SCOPE>(
     provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,

@@ -1,12 +1,6 @@
 use std::{cmp::max, time::Duration};
 
-use http_api_endpoint::{
-    http::{
-        header::{ACCEPT, CONTENT_TYPE},
-        Error as HttpError,
-    },
-    Body, Request, Response, RetryableEndpoint, RetryableEndpointRetry,
-};
+use http_api_endpoint::{Body, Request, Response, RetryableEndpoint, RetryableEndpointRetry};
 use oauth2_core::{
     access_token_request::{
         Body as REQ_Body, BodyWithDeviceAuthorizationGrant, CONTENT_TYPE as REQ_CONTENT_TYPE,
@@ -21,8 +15,12 @@ use oauth2_core::{
         },
         device_authorization_response::{DeviceCode, INTERVAL_DEFAULT},
     },
+    http::{
+        header::{ACCEPT, CONTENT_TYPE},
+        Error as HttpError,
+    },
+    serde::de::DeserializeOwned,
 };
-use serde::de::DeserializeOwned;
 use serde_json::{Error as SerdeJsonError, Map, Value};
 use serde_urlencoded::ser::Error as SerdeUrlencodedSerError;
 

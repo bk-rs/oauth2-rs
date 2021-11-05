@@ -1,10 +1,4 @@
-use http_api_endpoint::{
-    http::{
-        header::{ACCEPT, CONTENT_TYPE},
-        Error as HttpError,
-    },
-    Body, Endpoint, Request, Response,
-};
+use http_api_endpoint::{Body, Endpoint, Request, Response};
 use oauth2_core::{
     access_token_response::GENERAL_ERROR_BODY_KEY_ERROR,
     device_authorization_grant::{
@@ -16,8 +10,12 @@ use oauth2_core::{
             CONTENT_TYPE as RES_CONTENT_TYPE,
         },
     },
+    http::{
+        header::{ACCEPT, CONTENT_TYPE},
+        Error as HttpError,
+    },
+    serde::Serialize,
 };
-use serde::Serialize;
 use serde_json::{Error as SerdeJsonError, Map, Value};
 use serde_urlencoded::ser::Error as SerdeUrlencodedSerError;
 
