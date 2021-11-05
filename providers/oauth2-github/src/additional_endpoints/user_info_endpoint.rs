@@ -1,10 +1,12 @@
+use std::{fmt, str};
+
 use oauth2_client::{
     additional_endpoints::{
-        AccessTokenObtainFrom, EndpointExecuteError, UserInfo, UserInfoEndpoint,
+        AccessTokenObtainFrom, EndpointParseResponseError, EndpointRenderRequestError, UserInfo,
+        UserInfoEndpoint,
     },
     re_exports::{
-        async_trait, serde_json, AccessTokenResponseSuccessfulBody, Client,
-        ClientRespondEndpointError,
+        serde_json, AccessTokenResponseSuccessfulBody, Body, Endpoint, Request, Response, Scope,
     },
 };
 
@@ -13,49 +15,54 @@ use super::internal_user_endpoint::{User, UserEndpoint, UserEndpointError};
 //
 pub struct GithubUserInfoEndpoint;
 
-#[async_trait]
-impl UserInfoEndpoint for GithubUserInfoEndpoint {
+impl<SCOPE> UserInfoEndpoint<SCOPE> for GithubUserInfoEndpoint
+where
+    SCOPE: Scope,
+    <SCOPE as str::FromStr>::Err: fmt::Display,
+{
     fn can_execute(
         &self,
         _access_token_obtain_from: AccessTokenObtainFrom,
-        _access_token: &AccessTokenResponseSuccessfulBody<String>,
+        _access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
     ) -> bool {
         true
     }
 
-    async fn execute<C1, C2>(
+    fn render_request(
         &self,
         _access_token_obtain_from: AccessTokenObtainFrom,
-        access_token: &AccessTokenResponseSuccessfulBody<String>,
-        client: &C1,
-        _: &C2,
-    ) -> Result<UserInfo, EndpointExecuteError>
-    where
-        C1: Client + Send + Sync,
-        C2: Client + Send + Sync,
-    {
+        access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
+    ) -> Result<Request<Body>, EndpointRenderRequestError> {
         let endpoint = UserEndpoint::new(&access_token.access_token);
 
-        let user = client
-            .respond_endpoint(&endpoint)
-            .await
-            .map_err(|err| match err {
-                ClientRespondEndpointError::RespondFailed(err) => {
-                    EndpointExecuteError::RespondFailed(Box::new(err))
-                }
-                ClientRespondEndpointError::EndpointRenderRequestFailed(err) => err.into(),
-                ClientRespondEndpointError::EndpointParseResponseFailed(err) => err.into(),
-            })?;
+        endpoint.render_request().map_err(Into::into)
+    }
 
-        Ok(UserInfo::try_from(user).map_err(EndpointExecuteError::ToUserInfoFailed)?)
+    fn parse_response(
+        &self,
+        response: Response<Body>,
+    ) -> Result<UserInfo, EndpointParseResponseError> {
+        let endpoint = UserEndpoint::new("");
+
+        let user = endpoint.parse_response(response)?;
+
+        Ok(UserInfo::try_from(user).map_err(EndpointParseResponseError::ToUserInfoFailed)?)
     }
 }
 
 //
-impl From<UserEndpointError> for EndpointExecuteError {
+impl From<UserEndpointError> for EndpointRenderRequestError {
     fn from(err: UserEndpointError) -> Self {
         match err {
             UserEndpointError::MakeRequestFailed(err) => Self::MakeRequestFailed(err),
+            UserEndpointError::DeResponseBodyFailed(err) => Self::Other(Box::new(err)),
+        }
+    }
+}
+impl From<UserEndpointError> for EndpointParseResponseError {
+    fn from(err: UserEndpointError) -> Self {
+        match err {
+            UserEndpointError::MakeRequestFailed(err) => Self::Other(Box::new(err)),
             UserEndpointError::DeResponseBodyFailed(err) => Self::DeResponseBodyFailed(err),
         }
     }

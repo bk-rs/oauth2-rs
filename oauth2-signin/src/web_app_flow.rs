@@ -50,7 +50,7 @@ where
     pub flow: Flow<C>,
     pub provider: Box<dyn ProviderExtAuthorizationCodeGrant<Scope = String>>,
     pub scopes: Option<Vec<String>>,
-    pub user_info_endpoint: Box<dyn UserInfoEndpoint>,
+    pub user_info_endpoint: Box<dyn UserInfoEndpoint<String>>,
     pub client_with_user_info: C,
     pub another_client_with_user_info: C,
     _priv: (),
@@ -69,7 +69,7 @@ where
         C: Clone,
         P: ProviderExtAuthorizationCodeGrant + 'static,
         <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
-        UIEP: UserInfoEndpoint + 'static,
+        UIEP: UserInfoEndpoint<String> + 'static,
     {
         Self {
             flow: Flow::new(client.clone()),
@@ -131,24 +131,47 @@ where
             return SigninFlowHandleCallbackRet::Ok((access_token, None));
         }
 
-        // let user_info = match self
-        //     .user_info_endpoint
-        //     .execute(
-        //         access_token_obtain_from,
-        //         &access_token,
-        //         &self.client_with_user_info,
-        //         &self.another_client_with_user_info,
-        //     )
-        //     .await
-        // {
-        //     Ok(x) => x,
-        //     Err(err) => {
-        //         return SigninFlowHandleCallbackRet::FetchUserInfoError((access_token, err));
-        //     }
-        // };
+        let user_info_endpoint_request = match self
+            .user_info_endpoint
+            .render_request(access_token_obtain_from, &access_token)
+        {
+            Ok(x) => x,
+            Err(err) => {
+                return SigninFlowHandleCallbackRet::FetchUserInfoError((
+                    access_token,
+                    EndpointExecuteError::RenderRequestError(err),
+                ));
+            }
+        };
 
-        // SigninFlowHandleCallbackRet::Ok((access_token, Some(user_info)))
-        SigninFlowHandleCallbackRet::Ok((access_token, None))
+        let user_info_endpoint_response = match self
+            .client_with_user_info
+            .respond(user_info_endpoint_request)
+            .await
+        {
+            Ok(x) => x,
+            Err(err) => {
+                return SigninFlowHandleCallbackRet::FetchUserInfoError((
+                    access_token,
+                    EndpointExecuteError::RespondFailed(Box::new(err)),
+                ));
+            }
+        };
+
+        let user_info = match self
+            .user_info_endpoint
+            .parse_response(user_info_endpoint_response)
+        {
+            Ok(x) => x,
+            Err(err) => {
+                return SigninFlowHandleCallbackRet::FetchUserInfoError((
+                    access_token,
+                    EndpointExecuteError::ParseResponseError(err),
+                ));
+            }
+        };
+
+        SigninFlowHandleCallbackRet::Ok((access_token, Some(user_info)))
     }
 }
 

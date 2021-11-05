@@ -1,21 +1,28 @@
-use super::{AccessTokenObtainFrom, EndpointExecuteError};
-use crate::re_exports::{async_trait, AccessTokenResponseSuccessfulBody, Client};
+use std::{fmt, str};
 
-#[async_trait]
-pub trait RefreshAccessTokenEndpoint {
+use crate::re_exports::{AccessTokenResponseSuccessfulBody, Body, Request, Response, Scope};
+
+use super::{AccessTokenObtainFrom, EndpointParseResponseError, EndpointRenderRequestError};
+
+pub trait RefreshAccessTokenEndpoint<SCOPE>
+where
+    SCOPE: Scope,
+    <SCOPE as str::FromStr>::Err: fmt::Display,
+{
     fn can_execute(
         &self,
         access_token_obtain_from: AccessTokenObtainFrom,
-        access_token: &AccessTokenResponseSuccessfulBody<String>,
+        access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
     ) -> bool;
 
-    async fn execute<C>(
+    fn render_request(
         &self,
         access_token_obtain_from: AccessTokenObtainFrom,
-        access_token: &AccessTokenResponseSuccessfulBody<String>,
-        client: &C,
-    ) -> Result<AccessTokenResponseSuccessfulBody<String>, EndpointExecuteError>
-    where
-        C: Client + Send + Sync,
-        Self: Sized;
+        access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
+    ) -> Result<Request<Body>, EndpointRenderRequestError>;
+
+    fn parse_response(
+        &self,
+        response: Response<Body>,
+    ) -> Result<AccessTokenResponseSuccessfulBody<SCOPE>, EndpointParseResponseError>;
 }
