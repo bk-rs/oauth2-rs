@@ -47,9 +47,8 @@ where
         state: impl Into<Option<State>>,
     ) -> Result<Url, FlowBuildAuthorizationUrlError>
     where
-        SCOPE: Scope,
+        SCOPE: Scope + Serialize,
         <SCOPE as str::FromStr>::Err: fmt::Display,
-        SCOPE: Serialize,
     {
         // Step 1
         build_authorization_url(provider, scopes, state)
@@ -69,7 +68,55 @@ where
     where
         P: ProviderExtAuthorizationCodeGrant + Send + Sync,
         <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
-        <P as Provider>::Scope: DeserializeOwned + Send + Sync,
+        <P as Provider>::Scope: Serialize + DeserializeOwned + Send + Sync,
+    {
+        // Step 3
+        let query = parse_redirect_uri_query(query.as_ref())
+            .map_err(FlowHandleCallbackError::ParseRedirectUriQueryError)?;
+
+        let query = query.map_err(FlowHandleCallbackError::AuthorizationFailed)?;
+
+        if let Some(ref state) = state.into() {
+            if let Some(query_state) = &query.state {
+                if state != query_state {
+                    return Err(FlowHandleCallbackError::StateMismatch);
+                }
+            } else {
+                return Err(FlowHandleCallbackError::StateMissing);
+            }
+        }
+
+        let access_token_endpoint_request =
+            access_token_endpoint::render_request(provider, query.code)
+                .map_err(FlowHandleCallbackError::AccessTokenEndpointError)?;
+
+        let access_token_endpoint_response = self
+            .client_with_token
+            .respond(access_token_endpoint_request)
+            .await
+            .map_err(|err| {
+                FlowHandleCallbackError::AccessTokenEndpointRespondFailed(Box::new(err))
+            })?;
+
+        let access_token_ret =
+            access_token_endpoint::parse_response(provider, access_token_endpoint_response)
+                .map_err(FlowHandleCallbackError::AccessTokenEndpointError)?;
+
+        let access_token_successful_body =
+            access_token_ret.map_err(FlowHandleCallbackError::AccessTokenFailed)?;
+
+        Ok(access_token_successful_body)
+    }
+
+    pub async fn handle_callback_with_dyn<SCOPE>(
+        &self,
+        provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
+        query: impl AsRef<str>,
+        state: impl Into<Option<State>>,
+    ) -> Result<AT_RES_SuccessfulBody<SCOPE>, FlowHandleCallbackError>
+    where
+        SCOPE: Scope + DeserializeOwned + Send + Sync,
+        <SCOPE as str::FromStr>::Err: fmt::Display,
     {
         // Step 3
         let query = parse_redirect_uri_query(query.as_ref())

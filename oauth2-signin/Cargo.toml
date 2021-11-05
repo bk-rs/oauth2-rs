@@ -31,3 +31,5 @@ skip_feature_sets = [
 [dev-dependencies]
 oauth2-github = { version = "^0.0", path = "../providers/oauth2-github", default-features = false, features = ["with-authorization-code-grant", "with-additional-endpoints"] }
 oauth2-google = { version = "^0.0", path = "../providers/oauth2-google", default-features = false, features = ["with-authorization-code-grant", "with-additional-endpoints"] }
+
+tokio = { version = "1.12", default-features = false, features = ["macros", "rt"] }

@@ -123,7 +123,7 @@ where
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
         self.inner
             .scopes_default()
-            .map(|x| x.into_iter().map(|y| y.to_string()).collect())
+            .map(|x| x.iter().map(|y| y.to_string()).collect())
     }
 
     fn authorization_endpoint_url(&self) -> &Url {
