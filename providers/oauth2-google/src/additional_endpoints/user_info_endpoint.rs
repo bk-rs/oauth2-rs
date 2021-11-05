@@ -20,14 +20,6 @@ impl<SCOPE> UserInfoEndpoint<SCOPE> for GoogleUserInfoEndpoint
 where
     SCOPE: Scope,
 {
-    fn can_execute(
-        &self,
-        _access_token_obtain_from: AccessTokenObtainFrom,
-        _access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> bool {
-        true
-    }
-
     fn render_request(
         &self,
         _access_token_obtain_from: AccessTokenObtainFrom,

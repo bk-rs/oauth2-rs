@@ -6,6 +6,8 @@ pub use user_info::UserInfo;
 
 //
 pub mod endpoint_errors;
+pub mod endpoint_output_obtain_from;
+
 pub mod refresh_access_token_endpoint;
 pub mod revoke_access_token_endpoint;
 pub mod user_info_endpoint;
@@ -13,6 +15,8 @@ pub mod user_info_endpoint;
 pub use endpoint_errors::{
     EndpointExecuteError, EndpointParseResponseError, EndpointRenderRequestError,
 };
+pub use endpoint_output_obtain_from::EndpointOutputObtainFrom;
+
 pub use refresh_access_token_endpoint::RefreshAccessTokenEndpoint;
 pub use revoke_access_token_endpoint::RevokeAccessTokenEndpoint;
-pub use user_info_endpoint::UserInfoEndpoint;
+pub use user_info_endpoint::{DefaultUserInfoEndpoint, UserInfoEndpoint};

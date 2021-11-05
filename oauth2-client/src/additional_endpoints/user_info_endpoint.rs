@@ -1,9 +1,12 @@
+use std::error;
+
 use dyn_clone::{clone_trait_object, DynClone};
 
 use crate::re_exports::{AccessTokenResponseSuccessfulBody, Body, Request, Response, Scope};
 
 use super::{
-    AccessTokenObtainFrom, EndpointParseResponseError, EndpointRenderRequestError, UserInfo,
+    AccessTokenObtainFrom, EndpointOutputObtainFrom, EndpointParseResponseError,
+    EndpointRenderRequestError, UserInfo,
 };
 
 //
@@ -13,11 +16,21 @@ pub trait UserInfoEndpoint<SCOPE>: DynClone
 where
     SCOPE: Scope,
 {
-    fn can_execute(
+    fn obtain_from(
         &self,
-        access_token_obtain_from: AccessTokenObtainFrom,
-        access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> bool;
+        _access_token_obtain_from: AccessTokenObtainFrom,
+        _access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
+    ) -> EndpointOutputObtainFrom {
+        EndpointOutputObtainFrom::Respond
+    }
+
+    fn build(
+        &self,
+        _access_token_obtain_from: AccessTokenObtainFrom,
+        _access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
+    ) -> Result<UserInfo, Box<dyn error::Error + 'static>> {
+        unimplemented!()
+    }
 
     fn render_request(
         &self,
@@ -34,3 +47,39 @@ where
 }
 
 clone_trait_object!(<SCOPE> UserInfoEndpoint<SCOPE> where SCOPE: Clone);
+
+//
+//
+//
+#[derive(Debug, Clone)]
+pub struct DefaultUserInfoEndpoint;
+
+impl<SCOPE> UserInfoEndpoint<SCOPE> for DefaultUserInfoEndpoint
+where
+    SCOPE: Scope,
+{
+    fn obtain_from(
+        &self,
+        _access_token_obtain_from: AccessTokenObtainFrom,
+        _access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
+    ) -> EndpointOutputObtainFrom {
+        EndpointOutputObtainFrom::None
+    }
+
+    fn render_request(
+        &self,
+        _access_token_obtain_from: AccessTokenObtainFrom,
+        _access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
+    ) -> Result<Request<Body>, EndpointRenderRequestError> {
+        unreachable!()
+    }
+
+    fn parse_response(
+        &self,
+        _access_token_obtain_from: AccessTokenObtainFrom,
+        _access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
+        _response: Response<Body>,
+    ) -> Result<UserInfo, EndpointParseResponseError> {
+        unreachable!()
+    }
+}

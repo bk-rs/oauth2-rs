@@ -1,6 +1,9 @@
 use crate::re_exports::{AccessTokenResponseSuccessfulBody, Body, Request, Response, Scope};
 
-use super::{AccessTokenObtainFrom, EndpointParseResponseError, EndpointRenderRequestError};
+use super::{
+    AccessTokenObtainFrom, EndpointOutputObtainFrom, EndpointParseResponseError,
+    EndpointRenderRequestError,
+};
 
 //
 //
@@ -9,11 +12,13 @@ pub trait RevokeAccessTokenEndpoint<SCOPE>
 where
     SCOPE: Scope,
 {
-    fn can_execute(
+    fn obtain_from(
         &self,
-        access_token_obtain_from: AccessTokenObtainFrom,
-        access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> bool;
+        _access_token_obtain_from: AccessTokenObtainFrom,
+        _access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
+    ) -> EndpointOutputObtainFrom {
+        EndpointOutputObtainFrom::Respond
+    }
 
     fn render_request(
         &self,

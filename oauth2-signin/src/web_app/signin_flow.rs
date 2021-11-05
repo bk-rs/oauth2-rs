@@ -1,5 +1,8 @@
 use oauth2_client::{
-    additional_endpoints::{AccessTokenObtainFrom, EndpointExecuteError, UserInfoEndpoint},
+    additional_endpoints::{
+        AccessTokenObtainFrom, EndpointExecuteError, EndpointOutputObtainFrom,
+        EndpointRenderRequestError, UserInfoEndpoint,
+    },
     authorization_code_grant::{
         provider_ext::ProviderExtAuthorizationCodeGrantStringScopeWrapper, Flow,
         FlowBuildAuthorizationUrlError,
@@ -179,7 +182,7 @@ where
 
         let access_token_obtain_from = AccessTokenObtainFrom::AuthorizationCodeGrant;
 
-        let user_info_endpoint_can_execute = match self {
+        let user_info_endpoint_obtain_from = match self {
             #[cfg(feature = "with-github")]
             Self::Github {
                 flow: _,
@@ -187,7 +190,7 @@ where
                 scopes: _,
                 user_info_endpoint,
                 client_with_user_info: _,
-            } => user_info_endpoint.can_execute(access_token_obtain_from, &access_token),
+            } => user_info_endpoint.obtain_from(access_token_obtain_from, &access_token),
             #[cfg(feature = "with-google")]
             Self::Google {
                 flow: _,
@@ -195,13 +198,52 @@ where
                 scopes: _,
                 user_info_endpoint,
                 client_with_user_info: _,
-            } => user_info_endpoint.can_execute(access_token_obtain_from, &access_token),
+            } => user_info_endpoint.obtain_from(access_token_obtain_from, &access_token),
             #[cfg(feature = "_priv")]
             Self::_X(_) => unreachable!(),
         };
 
-        if !user_info_endpoint_can_execute {
-            return SigninFlowHandleCallbackRet::Ok((access_token, None));
+        match user_info_endpoint_obtain_from {
+            EndpointOutputObtainFrom::None => {
+                return SigninFlowHandleCallbackRet::Ok((access_token, None));
+            }
+            EndpointOutputObtainFrom::Build => {
+                let user_info_ret = match self {
+                    #[cfg(feature = "with-github")]
+                    Self::Github {
+                        flow: _,
+                        provider: _,
+                        scopes: _,
+                        user_info_endpoint,
+                        client_with_user_info: _,
+                    } => user_info_endpoint.build(access_token_obtain_from, &access_token),
+                    #[cfg(feature = "with-google")]
+                    Self::Google {
+                        flow: _,
+                        provider: _,
+                        scopes: _,
+                        user_info_endpoint,
+                        client_with_user_info: _,
+                    } => user_info_endpoint.build(access_token_obtain_from, &access_token),
+                    #[cfg(feature = "_priv")]
+                    Self::_X(_) => unreachable!(),
+                };
+
+                match user_info_ret {
+                    Ok(user_info) => {
+                        return SigninFlowHandleCallbackRet::Ok((access_token, Some(user_info)));
+                    }
+                    Err(err) => {
+                        return SigninFlowHandleCallbackRet::FetchUserInfoError((
+                            access_token,
+                            EndpointExecuteError::RenderRequestError(
+                                EndpointRenderRequestError::Other(err.to_string()),
+                            ),
+                        ));
+                    }
+                }
+            }
+            EndpointOutputObtainFrom::Respond => {}
         }
 
         let user_info_endpoint_request_ret = match self {

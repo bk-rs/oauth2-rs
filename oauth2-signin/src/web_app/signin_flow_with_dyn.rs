@@ -1,6 +1,7 @@
 use oauth2_client::{
     additional_endpoints::{
-        AccessTokenObtainFrom, EndpointExecuteError, UserInfo, UserInfoEndpoint,
+        AccessTokenObtainFrom, EndpointExecuteError, EndpointOutputObtainFrom,
+        EndpointRenderRequestError, UserInfo, UserInfoEndpoint,
     },
     authorization_code_grant::{
         provider_ext::ProviderExtAuthorizationCodeGrantStringScopeWrapper, Flow,
@@ -91,11 +92,32 @@ where
 
         let access_token_obtain_from = AccessTokenObtainFrom::AuthorizationCodeGrant;
 
-        if !self
+        match self
             .user_info_endpoint
-            .can_execute(access_token_obtain_from, &access_token)
+            .obtain_from(access_token_obtain_from, &access_token)
         {
-            return SigninFlowHandleCallbackRet::Ok((access_token, None));
+            EndpointOutputObtainFrom::None => {
+                return SigninFlowHandleCallbackRet::Ok((access_token, None));
+            }
+            EndpointOutputObtainFrom::Build => {
+                match self
+                    .user_info_endpoint
+                    .build(access_token_obtain_from, &access_token)
+                {
+                    Ok(user_info) => {
+                        return SigninFlowHandleCallbackRet::Ok((access_token, Some(user_info)));
+                    }
+                    Err(err) => {
+                        return SigninFlowHandleCallbackRet::FetchUserInfoError((
+                            access_token,
+                            EndpointExecuteError::RenderRequestError(
+                                EndpointRenderRequestError::Other(err.to_string()),
+                            ),
+                        ));
+                    }
+                };
+            }
+            EndpointOutputObtainFrom::Respond => {}
         }
 
         let user_info_endpoint_request = match self
