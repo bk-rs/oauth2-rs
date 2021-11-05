@@ -56,14 +56,14 @@ impl From<UserEndpointError> for EndpointRenderRequestError {
     fn from(err: UserEndpointError) -> Self {
         match err {
             UserEndpointError::MakeRequestFailed(err) => Self::MakeRequestFailed(err),
-            UserEndpointError::DeResponseBodyFailed(err) => Self::Other(Box::new(err)),
+            UserEndpointError::DeResponseBodyFailed(err) => Self::Other(err.to_string()),
         }
     }
 }
 impl From<UserEndpointError> for EndpointParseResponseError {
     fn from(err: UserEndpointError) -> Self {
         match err {
-            UserEndpointError::MakeRequestFailed(err) => Self::Other(Box::new(err)),
+            UserEndpointError::MakeRequestFailed(err) => Self::Other(err.to_string()),
             UserEndpointError::DeResponseBodyFailed(err) => Self::DeResponseBodyFailed(err),
         }
     }

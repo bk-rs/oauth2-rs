@@ -122,7 +122,7 @@ where
             Err(err) => {
                 return SigninFlowHandleCallbackRet::FetchUserInfoError((
                     access_token,
-                    EndpointExecuteError::RespondFailed(Box::new(err)),
+                    EndpointExecuteError::RespondFailed(err.to_string()),
                 ));
             }
         };

@@ -58,14 +58,16 @@ impl From<Oauth2V3UserInfoEndpointError> for EndpointRenderRequestError {
     fn from(err: Oauth2V3UserInfoEndpointError) -> Self {
         match err {
             Oauth2V3UserInfoEndpointError::MakeRequestFailed(err) => Self::MakeRequestFailed(err),
-            Oauth2V3UserInfoEndpointError::DeResponseBodyFailed(err) => Self::Other(Box::new(err)),
+            Oauth2V3UserInfoEndpointError::DeResponseBodyFailed(err) => {
+                Self::Other(err.to_string())
+            }
         }
     }
 }
 impl From<Oauth2V3UserInfoEndpointError> for EndpointParseResponseError {
     fn from(err: Oauth2V3UserInfoEndpointError) -> Self {
         match err {
-            Oauth2V3UserInfoEndpointError::MakeRequestFailed(err) => Self::Other(Box::new(err)),
+            Oauth2V3UserInfoEndpointError::MakeRequestFailed(err) => Self::Other(err.to_string()),
             Oauth2V3UserInfoEndpointError::DeResponseBodyFailed(err) => {
                 Self::DeResponseBodyFailed(err)
             }

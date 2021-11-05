@@ -123,7 +123,6 @@ pub mod filters {
     pub fn filters(
         ctx: Arc<Context>,
     ) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
-        let x = ctx.signin_flow_map.get("github").unwrap();
         let ctx_t = ctx.clone();
 
         warp::path!("auth" / String)
