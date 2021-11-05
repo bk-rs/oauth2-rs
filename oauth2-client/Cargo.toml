@@ -45,6 +45,7 @@ url = { version = "2.2", default-features = false }
 
 thiserror = { version = "1.0", default-features = false }
 dyn-clone = { version = "1.0", default-features = false }
+downcast-rs = { version = "1.2", default-features = false }
 
 [package.metadata.cargo-all-features]
 skip_optional_dependencies = true

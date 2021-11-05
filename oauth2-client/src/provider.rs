@@ -1,8 +1,10 @@
+use downcast_rs::{impl_downcast, DowncastSync};
+use dyn_clone::{clone_trait_object, DynClone};
+
 use crate::re_exports::{ClientId, ClientSecret, Scope, Url};
 
 //
-use dyn_clone::{clone_trait_object, DynClone};
-pub trait Provider: DynClone {
+pub trait Provider: DynClone + DowncastSync {
     type Scope: Scope;
 
     fn client_id(&self) -> Option<&ClientId>;
@@ -13,6 +15,7 @@ pub trait Provider: DynClone {
 }
 
 clone_trait_object!(<SCOPE> Provider<Scope = SCOPE> where SCOPE: Clone);
+impl_downcast!(Provider assoc Scope where Scope: self::Scope);
 
 //
 //

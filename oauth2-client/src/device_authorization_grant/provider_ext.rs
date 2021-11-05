@@ -1,14 +1,15 @@
 use std::{fmt, str};
 
+use downcast_rs::{impl_downcast, DowncastSync};
 use dyn_clone::{clone_trait_object, DynClone};
 
 use crate::{
-    re_exports::{ClientId, ClientSecret, Map, Url, Value},
+    re_exports::{ClientId, ClientSecret, Map, Scope, Url, Value},
     Provider,
 };
 
 //
-pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone {
+pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone + DowncastSync {
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
         None
     }
@@ -25,6 +26,7 @@ pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone {
 }
 
 clone_trait_object!(<SCOPE> ProviderExtDeviceAuthorizationGrant<Scope = SCOPE> where SCOPE: Clone);
+impl_downcast!(ProviderExtDeviceAuthorizationGrant assoc Scope where Scope: self::Scope, <Scope as str::FromStr>::Err: fmt::Display);
 
 //
 //
