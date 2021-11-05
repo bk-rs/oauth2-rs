@@ -1,4 +1,4 @@
-use std::{marker::PhantomData, str};
+use std::str;
 
 use oauth2_client::{
     additional_endpoints::{AccessTokenObtainFrom, EndpointExecuteError, UserInfoEndpoint},
@@ -40,7 +40,8 @@ where
         user_info_endpoint: GoogleUserInfoEndpoint,
         client_with_user_info: C,
     },
-    _X(PhantomData<C>),
+    #[cfg(feature = "_priv")]
+    _X(std::markder::PhantomData<C>),
 }
 
 impl<C> SigninFlow<C>
@@ -115,7 +116,8 @@ where
                 user_info_endpoint: _,
                 client_with_user_info: _,
             } => flow.build_authorization_url(provider, scopes.to_owned(), state),
-            Self::_X(_) => todo!(),
+            #[cfg(feature = "_priv")]
+            Self::_X(_) => unreachable!(),
         }
     }
 
@@ -141,7 +143,8 @@ where
                 user_info_endpoint: _,
                 client_with_user_info: _,
             } => flow.build_authorization_url(provider, Some(custom_scopes), state),
-            Self::_X(_) => todo!(),
+            #[cfg(feature = "_priv")]
+            Self::_X(_) => unreachable!(),
         }
     }
 
@@ -167,7 +170,8 @@ where
                 user_info_endpoint: _,
                 client_with_user_info: _,
             } => flow.handle_callback(provider, query, state).await,
-            Self::_X(_) => todo!(),
+            #[cfg(feature = "_priv")]
+            Self::_X(_) => unreachable!(),
         };
 
         let access_token = match access_token_ret {
@@ -194,7 +198,8 @@ where
                 user_info_endpoint,
                 client_with_user_info: _,
             } => user_info_endpoint.can_execute(access_token_obtain_from, &access_token),
-            Self::_X(_) => todo!(),
+            #[cfg(feature = "_priv")]
+            Self::_X(_) => unreachable!(),
         };
 
         if !user_info_endpoint_can_execute {
@@ -218,7 +223,8 @@ where
                 user_info_endpoint,
                 client_with_user_info: _,
             } => user_info_endpoint.render_request(access_token_obtain_from, &access_token),
-            Self::_X(_) => todo!(),
+            #[cfg(feature = "_priv")]
+            Self::_X(_) => unreachable!(),
         };
 
         let user_info_endpoint_request = match user_info_endpoint_request_ret {
@@ -256,7 +262,8 @@ where
                     .respond(user_info_endpoint_request)
                     .await
             }
-            Self::_X(_) => todo!(),
+            #[cfg(feature = "_priv")]
+            Self::_X(_) => unreachable!(),
         };
 
         let user_info_endpoint_response = match user_info_endpoint_response_ret {
@@ -292,7 +299,8 @@ where
                 user_info_endpoint,
                 user_info_endpoint_response,
             ),
-            Self::_X(_) => todo!(),
+            #[cfg(feature = "_priv")]
+            Self::_X(_) => unreachable!(),
         };
 
         let user_info = match user_info_ret {

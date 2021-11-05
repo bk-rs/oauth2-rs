@@ -38,3 +38,6 @@ url = { version = "2.2", default-features = false, features = ["serde"] }
 serde_json = { version = "1.0" }
 serde_urlencoded = { version = "0.7" }
 serde_qs = { version = "0.8" }
+
+[package.metadata.cargo-all-features]
+skip_optional_dependencies = true
