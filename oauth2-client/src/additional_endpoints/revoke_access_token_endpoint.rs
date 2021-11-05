@@ -21,5 +21,10 @@ where
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
     ) -> Result<Request<Body>, EndpointRenderRequestError>;
 
-    fn parse_response(&self, response: Response<Body>) -> Result<(), EndpointParseResponseError>;
+    fn parse_response(
+        &self,
+        access_token_obtain_from: AccessTokenObtainFrom,
+        access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
+        response: Response<Body>,
+    ) -> Result<(), EndpointParseResponseError>;
 }

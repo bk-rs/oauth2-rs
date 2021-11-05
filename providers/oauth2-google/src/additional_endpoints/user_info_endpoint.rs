@@ -43,6 +43,8 @@ where
 
     fn parse_response(
         &self,
+        _access_token_obtain_from: AccessTokenObtainFrom,
+        _access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
         response: Response<Body>,
     ) -> Result<UserInfo, EndpointParseResponseError> {
         let endpoint = Oauth2V3UserInfoEndpoint::new("");

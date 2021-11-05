@@ -127,10 +127,11 @@ where
             }
         };
 
-        let user_info = match self
-            .user_info_endpoint
-            .parse_response(user_info_endpoint_response)
-        {
+        let user_info = match self.user_info_endpoint.parse_response(
+            access_token_obtain_from,
+            &access_token,
+            user_info_endpoint_response,
+        ) {
             Ok(x) => x,
             Err(err) => {
                 return SigninFlowHandleCallbackRet::FetchUserInfoError((

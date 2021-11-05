@@ -51,6 +51,7 @@ impl Endpoint for UserEndpoint {
 pub struct User {
     pub login: String,
     pub id: usize,
+    pub avatar_url: String,
     pub name: String,
     pub email: String,
 }

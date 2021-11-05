@@ -286,6 +286,8 @@ where
                 client_with_user_info: _,
             } => UserInfoEndpoint::<String>::parse_response(
                 user_info_endpoint,
+                access_token_obtain_from,
+                &access_token,
                 user_info_endpoint_response,
             ),
             #[cfg(feature = "with-web-app-google")]
@@ -297,6 +299,8 @@ where
                 client_with_user_info: _,
             } => UserInfoEndpoint::<String>::parse_response(
                 user_info_endpoint,
+                access_token_obtain_from,
+                &access_token,
                 user_info_endpoint_response,
             ),
             #[cfg(feature = "_priv")]
