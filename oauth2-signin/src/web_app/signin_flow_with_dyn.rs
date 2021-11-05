@@ -1,5 +1,3 @@
-use std::{fmt, str};
-
 use oauth2_client::{
     additional_endpoints::{
         AccessTokenObtainFrom, EndpointExecuteError, UserInfo, UserInfoEndpoint,
@@ -38,7 +36,7 @@ where
     where
         C: Clone,
         P: ProviderExtAuthorizationCodeGrant + Clone + 'static,
-        <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
+
         UIEP: UserInfoEndpoint<String> + 'static,
     {
         Self {

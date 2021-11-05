@@ -1,5 +1,3 @@
-use std::{fmt, str};
-
 use crate::re_exports::{AccessTokenResponseSuccessfulBody, Body, Request, Response, Scope};
 
 use super::{AccessTokenObtainFrom, EndpointParseResponseError, EndpointRenderRequestError};
@@ -7,7 +5,6 @@ use super::{AccessTokenObtainFrom, EndpointParseResponseError, EndpointRenderReq
 pub trait RefreshAccessTokenEndpoint<SCOPE>
 where
     SCOPE: Scope,
-    <SCOPE as str::FromStr>::Err: fmt::Display,
 {
     fn can_execute(
         &self,

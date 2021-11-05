@@ -1,5 +1,3 @@
-use std::str;
-
 use oauth2_client::{
     additional_endpoints::{AccessTokenObtainFrom, EndpointExecuteError, UserInfoEndpoint},
     authorization_code_grant::{

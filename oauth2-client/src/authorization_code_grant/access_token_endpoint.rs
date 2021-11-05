@@ -1,5 +1,3 @@
-use std::{fmt, str};
-
 use http_api_endpoint::{
     http::{
         header::{ACCEPT, CONTENT_TYPE},
@@ -31,7 +29,6 @@ pub fn render_request<'a, SCOPE>(
 ) -> Result<Request<Body>, AccessTokenEndpointError>
 where
     SCOPE: Scope,
-    <SCOPE as str::FromStr>::Err: fmt::Display,
 {
     let mut body = BodyWithAuthorizationCodeGrant::new(
         code.to_owned(),
@@ -74,7 +71,6 @@ pub fn parse_response<'a, SCOPE>(
 ) -> Result<Result<RES_SuccessfulBody<SCOPE>, RES_ErrorBody>, AccessTokenEndpointError>
 where
     SCOPE: Scope + DeserializeOwned,
-    <SCOPE as str::FromStr>::Err: fmt::Display,
 {
     if let Some(body_ret_ret) = provider.access_token_response_parsing(&response) {
         let body_ret = body_ret_ret.map_err(|err| {

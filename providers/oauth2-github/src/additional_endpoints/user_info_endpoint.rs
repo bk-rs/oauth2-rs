@@ -1,5 +1,3 @@
-use std::{fmt, str};
-
 use oauth2_client::{
     additional_endpoints::{
         AccessTokenObtainFrom, EndpointParseResponseError, EndpointRenderRequestError, UserInfo,
@@ -19,7 +17,6 @@ pub struct GithubUserInfoEndpoint;
 impl<SCOPE> UserInfoEndpoint<SCOPE> for GithubUserInfoEndpoint
 where
     SCOPE: Scope,
-    <SCOPE as str::FromStr>::Err: fmt::Display,
 {
     fn can_execute(
         &self,

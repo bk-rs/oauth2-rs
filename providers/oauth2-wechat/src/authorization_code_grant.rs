@@ -1,4 +1,4 @@
-use std::{error, str::FromStr};
+use std::error;
 
 use oauth2_client::{
     authorization_code_grant::provider_ext::{
@@ -263,7 +263,10 @@ impl From<WeChatAccessTokenResponseSuccessfulBody>
         let scope: Vec<_> = body
             .scope
             .split(',')
-            .map(|x| WeChatScope::from_str(x).unwrap_or(WeChatScope::Other(x.to_owned())))
+            .map(|x| {
+                x.parse::<WeChatScope>()
+                    .unwrap_or(WeChatScope::Other(x.to_owned()))
+            })
             .collect();
 
         let mut map = Map::new();

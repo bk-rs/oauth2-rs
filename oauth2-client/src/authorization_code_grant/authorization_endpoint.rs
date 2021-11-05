@@ -1,5 +1,3 @@
-use std::{fmt, str};
-
 use http_api_endpoint::{http::Error as HttpError, Body, Request, Response};
 use oauth2_core::{
     access_token_response::GENERAL_ERROR_BODY_KEY_ERROR,
@@ -25,7 +23,6 @@ pub fn render_request<'a, SCOPE>(
 ) -> Result<Request<Body>, AuthorizationEndpointError>
 where
     SCOPE: Scope + Serialize,
-    <SCOPE as str::FromStr>::Err: fmt::Display,
 {
     let mut query = REQ_Query::new(
         provider
@@ -72,7 +69,6 @@ pub fn parse_response<'a, SCOPE>(
 ) -> Result<(), AuthorizationEndpointError>
 where
     SCOPE: Scope + Serialize,
-    <SCOPE as str::FromStr>::Err: fmt::Display,
 {
     unreachable!()
 }

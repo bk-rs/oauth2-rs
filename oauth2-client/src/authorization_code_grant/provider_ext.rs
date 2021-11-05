@@ -1,4 +1,4 @@
-use std::{error, fmt, str};
+use std::error;
 
 use downcast_rs::{impl_downcast, DowncastSync};
 use dyn_clone::{clone_trait_object, DynClone};
@@ -22,10 +22,7 @@ use crate::{
 };
 
 //
-pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone + DowncastSync
-where
-    <<Self as Provider>::Scope as str::FromStr>::Err: fmt::Display,
-{
+pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone + DowncastSync {
     fn redirect_uri(&self) -> Option<&RedirectUri>;
 
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
@@ -75,7 +72,7 @@ where
 }
 
 clone_trait_object!(<SCOPE> ProviderExtAuthorizationCodeGrant<Scope = SCOPE> where SCOPE: Clone);
-impl_downcast!(ProviderExtAuthorizationCodeGrant assoc Scope where Scope: self::Scope, <Scope as str::FromStr>::Err: fmt::Display);
+impl_downcast!(ProviderExtAuthorizationCodeGrant assoc Scope where Scope: self::Scope);
 
 //
 //
@@ -84,7 +81,6 @@ impl_downcast!(ProviderExtAuthorizationCodeGrant assoc Scope where Scope: self::
 pub struct ProviderExtAuthorizationCodeGrantStringScopeWrapper<P>
 where
     P: ProviderExtAuthorizationCodeGrant,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     inner: P,
 }
@@ -92,7 +88,6 @@ where
 impl<P> ProviderExtAuthorizationCodeGrantStringScopeWrapper<P>
 where
     P: ProviderExtAuthorizationCodeGrant,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     pub fn new(provider: P) -> Self {
         Self { inner: provider }
@@ -102,7 +97,6 @@ where
 impl<P> Provider for ProviderExtAuthorizationCodeGrantStringScopeWrapper<P>
 where
     P: ProviderExtAuthorizationCodeGrant + Clone,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     type Scope = String;
 
@@ -122,7 +116,6 @@ where
 impl<P> ProviderExtAuthorizationCodeGrant for ProviderExtAuthorizationCodeGrantStringScopeWrapper<P>
 where
     P: ProviderExtAuthorizationCodeGrant + Clone,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     fn redirect_uri(&self) -> Option<&RedirectUri> {
         self.inner.redirect_uri()

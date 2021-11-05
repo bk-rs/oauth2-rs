@@ -1,5 +1,3 @@
-use std::{fmt, str};
-
 use http_api_client::Client;
 use oauth2_core::{
     authorization_code_grant::{
@@ -48,7 +46,6 @@ where
     ) -> Result<Url, FlowBuildAuthorizationUrlError>
     where
         SCOPE: Scope + Serialize,
-        <SCOPE as str::FromStr>::Err: fmt::Display,
     {
         // Step 1
         build_authorization_url(provider, scopes, state)
@@ -67,7 +64,7 @@ where
     ) -> Result<AT_RES_SuccessfulBody<<P as Provider>::Scope>, FlowHandleCallbackError>
     where
         P: ProviderExtAuthorizationCodeGrant + Send + Sync,
-        <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
+
         <P as Provider>::Scope: Serialize + DeserializeOwned + Send + Sync,
     {
         // Step 3
@@ -116,7 +113,6 @@ where
     ) -> Result<AT_RES_SuccessfulBody<SCOPE>, FlowHandleCallbackError>
     where
         SCOPE: Scope + DeserializeOwned + Send + Sync,
-        <SCOPE as str::FromStr>::Err: fmt::Display,
     {
         // Step 3
         let query = parse_redirect_uri_query(query.as_ref())
@@ -187,7 +183,6 @@ pub fn build_authorization_url<'a, SCOPE>(
 ) -> Result<Url, FlowBuildAuthorizationUrlError>
 where
     SCOPE: Scope + Serialize,
-    <SCOPE as str::FromStr>::Err: fmt::Display,
 {
     let scopes = scopes.into().or(provider.scopes_default());
 

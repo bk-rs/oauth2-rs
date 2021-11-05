@@ -1,5 +1,3 @@
-use std::{fmt, str};
-
 use dyn_clone::{clone_trait_object, DynClone};
 
 use crate::re_exports::{AccessTokenResponseSuccessfulBody, Body, Request, Response, Scope};
@@ -11,7 +9,6 @@ use super::{
 pub trait UserInfoEndpoint<SCOPE>: DynClone
 where
     SCOPE: Scope,
-    <SCOPE as str::FromStr>::Err: fmt::Display,
 {
     fn can_execute(
         &self,

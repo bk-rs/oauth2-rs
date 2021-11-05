@@ -1,14 +1,12 @@
 //! https://datatracker.ietf.org/doc/html/rfc6749#section-5
 
-use std::{fmt, str};
-
 use mime::Mime;
 use serde::{Deserialize, Serialize};
 use serde_enum_str::{Deserialize_enum_str, Serialize_enum_str};
 use serde_json::{Map, Value};
 use url::Url;
 
-use crate::types::{AccessTokenType, Scope, ScopeParameter};
+use crate::types::{AccessTokenType, Scope, ScopeFromStrError, ScopeParameter};
 
 pub const CONTENT_TYPE: Mime = mime::APPLICATION_JSON;
 pub const GENERAL_ERROR_BODY_KEY_ERROR: &str = "error";
@@ -17,7 +15,6 @@ pub const GENERAL_ERROR_BODY_KEY_ERROR: &str = "error";
 pub struct GeneralSuccessfulBody<SCOPE>
 where
     SCOPE: Scope,
-    <SCOPE as str::FromStr>::Err: fmt::Display,
 {
     pub access_token: String,
     pub token_type: AccessTokenType,
@@ -34,7 +31,6 @@ where
 impl<SCOPE> GeneralSuccessfulBody<SCOPE>
 where
     SCOPE: Scope,
-    <SCOPE as str::FromStr>::Err: fmt::Display,
 {
     pub fn new(
         access_token: String,
@@ -60,15 +56,11 @@ where
         self._extensions.as_ref()
     }
 
-    pub fn try_from_t_with_string(body: &GeneralSuccessfulBody<String>) -> Result<Self, String> {
+    pub fn try_from_t_with_string(
+        body: &GeneralSuccessfulBody<String>,
+    ) -> Result<Self, ScopeFromStrError> {
         let scope = if let Some(x) = &body.scope {
-            Some(
-                x.0.iter()
-                    .map(|y| SCOPE::from_str(y))
-                    .collect::<Result<Vec<_>, _>>()
-                    .map_err(|err| err.to_string())?
-                    .into(),
-            )
+            Some(ScopeParameter::<SCOPE>::try_from_t_with_string(x)?)
         } else {
             None
         };
@@ -89,7 +81,6 @@ where
 impl<SCOPE> From<&GeneralSuccessfulBody<SCOPE>> for GeneralSuccessfulBody<String>
 where
     SCOPE: Scope,
-    <SCOPE as str::FromStr>::Err: fmt::Display,
 {
     fn from(body: &GeneralSuccessfulBody<SCOPE>) -> Self {
         let mut this = Self::new(

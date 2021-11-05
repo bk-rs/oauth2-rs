@@ -1,7 +1,5 @@
 //! https://datatracker.ietf.org/doc/html/rfc8628#section-3.1
 
-use std::{fmt, str};
-
 use http::Method;
 use mime::Mime;
 use serde::{Deserialize, Serialize};
@@ -16,7 +14,6 @@ pub const CONTENT_TYPE: Mime = mime::APPLICATION_WWW_FORM_URLENCODED;
 pub struct Body<SCOPE>
 where
     SCOPE: Scope,
-    <SCOPE as str::FromStr>::Err: fmt::Display,
 {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub client_id: Option<ClientId>,
@@ -29,7 +26,6 @@ where
 impl<SCOPE> Body<SCOPE>
 where
     SCOPE: Scope,
-    <SCOPE as str::FromStr>::Err: fmt::Display,
 {
     pub fn new(client_id: Option<ClientId>, scope: Option<ScopeParameter<SCOPE>>) -> Self {
         Self {

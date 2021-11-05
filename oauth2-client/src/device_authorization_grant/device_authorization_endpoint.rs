@@ -1,5 +1,3 @@
-use std::{fmt, str};
-
 use http_api_endpoint::{
     http::{
         header::{ACCEPT, CONTENT_TYPE},
@@ -48,7 +46,7 @@ where
 impl<'a, P> Endpoint for DeviceAuthorizationEndpoint<'a, P>
 where
     P: ProviderExtDeviceAuthorizationGrant,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
+
     <P as Provider>::Scope: Serialize,
 {
     type RenderRequestError = DeviceAuthorizationEndpointError;

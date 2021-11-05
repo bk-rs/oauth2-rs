@@ -1,7 +1,5 @@
 //! https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.1
 
-use std::{fmt, str};
-
 use http::Method;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
@@ -16,7 +14,6 @@ pub const RESPONSE_TYPE: &str = "code";
 pub struct Query<SCOPE>
 where
     SCOPE: Scope,
-    <SCOPE as str::FromStr>::Err: fmt::Display,
 {
     pub response_type: String,
     pub client_id: ClientId,
@@ -33,7 +30,6 @@ where
 impl<SCOPE> Query<SCOPE>
 where
     SCOPE: Scope,
-    <SCOPE as str::FromStr>::Err: fmt::Display,
 {
     pub fn new(
         client_id: ClientId,
@@ -80,7 +76,6 @@ where
 impl<SCOPE> From<&Query<SCOPE>> for Query<String>
 where
     SCOPE: Scope,
-    <SCOPE as str::FromStr>::Err: fmt::Display,
 {
     fn from(query: &Query<SCOPE>) -> Self {
         let mut this = Self::new(

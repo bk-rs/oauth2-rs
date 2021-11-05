@@ -1,5 +1,3 @@
-use std::{fmt, str};
-
 use http_api_client::{
     Client, ClientRespondEndpointError, RetryableClient,
     RetryableClientRespondEndpointUntilDoneError,
@@ -56,7 +54,7 @@ where
     ) -> Result<DAT_RES_SuccessfulBody<<P as Provider>::Scope>, FlowExecuteError>
     where
         P: ProviderExtDeviceAuthorizationGrant + Send + Sync,
-        <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
+
         <P as Provider>::Scope: Serialize + DeserializeOwned + Send + Sync,
         UI: FnOnce(UserCode, VerificationUri, Option<VerificationUriComplete>),
     {

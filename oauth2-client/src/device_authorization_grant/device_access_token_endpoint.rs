@@ -1,4 +1,4 @@
-use std::{cmp::max, fmt, str, time::Duration};
+use std::{cmp::max, time::Duration};
 
 use http_api_endpoint::{
     http::{
@@ -53,7 +53,7 @@ where
 impl<'a, P> RetryableEndpoint for DeviceAccessTokenEndpoint<'a, P>
 where
     P: ProviderExtDeviceAuthorizationGrant,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
+
     <P as Provider>::Scope: DeserializeOwned,
 {
     type RetryReason = DeviceAccessTokenEndpointRetryReason;

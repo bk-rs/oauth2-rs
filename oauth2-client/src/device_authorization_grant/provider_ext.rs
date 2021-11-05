@@ -1,5 +1,3 @@
-use std::{fmt, str};
-
 use downcast_rs::{impl_downcast, DowncastSync};
 use dyn_clone::{clone_trait_object, DynClone};
 
@@ -26,7 +24,7 @@ pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone + DowncastSyn
 }
 
 clone_trait_object!(<SCOPE> ProviderExtDeviceAuthorizationGrant<Scope = SCOPE> where SCOPE: Clone);
-impl_downcast!(ProviderExtDeviceAuthorizationGrant assoc Scope where Scope: self::Scope, <Scope as str::FromStr>::Err: fmt::Display);
+impl_downcast!(ProviderExtDeviceAuthorizationGrant assoc Scope where Scope: self::Scope);
 
 //
 //
@@ -35,7 +33,6 @@ impl_downcast!(ProviderExtDeviceAuthorizationGrant assoc Scope where Scope: self
 pub struct ProviderExtDeviceAuthorizationGrantStringScopeWrapper<P>
 where
     P: ProviderExtDeviceAuthorizationGrant,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     inner: P,
 }
@@ -43,7 +40,6 @@ where
 impl<P> ProviderExtDeviceAuthorizationGrantStringScopeWrapper<P>
 where
     P: ProviderExtDeviceAuthorizationGrant,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     pub fn new(provider: P) -> Self {
         Self { inner: provider }
@@ -53,7 +49,6 @@ where
 impl<P> Provider for ProviderExtDeviceAuthorizationGrantStringScopeWrapper<P>
 where
     P: ProviderExtDeviceAuthorizationGrant + Clone,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     type Scope = String;
 
@@ -74,7 +69,6 @@ impl<P> ProviderExtDeviceAuthorizationGrant
     for ProviderExtDeviceAuthorizationGrantStringScopeWrapper<P>
 where
     P: ProviderExtDeviceAuthorizationGrant + Clone,
-    <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
         self.inner

@@ -45,7 +45,6 @@ where
 impl<'de, T> Deserialize<'de> for ScopeParameter<T>
 where
     T: Scope,
-    <T as str::FromStr>::Err: fmt::Display,
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -64,7 +63,6 @@ struct ScopeParameterVisitor<T> {
 impl<'de, T> Visitor<'de> for ScopeParameterVisitor<T>
 where
     T: Scope,
-    <T as str::FromStr>::Err: fmt::Display,
 {
     type Value = ScopeParameter<T>;
 
@@ -85,12 +83,14 @@ where
             SCOPE_PARAMETER_DELIMITATION
         };
 
-        let inner = v
-            .split(split_char)
-            .map(|x| T::from_str(x))
-            .collect::<Result<Vec<_>, _>>()
-            .map_err(|err| de::Error::custom(ScopeFromStrError(err.to_string())))?;
-        Ok(ScopeParameter(inner))
+        let mut inner = vec![];
+        for s in v.split(split_char) {
+            inner.push(
+                T::from_str(s)
+                    .map_err(|_| de::Error::custom(ScopeFromStrError::Unknown(s.to_owned())))?,
+            );
+        }
+        Ok(inner.into())
     }
 }
 
@@ -107,23 +107,23 @@ where
 impl<T> ScopeParameter<T>
 where
     T: Scope,
-    <T as str::FromStr>::Err: fmt::Display,
 {
     pub fn try_from_t_with_string(v: &ScopeParameter<String>) -> Result<Self, ScopeFromStrError> {
-        Ok(v.0
-            .iter()
-            .map(|y| T::from_str(y))
-            .collect::<Result<Vec<_>, _>>()
-            .map_err(|err| ScopeFromStrError(err.to_string()))?
-            .into())
+        let mut inner = vec![];
+        for s in v.0.iter() {
+            inner.push(T::from_str(s).map_err(|_| ScopeFromStrError::Unknown(s.to_owned()))?);
+        }
+        Ok(inner.into())
     }
 }
 
 #[derive(Debug)]
-pub struct ScopeFromStrError(pub String);
+pub enum ScopeFromStrError {
+    Unknown(String),
+}
 impl fmt::Display for ScopeFromStrError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0)
+        write!(f, "{}", self)
     }
 }
 impl error::Error for ScopeFromStrError {}
