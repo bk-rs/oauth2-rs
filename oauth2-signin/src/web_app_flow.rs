@@ -9,16 +9,20 @@ use oauth2_client::{
         FlowBuildAuthorizationUrlError, FlowHandleCallbackError,
     },
     oauth2_core::types::State,
-    re_exports::{AccessTokenResponseSuccessfulBody, Url},
+    re_exports::{AccessTokenResponseSuccessfulBody, Client, Url},
     Provider, ProviderExtAuthorizationCodeGrant,
 };
 
-use crate::HttpClient;
-
-pub struct SigninFlowMap {
-    inner: HashMap<String, SigninFlow>,
+pub struct SigninFlowMap<C>
+where
+    C: Client,
+{
+    inner: HashMap<String, SigninFlow<C>>,
 }
-impl SigninFlowMap {
+impl<C> SigninFlowMap<C>
+where
+    C: Client,
+{
     pub fn new() -> Self {
         Self {
             inner: HashMap::new(),
@@ -27,35 +31,42 @@ impl SigninFlowMap {
     pub fn insert(
         &mut self,
         name: impl AsRef<str>,
-        signin_flow: SigninFlow,
+        signin_flow: SigninFlow<C>,
     ) -> Result<(), &'static str> {
         match self.inner.insert(name.as_ref().to_owned(), signin_flow) {
             Some(_) => Err("name exists"),
             None => Ok(()),
         }
     }
-    pub fn get(&self, name: impl AsRef<str>) -> Option<&SigninFlow> {
+    pub fn get(&self, name: impl AsRef<str>) -> Option<&SigninFlow<C>> {
         self.inner.get(name.as_ref())
     }
 }
 
-pub struct SigninFlow {
-    pub flow: Flow<HttpClient>,
+pub struct SigninFlow<C>
+where
+    C: Client,
+{
+    pub flow: Flow<C>,
     pub provider: Box<dyn ProviderExtAuthorizationCodeGrant<Scope = String>>,
     pub scopes: Option<Vec<String>>,
     pub user_info_endpoint: Box<dyn UserInfoEndpoint>,
-    pub client_with_user_info: HttpClient,
-    pub another_client_with_user_info: HttpClient,
+    pub client_with_user_info: C,
+    pub another_client_with_user_info: C,
     _priv: (),
 }
-impl SigninFlow {
+impl<C> SigninFlow<C>
+where
+    C: Client,
+{
     pub fn new<P, UIEP>(
-        client: HttpClient,
+        client: C,
         provider: P,
         scopes: impl Into<Option<Vec<<P as Provider>::Scope>>>,
         user_info_endpoint: UIEP,
     ) -> Self
     where
+        C: Clone,
         P: ProviderExtAuthorizationCodeGrant + 'static,
         <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
         UIEP: UserInfoEndpoint + 'static,
@@ -76,7 +87,10 @@ impl SigninFlow {
     }
 }
 
-impl SigninFlow {
+impl<C> SigninFlow<C>
+where
+    C: Client + Send + Sync,
+{
     pub fn build_authorization_url(
         &self,
         state: impl Into<Option<State>>,
@@ -158,13 +172,15 @@ mod tests {
     use oauth2_github::{GithubProviderWithWebApplication, GithubScope, GithubUserInfoEndpoint};
     use oauth2_google::{GoogleProviderForWebServerApps, GoogleScope, GoogleUserInfoEndpoint};
 
+    use http_api_isahc_client::IsahcClient;
+
     #[test]
     fn test_build_authorization_url() -> Result<(), Box<dyn error::Error>> {
         let mut map = SigninFlowMap::new();
         map.insert(
             "github",
             SigninFlow::new(
-                HttpClient::new()?,
+                IsahcClient::new()?,
                 GithubProviderWithWebApplication::new(
                     "client_id".to_owned(),
                     "client_secret".to_owned(),
@@ -177,7 +193,7 @@ mod tests {
         map.insert(
             "google",
             SigninFlow::new(
-                HttpClient::new()?,
+                IsahcClient::new()?,
                 GoogleProviderForWebServerApps::new(
                     "client_id".to_owned(),
                     "client_secret".to_owned(),
@@ -209,7 +225,7 @@ mod tests {
         map.insert(
             "github",
             SigninFlow::new(
-                HttpClient::new()?,
+                IsahcClient::new()?,
                 GithubProviderWithWebApplication::new(
                     "client_id".to_owned(),
                     "client_secret".to_owned(),
