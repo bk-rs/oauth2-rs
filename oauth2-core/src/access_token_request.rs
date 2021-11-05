@@ -9,13 +9,15 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 use url::Url;
 
-use crate::types::Code;
-use crate::types::{ClientId, ClientSecret};
+use crate::types::{ClientId, ClientSecret, Code};
 
 pub const METHOD: Method = Method::POST;
 pub const CONTENT_TYPE: Mime = mime::APPLICATION_WWW_FORM_URLENCODED;
 pub const GRANT_TYPE_WITH_AUTHORIZATION_CODE_GRANT: &str = "authorization_code";
 
+//
+//
+//
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(tag = "grant_type")]
 pub enum Body {
@@ -28,9 +30,6 @@ pub enum Body {
 }
 
 //
-//
-//
-
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct BodyWithAuthorizationCodeGrant {
     pub code: Code,
@@ -71,9 +70,6 @@ impl BodyWithAuthorizationCodeGrant {
 }
 
 //
-//
-//
-
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct BodyWithDeviceAuthorizationGrant {
     pub device_code: String,
@@ -114,7 +110,7 @@ mod tests_with_authorization_code_grant {
     use super::*;
 
     #[test]
-    fn ser_de() {
+    fn test_ser_de() {
         let body_str = "grant_type=authorization_code&code=SplxlOBeZQQYbYS6WxSbIA&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb";
         match serde_urlencoded::from_str::<Body>(body_str) {
             Ok(Body::AuthorizationCodeGrant(body)) => {
@@ -136,7 +132,7 @@ mod tests_with_device_authorization_grant {
     use super::*;
 
     #[test]
-    fn ser_de() {
+    fn test_ser_de() {
         let body_str = "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Adevice_code&device_code=GmRhmhcxhwAzkoEqiMEg_DnyEysNkuNhszIySk9eS&client_id=1406020730";
         match serde_urlencoded::from_str::<Body>(body_str) {
             Ok(Body::DeviceAuthorizationGrant(body)) => {
@@ -158,7 +154,7 @@ mod tests_with_device_authorization_grant {
     }
 
     #[test]
-    fn ser_de_extensions() {
+    fn test_ser_de_extensions() {
         //
         let mut extensions = Map::new();
         extensions.insert("foo".to_owned(), Value::String("bar".to_owned()));

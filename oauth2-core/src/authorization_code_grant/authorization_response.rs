@@ -3,11 +3,11 @@
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 
-use crate::{
-    access_token_response::GeneralErrorBody,
-    types::{Code, State},
-};
+use crate::types::{Code, State};
 
+//
+//
+//
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SuccessfulQuery {
     pub code: Code,
@@ -34,7 +34,10 @@ impl SuccessfulQuery {
     }
 }
 
-pub type ErrorQuery = GeneralErrorBody;
+//
+//
+//
+pub type ErrorQuery = crate::access_token_response::ErrorBody;
 
 #[cfg(test)]
 mod tests {

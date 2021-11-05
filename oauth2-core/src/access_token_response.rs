@@ -11,8 +11,11 @@ use crate::types::{AccessTokenType, Scope, ScopeFromStrError, ScopeParameter};
 pub const CONTENT_TYPE: Mime = mime::APPLICATION_JSON;
 pub const GENERAL_ERROR_BODY_KEY_ERROR: &str = "error";
 
+//
+//
+//
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct GeneralSuccessfulBody<SCOPE>
+pub struct SuccessfulBody<SCOPE>
 where
     SCOPE: Scope,
 {
@@ -28,7 +31,7 @@ where
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     pub _extensions: Option<Map<String, Value>>,
 }
-impl<SCOPE> GeneralSuccessfulBody<SCOPE>
+impl<SCOPE> SuccessfulBody<SCOPE>
 where
     SCOPE: Scope,
 {
@@ -57,7 +60,7 @@ where
     }
 
     pub fn try_from_t_with_string(
-        body: &GeneralSuccessfulBody<String>,
+        body: &SuccessfulBody<String>,
     ) -> Result<Self, ScopeFromStrError> {
         let scope = if let Some(x) = &body.scope {
             Some(ScopeParameter::<SCOPE>::try_from_t_with_string(x)?)
@@ -78,11 +81,12 @@ where
         Ok(this)
     }
 }
-impl<SCOPE> From<&GeneralSuccessfulBody<SCOPE>> for GeneralSuccessfulBody<String>
+
+impl<SCOPE> From<&SuccessfulBody<SCOPE>> for SuccessfulBody<String>
 where
     SCOPE: Scope,
 {
-    fn from(body: &GeneralSuccessfulBody<SCOPE>) -> Self {
+    fn from(body: &SuccessfulBody<SCOPE>) -> Self {
         let mut this = Self::new(
             body.access_token.to_owned(),
             body.token_type.to_owned(),
@@ -99,8 +103,11 @@ where
     }
 }
 
+//
+//
+//
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct GeneralErrorBody {
+pub struct ErrorBody {
     pub error: ErrorBodyError,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error_description: Option<String>,
@@ -110,7 +117,7 @@ pub struct GeneralErrorBody {
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     _extensions: Option<Map<String, Value>>,
 }
-impl GeneralErrorBody {
+impl ErrorBody {
     pub fn new(
         error: ErrorBodyError,
         error_description: Option<String>,
@@ -192,28 +199,33 @@ mod tests {
     use super::*;
 
     #[test]
-    fn ser_de_error_body() {
+    fn test_ser_de_error_body() {
         let body_str = r#"
         {
             "error": "invalid_scope"
         }
         "#;
-        match serde_json::from_str::<GeneralErrorBody>(body_str) {
+        match serde_json::from_str::<ErrorBody>(body_str) {
             Ok(body) => {
                 assert_eq!(body.error, ErrorBodyError::InvalidScope);
             }
             Err(err) => panic!("{}", err),
         }
     }
+}
+
+#[cfg(test)]
+mod tests_with_authorization_code_grant {
+    use super::*;
 
     #[test]
-    fn ser_de_error_body_with_device_authorization_grant() {
+    fn test_ser_de_error_body() {
         let body_str = r#"
         {
             "error": "authorization_pending"
         }
         "#;
-        match serde_json::from_str::<GeneralErrorBody>(body_str) {
+        match serde_json::from_str::<ErrorBody>(body_str) {
             Ok(body) => {
                 assert_eq!(body.error, ErrorBodyError::AuthorizationPending);
             }

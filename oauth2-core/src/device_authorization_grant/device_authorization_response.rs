@@ -7,8 +7,6 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 use url::Url;
 
-use crate::access_token_response::GeneralErrorBody;
-
 pub const CONTENT_TYPE: Mime = mime::APPLICATION_JSON;
 pub const INTERVAL_DEFAULT: usize = 5;
 pub type DeviceCode = String;
@@ -16,6 +14,9 @@ pub type UserCode = String;
 pub type VerificationUri = Url;
 pub type VerificationUriComplete = Url;
 
+//
+//
+//
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SuccessfulBody {
     pub device_code: DeviceCode,
@@ -35,6 +36,7 @@ pub struct SuccessfulBody {
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     _extensions: Option<Map<String, Value>>,
 }
+
 impl SuccessfulBody {
     pub fn interval(&self) -> Duration {
         Duration::from_secs(self.interval.unwrap_or_else(|| INTERVAL_DEFAULT) as u64)
@@ -48,7 +50,10 @@ impl SuccessfulBody {
     }
 }
 
-pub type ErrorBody = GeneralErrorBody;
+//
+//
+//
+pub type ErrorBody = crate::access_token_response::ErrorBody;
 
 #[cfg(test)]
 mod tests {

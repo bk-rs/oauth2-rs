@@ -5,9 +5,9 @@ pub use http_api_endpoint::{
 };
 pub use oauth2_core::{
     access_token_response::{
+        ErrorBody as AccessTokenResponseErrorBody,
         ErrorBodyError as AccessTokenResponseErrorBodyError,
-        GeneralErrorBody as AccessTokenResponseErrorBody,
-        GeneralSuccessfulBody as AccessTokenResponseSuccessfulBody,
+        SuccessfulBody as AccessTokenResponseSuccessfulBody,
     },
     types::{AccessTokenType, ClientId, ClientSecret, RedirectUri, Scope},
 };

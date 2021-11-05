@@ -10,6 +10,9 @@ use crate::types::{ClientId, Scope, ScopeFromStrError, ScopeParameter, State};
 pub const METHOD: Method = Method::GET;
 pub const RESPONSE_TYPE: &str = "code";
 
+//
+//
+//
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Query<SCOPE>
 where
@@ -73,6 +76,7 @@ where
         Ok(this)
     }
 }
+
 impl<SCOPE> From<&Query<SCOPE>> for Query<String>
 where
     SCOPE: Scope,
@@ -99,7 +103,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn ser() {
+    fn test_ser_de() {
         let query = Query::new(
             "your_client_id".to_owned(),
             Some("https://client.example.com/cb".parse().unwrap()),

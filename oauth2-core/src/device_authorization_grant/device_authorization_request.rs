@@ -10,6 +10,9 @@ use crate::types::{ClientId, Scope, ScopeParameter};
 pub const METHOD: Method = Method::POST;
 pub const CONTENT_TYPE: Mime = mime::APPLICATION_WWW_FORM_URLENCODED;
 
+//
+//
+//
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Body<SCOPE>
 where
@@ -23,6 +26,7 @@ where
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     _extensions: Option<Map<String, Value>>,
 }
+
 impl<SCOPE> Body<SCOPE>
 where
     SCOPE: Scope,

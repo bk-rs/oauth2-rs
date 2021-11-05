@@ -1,4 +1,2 @@
-use crate::access_token_response::{GeneralErrorBody, GeneralSuccessfulBody};
-
-pub type SuccessfulBody<SCOPE> = GeneralSuccessfulBody<SCOPE>;
-pub type ErrorBody = GeneralErrorBody;
+pub type SuccessfulBody<SCOPE> = crate::access_token_response::SuccessfulBody<SCOPE>;
+pub type ErrorBody = crate::access_token_response::ErrorBody;
