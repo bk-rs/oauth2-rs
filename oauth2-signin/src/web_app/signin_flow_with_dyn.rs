@@ -14,7 +14,7 @@ use oauth2_client::{
 };
 
 #[derive(Clone)]
-pub struct SigninFlow<C>
+pub struct SigninFlowWithDyn<C>
 where
     C: Client,
 {
@@ -25,7 +25,7 @@ where
     pub client_with_user_info: C,
     _priv: (),
 }
-impl<C> SigninFlow<C>
+impl<C> SigninFlowWithDyn<C>
 where
     C: Client,
 {
@@ -56,7 +56,7 @@ where
     }
 }
 
-impl<C> SigninFlow<C>
+impl<C> SigninFlowWithDyn<C>
 where
     C: Client + Send + Sync,
 {
@@ -172,7 +172,7 @@ mod tests {
         let mut map = HashMap::new();
         map.insert(
             "github",
-            SigninFlow::new(
+            SigninFlowWithDyn::new(
                 IsahcClient::new()?,
                 GithubProviderWithWebApplication::new(
                     "client_id".to_owned(),
@@ -185,7 +185,7 @@ mod tests {
         );
         map.insert(
             "google",
-            SigninFlow::new(
+            SigninFlowWithDyn::new(
                 IsahcClient::new()?,
                 GoogleProviderForWebServerApps::new(
                     "client_id".to_owned(),
@@ -217,7 +217,7 @@ mod tests {
         let mut map = HashMap::new();
         map.insert(
             "github",
-            SigninFlow::new(
+            SigninFlowWithDyn::new(
                 IsahcClient::new()?,
                 GithubProviderWithWebApplication::new(
                     "client_id".to_owned(),

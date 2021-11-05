@@ -7,9 +7,16 @@ edition = "2021"
 all-features = true
 
 [features]
-default = ["with-web-app"]
+default = [
+    "with-web-app",
+    "with-web-app-github",
+    "with-web-app-google",
+]
 
 with-web-app = ["oauth2-client/with-authorization-code-grant"]
+
+with-web-app-github = ["oauth2-github/with-authorization-code-grant"]
+with-web-app-google = ["oauth2-google/with-authorization-code-grant"]
 
 [dependencies]
 oauth2-client = { version = "^0.0", path = "../oauth2-client", default-features = false, features = [
@@ -17,9 +24,22 @@ oauth2-client = { version = "^0.0", path = "../oauth2-client", default-features 
     "with-flow",
 ] }
 
+oauth2-github = { version = "^0.0", path = "../providers/oauth2-github", default-features = false, features = [
+    "with-additional-endpoints"
+], optional = true}
+oauth2-google = { version = "^0.0", path = "../providers/oauth2-google", default-features = false, features = [
+    "with-additional-endpoints"
+], optional = true }
+
 [dev-dependencies]
-oauth2-github = { version = "^0.0", path = "../providers/oauth2-github", default-features = false, features = ["with-authorization-code-grant", "with-additional-endpoints"] }
-oauth2-google = { version = "^0.0", path = "../providers/oauth2-google", default-features = false, features = ["with-authorization-code-grant", "with-additional-endpoints"] }
+oauth2-github = { version = "^0.0", path = "../providers/oauth2-github", default-features = false, features = [
+    "with-authorization-code-grant", 
+    "with-additional-endpoints"
+] }
+oauth2-google = { version = "^0.0", path = "../providers/oauth2-google", default-features = false, features = [
+    "with-authorization-code-grant", 
+    "with-additional-endpoints"
+] }
 
 http-api-isahc-client = { version = "0.1", default-features = false }
 

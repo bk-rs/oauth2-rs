@@ -76,7 +76,7 @@ clone_trait_object!(<SCOPE> ProviderExtAuthorizationCodeGrant<Scope = SCOPE> whe
 //
 //
 //
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct ProviderExtAuthorizationCodeGrantStringScopeWrapper<P>
 where
     P: ProviderExtAuthorizationCodeGrant,

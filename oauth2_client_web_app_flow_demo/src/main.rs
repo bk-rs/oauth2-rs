@@ -10,18 +10,17 @@ open http://oauth2-rs.lvh.me/auth/github
 open https://oauth2-rs.lvh.me/auth/google
 */
 
-use std::{env, error, fs, path::PathBuf, sync::Arc};
+use std::{collections::HashMap, env, error, fs, path::PathBuf, sync::Arc};
 
 use futures_util::future;
 use http_api_isahc_client::IsahcClient;
-use oauth2_github::{GithubProviderWithWebApplication, GithubScope, GithubUserInfoEndpoint};
-use oauth2_google::{
-    GoogleProviderForWebServerApps, GoogleProviderForWebServerAppsAccessType, GoogleScope,
-    GoogleUserInfoEndpoint,
-};
 use oauth2_signin::{
     oauth2_client::re_exports::{ClientId, ClientSecret, RedirectUri},
-    web_app::{SigninFlow, SigninFlowMap},
+    web_app::{
+        GithubProviderWithWebApplication, GithubScope, GithubUserInfoEndpoint,
+        GoogleProviderForWebServerApps, GoogleProviderForWebServerAppsAccessType, GoogleScope,
+        GoogleUserInfoEndpoint, SigninFlow,
+    },
 };
 use serde::Deserialize;
 
@@ -62,10 +61,10 @@ async fn run(
     tls_cert_path: PathBuf,
     tls_key_path: PathBuf,
 ) -> Result<(), Box<dyn error::Error>> {
-    let mut signin_flow_map = SigninFlowMap::new();
+    let mut signin_flow_map = HashMap::new();
     signin_flow_map.insert(
         "github",
-        SigninFlow::new(
+        SigninFlow::with_github(
             IsahcClient::new()?,
             GithubProviderWithWebApplication::new(
                 clients_config.github.client_id.to_owned(),
@@ -78,7 +77,7 @@ async fn run(
     );
     signin_flow_map.insert(
         "google",
-        SigninFlow::new(
+        SigninFlow::with_google(
             IsahcClient::new()?,
             GoogleProviderForWebServerApps::new(
                 clients_config.google.client_id.to_owned(),
@@ -110,7 +109,7 @@ async fn run(
 }
 
 pub struct Context {
-    pub signin_flow_map: SigninFlowMap<IsahcClient>,
+    pub signin_flow_map: HashMap<&'static str, SigninFlow<IsahcClient>>,
 }
 
 pub mod filters {
@@ -126,22 +125,6 @@ pub mod filters {
     ) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
         let x = ctx.signin_flow_map.get("github").unwrap();
         let ctx_t = ctx.clone();
-
-        warp::path!(String)
-            .and(warp::any().map(move || {
-                SigninFlow::new(
-                    IsahcClient::new().unwrap(),
-                    GithubProviderWithWebApplication::new(
-                        "".to_owned(),
-                        "".to_owned(),
-                        "".parse().unwrap(),
-                    )
-                    .unwrap(),
-                    None,
-                    GithubUserInfoEndpoint,
-                )
-            }))
-            .map(|x: String, ctx: SigninFlow<IsahcClient>| Ok(warp::reply::html("")));
 
         warp::path!("auth" / String)
             .and(warp::any().map(move || ctx_t.clone()))

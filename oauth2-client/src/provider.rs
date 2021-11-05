@@ -17,7 +17,7 @@ clone_trait_object!(<SCOPE> Provider<Scope = SCOPE> where SCOPE: Clone);
 //
 //
 //
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct ProviderStringScopeWrapper<P>
 where
     P: Provider,
