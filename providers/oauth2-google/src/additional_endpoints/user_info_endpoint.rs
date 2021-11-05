@@ -15,6 +15,7 @@ use super::internal_oauth2_v3_user_info_endpoint::{
 };
 
 //
+#[derive(Debug, Clone)]
 pub struct GoogleUserInfoEndpoint;
 
 impl<SCOPE> UserInfoEndpoint<SCOPE> for GoogleUserInfoEndpoint

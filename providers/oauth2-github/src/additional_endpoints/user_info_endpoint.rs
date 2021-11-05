@@ -13,6 +13,7 @@ use oauth2_client::{
 use super::internal_user_endpoint::{User, UserEndpoint, UserEndpointError};
 
 //
+#[derive(Debug, Clone)]
 pub struct GithubUserInfoEndpoint;
 
 impl<SCOPE> UserInfoEndpoint<SCOPE> for GithubUserInfoEndpoint

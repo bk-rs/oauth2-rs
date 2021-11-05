@@ -1,12 +1,14 @@
 use std::{fmt, str};
 
+use dyn_clone::{clone_trait_object, DynClone};
+
 use crate::re_exports::{AccessTokenResponseSuccessfulBody, Body, Request, Response, Scope};
 
 use super::{
     AccessTokenObtainFrom, EndpointParseResponseError, EndpointRenderRequestError, UserInfo,
 };
 
-pub trait UserInfoEndpoint<SCOPE>
+pub trait UserInfoEndpoint<SCOPE>: DynClone
 where
     SCOPE: Scope,
     <SCOPE as str::FromStr>::Err: fmt::Display,
@@ -28,3 +30,5 @@ where
         response: Response<Body>,
     ) -> Result<UserInfo, EndpointParseResponseError>;
 }
+
+clone_trait_object!(<SCOPE> UserInfoEndpoint<SCOPE> where SCOPE: Clone);

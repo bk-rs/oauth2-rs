@@ -1,7 +1,8 @@
 use crate::re_exports::{ClientId, ClientSecret, Scope, Url};
 
 //
-pub trait Provider {
+use dyn_clone::{clone_trait_object, DynClone};
+pub trait Provider: DynClone {
     type Scope: Scope;
 
     fn client_id(&self) -> Option<&ClientId>;
@@ -11,9 +12,12 @@ pub trait Provider {
     fn token_endpoint_url(&self) -> &Url;
 }
 
+clone_trait_object!(<SCOPE> Provider<Scope = SCOPE> where SCOPE: Clone);
+
 //
 //
 //
+#[derive(Clone)]
 pub struct ProviderStringScopeWrapper<P>
 where
     P: Provider,
@@ -32,7 +36,7 @@ where
 
 impl<P> Provider for ProviderStringScopeWrapper<P>
 where
-    P: Provider,
+    P: Provider + Clone,
 {
     type Scope = String;
 

@@ -1,12 +1,14 @@
 use std::{fmt, str};
 
+use dyn_clone::{clone_trait_object, DynClone};
+
 use crate::{
     re_exports::{ClientId, ClientSecret, Map, Url, Value},
     Provider,
 };
 
 //
-pub trait ProviderExtDeviceAuthorizationGrant: Provider {
+pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone {
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
         None
     }
@@ -22,9 +24,12 @@ pub trait ProviderExtDeviceAuthorizationGrant: Provider {
     }
 }
 
+clone_trait_object!(<SCOPE> ProviderExtDeviceAuthorizationGrant<Scope = SCOPE> where SCOPE: Clone);
+
 //
 //
 //
+#[derive(Clone)]
 pub struct ProviderExtDeviceAuthorizationGrantStringScopeWrapper<P>
 where
     P: ProviderExtDeviceAuthorizationGrant,
@@ -45,7 +50,7 @@ where
 
 impl<P> Provider for ProviderExtDeviceAuthorizationGrantStringScopeWrapper<P>
 where
-    P: ProviderExtDeviceAuthorizationGrant,
+    P: ProviderExtDeviceAuthorizationGrant + Clone,
     <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     type Scope = String;
@@ -66,7 +71,7 @@ where
 impl<P> ProviderExtDeviceAuthorizationGrant
     for ProviderExtDeviceAuthorizationGrantStringScopeWrapper<P>
 where
-    P: ProviderExtDeviceAuthorizationGrant,
+    P: ProviderExtDeviceAuthorizationGrant + Clone,
     <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {

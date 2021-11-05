@@ -44,3 +44,4 @@ serde_qs = { version = "0.8", default-features = false, optional = true }
 url = { version = "2.2", default-features = false }
 
 thiserror = { version = "1.0", default-features = false }
+dyn-clone = { version = "1.0", default-features = false }

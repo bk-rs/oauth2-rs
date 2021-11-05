@@ -14,13 +14,14 @@ use std::{collections::HashMap, env, error, fs, path::PathBuf, sync::Arc};
 
 use futures_util::future;
 use http_api_isahc_client::IsahcClient;
-use oauth2_client::{
-    authorization_code_grant::Flow,
-    re_exports::{ClientId, ClientSecret, Deserialize_enum_str, RedirectUri},
-};
-use oauth2_github::{GithubProviderWithWebApplication, GithubScope};
+use oauth2_github::{GithubProviderWithWebApplication, GithubScope, GithubUserInfoEndpoint};
 use oauth2_google::{
     GoogleProviderForWebServerApps, GoogleProviderForWebServerAppsAccessType, GoogleScope,
+    GoogleUserInfoEndpoint,
+};
+use oauth2_signin::{
+    oauth2_client::re_exports::{ClientId, ClientSecret, RedirectUri},
+    web_app::{SigninFlow, SigninFlowMap},
 };
 use serde::Deserialize;
 
@@ -61,40 +62,39 @@ async fn run(
     tls_cert_path: PathBuf,
     tls_key_path: PathBuf,
 ) -> Result<(), Box<dyn error::Error>> {
-    let provider_map: HashMap<ProviderKey, ProviderValue> = vec![
-        (
-            ProviderKey::Github,
-            ProviderValue::Github((
-                Flow::new(IsahcClient::new()?),
-                GithubProviderWithWebApplication::new(
-                    clients_config.github.client_id.to_owned(),
-                    clients_config.github.client_secret.to_owned(),
-                    clients_config.github.redirect_uri.to_owned(),
-                )?,
-                vec![GithubScope::PublicRepo, GithubScope::UserEmail],
-            )),
+    let mut signin_flow_map = SigninFlowMap::new();
+    signin_flow_map.insert(
+        "github",
+        SigninFlow::new(
+            IsahcClient::new()?,
+            GithubProviderWithWebApplication::new(
+                clients_config.github.client_id.to_owned(),
+                clients_config.github.client_secret.to_owned(),
+                clients_config.github.redirect_uri.to_owned(),
+            )?,
+            vec![GithubScope::PublicRepo, GithubScope::UserEmail],
+            GithubUserInfoEndpoint,
         ),
-        (
-            ProviderKey::Google,
-            ProviderValue::Google((
-                Flow::new(IsahcClient::new()?),
-                GoogleProviderForWebServerApps::new(
-                    clients_config.google.client_id.to_owned(),
-                    clients_config.google.client_secret.to_owned(),
-                    clients_config.google.redirect_uri.to_owned(),
-                )?
-                .configure(|mut x| {
-                    x.access_type = Some(GoogleProviderForWebServerAppsAccessType::Offline);
-                    x.include_granted_scopes = Some(true);
-                }),
-                vec![GoogleScope::Email, GoogleScope::DriveFile],
-            )),
+    );
+    signin_flow_map.insert(
+        "google",
+        SigninFlow::new(
+            IsahcClient::new()?,
+            GoogleProviderForWebServerApps::new(
+                clients_config.google.client_id.to_owned(),
+                clients_config.google.client_secret.to_owned(),
+                clients_config.google.redirect_uri.to_owned(),
+            )?
+            .configure(|mut x| {
+                x.access_type = Some(GoogleProviderForWebServerAppsAccessType::Offline);
+                x.include_granted_scopes = Some(true);
+            }),
+            vec![GoogleScope::Email, GoogleScope::DriveFile],
+            GoogleUserInfoEndpoint,
         ),
-    ]
-    .into_iter()
-    .collect();
+    );
 
-    let ctx = Arc::new(Context { provider_map });
+    let ctx = Arc::new(Context { signin_flow_map });
 
     let routes = filters::filters(ctx.clone());
     let server_http = warp::serve(routes.clone()).run(([127, 0, 0, 1], 80));
@@ -110,37 +110,11 @@ async fn run(
 }
 
 pub struct Context {
-    pub provider_map: HashMap<ProviderKey, ProviderValue>,
-}
-
-#[derive(Deserialize_enum_str, Debug, Copy, Clone, PartialEq, Eq, Hash)]
-pub enum ProviderKey {
-    #[serde(rename = "github")]
-    Github,
-    #[serde(rename = "google")]
-    Google,
-}
-
-#[derive(Debug, Clone)]
-pub enum ProviderValue {
-    Github(
-        (
-            Flow<IsahcClient>,
-            GithubProviderWithWebApplication,
-            Vec<GithubScope>,
-        ),
-    ),
-    Google(
-        (
-            Flow<IsahcClient>,
-            GoogleProviderForWebServerApps,
-            Vec<GoogleScope>,
-        ),
-    ),
+    pub signin_flow_map: SigninFlowMap<IsahcClient>,
 }
 
 pub mod filters {
-    use super::{Context, ProviderKey};
+    use super::Context;
 
     use std::sync::Arc;
 
@@ -152,10 +126,14 @@ pub mod filters {
     ) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
         let ctx_t = ctx.clone();
 
-        warp::path!("auth" / ProviderKey)
+        warp::path!(String)
+            .and(warp::any().map(move || ctx_t.clone()))
+            .map(|x: String, ctx: Arc<Context>| Ok(warp::reply::html("")));
+
+        warp::path!("auth" / String)
             .and(warp::any().map(move || ctx_t.clone()))
             .and_then(auth_handler)
-            .or(warp::path!("auth" / ProviderKey / "callback")
+            .or(warp::path!("auth" / String / "callback")
                 .and(
                     warp::query::raw()
                         .map(Some)
@@ -167,23 +145,16 @@ pub mod filters {
     }
 
     async fn auth_handler(
-        provider_key: ProviderKey,
+        provider: String,
         ctx: Arc<Context>,
     ) -> Result<impl warp::Reply, warp::Rejection> {
-        let provider_value = ctx.provider_map.get(&provider_key).unwrap();
+        let flow = ctx.signin_flow_map.get(provider.as_str()).unwrap();
 
         let state = "TODO".to_owned();
 
-        let url = match provider_value {
-            crate::ProviderValue::Github((flow, provider, scopes)) => flow
-                .build_authorization_url(provider, scopes.to_owned(), state)
-                .unwrap(),
-            crate::ProviderValue::Google((flow, provider, scopes)) => flow
-                .build_authorization_url(provider, scopes.to_owned(), state)
-                .unwrap(),
-        };
+        let url = flow.build_authorization_url(state).unwrap();
 
-        info!("{:?} {:?}", provider_key, url.as_str());
+        info!("{} {:?}", provider, url.as_str());
 
         Ok(warp::redirect::temporary(
             url.as_str().parse::<Uri>().unwrap(),
@@ -191,37 +162,20 @@ pub mod filters {
     }
 
     async fn auth_callback_handler(
-        provider_key: ProviderKey,
+        provider: String,
         query_raw: Option<String>,
         ctx: Arc<Context>,
     ) -> Result<impl warp::Reply, warp::Rejection> {
         let query_raw = query_raw.unwrap();
 
-        let provider_value = ctx.provider_map.get(&provider_key).unwrap();
+        let flow = ctx.signin_flow_map.get(provider.as_str()).unwrap();
 
         let state = "TODO".to_owned();
 
-        match provider_value {
-            crate::ProviderValue::Github((flow, provider, _scopes)) => {
-                let access_token_body = flow
-                    .handle_callback(provider, query_raw, state)
-                    .await
-                    .unwrap();
+        let ret = flow.handle_callback(query_raw, state).await;
 
-                info!("{:?} {:?}", provider_key, access_token_body);
+        info!("{} {:?}", provider, ret);
 
-                Ok(warp::reply::html(format!("{:?}", access_token_body)))
-            }
-            crate::ProviderValue::Google((flow, provider, _scopes)) => {
-                let access_token_body = flow
-                    .handle_callback(provider, query_raw, state)
-                    .await
-                    .unwrap();
-
-                info!("{:?} {:?}", provider_key, access_token_body);
-
-                Ok(warp::reply::html(format!("{:?}", access_token_body)))
-            }
-        }
+        Ok(warp::reply::html(format!("{:?}", ret)))
     }
 }

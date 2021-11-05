@@ -1,5 +1,6 @@
 use std::{error, fmt, str};
 
+use dyn_clone::{clone_trait_object, DynClone};
 pub use oauth2_core::{
     access_token_request::BodyWithAuthorizationCodeGrant as AccessTokenRequestBody,
     authorization_code_grant::{
@@ -18,7 +19,7 @@ use crate::{
 };
 
 //
-pub trait ProviderExtAuthorizationCodeGrant: Provider
+pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone
 where
     <<Self as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
@@ -70,9 +71,12 @@ where
     }
 }
 
+clone_trait_object!(<SCOPE> ProviderExtAuthorizationCodeGrant<Scope = SCOPE> where SCOPE: Clone);
+
 //
 //
 //
+#[derive(Clone)]
 pub struct ProviderExtAuthorizationCodeGrantStringScopeWrapper<P>
 where
     P: ProviderExtAuthorizationCodeGrant,
@@ -93,7 +97,7 @@ where
 
 impl<P> Provider for ProviderExtAuthorizationCodeGrantStringScopeWrapper<P>
 where
-    P: ProviderExtAuthorizationCodeGrant,
+    P: ProviderExtAuthorizationCodeGrant + Clone,
     <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     type Scope = String;
@@ -113,7 +117,7 @@ where
 
 impl<P> ProviderExtAuthorizationCodeGrant for ProviderExtAuthorizationCodeGrantStringScopeWrapper<P>
 where
-    P: ProviderExtAuthorizationCodeGrant,
+    P: ProviderExtAuthorizationCodeGrant + Clone,
     <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
 {
     fn redirect_uri(&self) -> Option<&RedirectUri> {

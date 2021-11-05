@@ -13,6 +13,7 @@ use oauth2_client::{
     Provider, ProviderExtAuthorizationCodeGrant,
 };
 
+#[derive(Clone)]
 pub struct SigninFlowMap<C>
 where
     C: Client,
@@ -43,6 +44,7 @@ where
     }
 }
 
+#[derive(Clone)]
 pub struct SigninFlow<C>
 where
     C: Client,
@@ -67,7 +69,7 @@ where
     ) -> Self
     where
         C: Clone,
-        P: ProviderExtAuthorizationCodeGrant + 'static,
+        P: ProviderExtAuthorizationCodeGrant + Clone + 'static,
         <<P as Provider>::Scope as str::FromStr>::Err: fmt::Display,
         UIEP: UserInfoEndpoint<String> + 'static,
     {
@@ -175,6 +177,7 @@ where
     }
 }
 
+#[derive(Debug)]
 pub enum SigninFlowHandleCallbackRet {
     Ok((AccessTokenResponseSuccessfulBody<String>, Option<UserInfo>)),
     FetchUserInfoError(
