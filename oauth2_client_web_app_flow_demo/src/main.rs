@@ -5,6 +5,9 @@ CAROOT=$(pwd)/mkcert mkcert -install
 
 RUST_BACKTRACE=1 RUST_LOG=trace cargo run -p oauth2_client_web_app_flow_demo
 
+sudo socat tcp-listen:80,reuseaddr,fork tcp:127.0.0.1:8080
+sudo socat tcp-listen:443,reuseaddr,fork tcp:127.0.0.1:8443
+
 open http://oauth2-rs.lvh.me/auth/github
 
 open https://oauth2-rs.lvh.me/auth/google
@@ -106,12 +109,12 @@ async fn run(
     let ctx = Arc::new(Context { signin_flow_map });
 
     let routes = filters(ctx, session_store);
-    let server_http = warp::serve(routes.clone()).run(([127, 0, 0, 1], 80));
+    let server_http = warp::serve(routes.clone()).run(([127, 0, 0, 1], 8080));
     let server_https = warp::serve(routes)
         .tls()
         .cert_path(tls_cert_path)
         .key_path(tls_key_path)
-        .run(([127, 0, 0, 1], 443));
+        .run(([127, 0, 0, 1], 8443));
 
     future::join(server_http, server_https).await;
 
