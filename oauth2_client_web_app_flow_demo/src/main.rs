@@ -23,8 +23,10 @@ use oauth2_signin::{
         GoogleUserInfoEndpoint, SigninFlow,
     },
 };
+use rand::{distributions::Alphanumeric, thread_rng, Rng as _};
 use serde::Deserialize;
 use warp::{http::Uri, Filter};
+use warp_sessions::{MemoryStore, SessionWithStore};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn error::Error>> {
@@ -99,9 +101,11 @@ async fn run(
         ),
     );
 
+    let session_store = MemoryStore::new();
+
     let ctx = Arc::new(Context { signin_flow_map });
 
-    let routes = filters(ctx.clone());
+    let routes = filters(ctx, session_store);
     let server_http = warp::serve(routes.clone()).run(([127, 0, 0, 1], 80));
     let server_https = warp::serve(routes)
         .tls()
@@ -116,12 +120,17 @@ async fn run(
 
 fn filters(
     ctx: Arc<Context>,
+    session_store: MemoryStore,
 ) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
     let ctx_t = ctx.clone();
+    let session_store_t = session_store.clone();
 
     warp::path!("auth" / String)
         .and(warp::any().map(move || ctx_t.clone()))
+        .and(warp_sessions::request::with_session(session_store_t, None))
         .and_then(auth_handler)
+        .untuple_one()
+        .and_then(warp_sessions::reply::with_session)
         .or(warp::path!("auth" / String / "callback")
             .and(
                 warp::query::raw()
@@ -130,23 +139,36 @@ fn filters(
                     .unify(),
             )
             .and(warp::any().map(move || ctx.clone()))
-            .and_then(auth_callback_handler))
+            .and(warp_sessions::request::with_session(session_store, None))
+            .and_then(auth_callback_handler)
+            .untuple_one()
+            .and_then(warp_sessions::reply::with_session))
 }
 
 async fn auth_handler(
     provider: String,
     ctx: Arc<Context>,
-) -> Result<impl warp::Reply, warp::Rejection> {
+    mut session_with_store: SessionWithStore<MemoryStore>,
+) -> Result<(impl warp::Reply, SessionWithStore<MemoryStore>), warp::Rejection> {
     let flow = ctx.signin_flow_map.get(provider.as_str()).unwrap();
 
-    let state = "TODO".to_owned();
+    let state = thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(10)
+        .map(char::from)
+        .collect::<String>();
 
+    session_with_store
+        .session
+        .insert(format!("state_{}", provider).as_str(), state.to_owned())
+        .unwrap();
     let url = flow.build_authorization_url(state).unwrap();
 
     info!("{} {:?}", provider, url.as_str());
 
-    Ok(warp::redirect::temporary(
-        url.as_str().parse::<Uri>().unwrap(),
+    Ok((
+        warp::redirect::temporary(url.as_str().parse::<Uri>().unwrap()),
+        session_with_store,
     ))
 }
 
@@ -154,16 +176,20 @@ async fn auth_callback_handler(
     provider: String,
     query_raw: Option<String>,
     ctx: Arc<Context>,
-) -> Result<impl warp::Reply, warp::Rejection> {
+    session_with_store: SessionWithStore<MemoryStore>,
+) -> Result<(impl warp::Reply, SessionWithStore<MemoryStore>), warp::Rejection> {
     let query_raw = query_raw.unwrap();
 
     let flow = ctx.signin_flow_map.get(provider.as_str()).unwrap();
 
-    let state = "TODO".to_owned();
+    let state = session_with_store
+        .session
+        .get::<String>(format!("state_{}", provider).as_str())
+        .unwrap();
 
     let ret = flow.handle_callback(query_raw, state).await;
 
     info!("{} {:?}", provider, ret);
 
-    Ok(warp::reply::html(format!("{:?}", ret)))
+    Ok((warp::reply::html(format!("{:?}", ret)), session_with_store))
 }
