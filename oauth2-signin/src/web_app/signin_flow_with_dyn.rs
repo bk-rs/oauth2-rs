@@ -24,7 +24,6 @@ where
     pub scopes: Option<Vec<String>>,
     pub user_info_endpoint: Box<dyn UserInfoEndpoint<String>>,
     pub client_with_user_info: C,
-    _priv: (),
 }
 impl<C> fmt::Debug for SigninFlowWithDyn<C>
 where
@@ -66,16 +65,7 @@ where
                 .map(|x| x.iter().map(|y| y.to_string()).collect()),
             user_info_endpoint: Box::new(user_info_endpoint),
             client_with_user_info: client,
-            _priv: (),
         }
-    }
-
-    pub fn configure<F>(mut self, mut f: F) -> Self
-    where
-        F: FnMut(&mut Self),
-    {
-        f(&mut self);
-        self
     }
 }
 
@@ -227,10 +217,7 @@ mod tests {
                 )?,
                 vec![GithubScope::User],
                 GithubUserInfoEndpoint,
-            )
-            .configure(move |x| {
-                x.client_with_user_info = IsahcClient::new().unwrap();
-            }),
+            ),
         );
         map.insert(
             "google",
