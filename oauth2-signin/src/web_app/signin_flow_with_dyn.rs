@@ -49,9 +49,17 @@ where
                 .into()
                 .map(|x| x.iter().map(|y| y.to_string()).collect()),
             user_info_endpoint: Box::new(user_info_endpoint),
-            client_with_user_info: client.clone(),
+            client_with_user_info: client,
             _priv: (),
         }
+    }
+
+    pub fn configure<F>(mut self, mut f: F) -> Self
+    where
+        F: FnMut(&mut Self),
+    {
+        f(&mut self);
+        self
     }
 }
 
@@ -191,6 +199,7 @@ mod tests {
     #[test]
     fn test_build_authorization_url() -> Result<(), Box<dyn error::Error>> {
         let mut map = HashMap::new();
+
         map.insert(
             "github",
             SigninFlowWithDyn::new(
@@ -202,7 +211,10 @@ mod tests {
                 )?,
                 vec![GithubScope::User],
                 GithubUserInfoEndpoint,
-            ),
+            )
+            .configure(move |x| {
+                x.client_with_user_info = IsahcClient::new().unwrap();
+            }),
         );
         map.insert(
             "google",
