@@ -7,14 +7,13 @@ use oauth2_client::{
     },
     authorization_code_grant::{
         provider_ext::ProviderExtAuthorizationCodeGrantStringScopeWrapper, Flow,
-        FlowBuildAuthorizationUrlError,
     },
     oauth2_core::types::State,
     re_exports::{Client, Url},
     Provider, ProviderExtAuthorizationCodeGrant,
 };
 
-use super::SigninFlowHandleCallbackRet;
+use super::{SigninFlowBuildAuthorizationUrlError, SigninFlowHandleCallbackRet};
 
 //
 //
@@ -81,7 +80,7 @@ where
     pub fn build_authorization_url(
         &self,
         state: impl Into<Option<State>>,
-    ) -> Result<Url, FlowBuildAuthorizationUrlError> {
+    ) -> Result<Url, SigninFlowBuildAuthorizationUrlError> {
         self.flow
             .build_authorization_url(self.provider.as_ref(), self.scopes.to_owned(), state)
     }
@@ -90,7 +89,7 @@ where
         &self,
         custom_scopes: Vec<String>,
         state: impl Into<Option<State>>,
-    ) -> Result<Url, FlowBuildAuthorizationUrlError> {
+    ) -> Result<Url, SigninFlowBuildAuthorizationUrlError> {
         self.flow
             .build_authorization_url(self.provider.as_ref(), Some(custom_scopes), state)
     }

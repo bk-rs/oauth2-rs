@@ -1,5 +1,5 @@
 pub use http_api_endpoint::{
-    Body, Endpoint, Request, Response, RetryableEndpoint, MIME_APPLICATION_JSON,
+    self, Body, Endpoint, Request, Response, RetryableEndpoint, MIME_APPLICATION_JSON,
 };
 pub use oauth2_core::{
     http::{self, Error as HttpError},
@@ -15,6 +15,6 @@ pub use thiserror;
 
 #[cfg(feature = "http-api-client")]
 pub use http_api_client::{
-    async_trait, Client, ClientRespondEndpointError, RetryableClient,
+    self, Client, ClientRespondEndpointError, RetryableClient,
     RetryableClientRespondEndpointUntilDoneError,
 };
