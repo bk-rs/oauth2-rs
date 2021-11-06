@@ -102,6 +102,7 @@ async fn auth_callback_handler(
     session_with_store
         .session
         .remove(state_session_key(&provider).as_str());
+    info!("{} {:?}", provider, state);
 
     let ret = flow.handle_callback(query_raw, state).await;
 

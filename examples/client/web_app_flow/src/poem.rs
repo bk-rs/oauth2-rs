@@ -103,6 +103,7 @@ async fn auth_callback_handler(
 
     let state = session.get::<String>(state_session_key(&provider).as_str());
     session.remove(state_session_key(&provider).as_str());
+    info!("{} {:?}", provider, state);
 
     let ret = flow.handle_callback(query_raw, state).await;
 
