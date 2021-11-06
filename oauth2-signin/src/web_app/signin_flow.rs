@@ -1,3 +1,9 @@
+#![allow(unused_imports)]
+#![allow(unreachable_code)]
+#![allow(unused_variables)]
+
+use std::{error, marker::PhantomData};
+
 use oauth2_client::{
     additional_endpoints::{
         AccessTokenObtainFrom, EndpointExecuteError, EndpointOutputObtainFrom,
@@ -18,6 +24,9 @@ use super::{GoogleProviderForWebServerApps, GoogleScope, GoogleUserInfoEndpoint}
 
 use super::SigninFlowHandleCallbackRet;
 
+//
+//
+//
 #[derive(Debug, Clone)]
 pub enum SigninFlow<C>
 where
@@ -41,9 +50,11 @@ where
         user_info_endpoint: GoogleUserInfoEndpoint,
         client_with_user_info: C,
     },
-    #[cfg(feature = "_priv")]
-    _X(std::markder::PhantomData<C>),
+    _Priv(_SigninFlowPrivVariant<C>),
 }
+
+#[derive(Debug, Clone)]
+pub struct _SigninFlowPrivVariant<C>(PhantomData<C>);
 
 impl<C> SigninFlow<C>
 where
@@ -117,8 +128,7 @@ where
                 user_info_endpoint: _,
                 client_with_user_info: _,
             } => flow.build_authorization_url(provider, scopes.to_owned(), state),
-            #[cfg(feature = "_priv")]
-            Self::_X(_) => unreachable!(),
+            Self::_Priv(_) => unreachable!(),
         }
     }
 
@@ -144,8 +154,7 @@ where
                 user_info_endpoint: _,
                 client_with_user_info: _,
             } => flow.build_authorization_url(provider, Some(custom_scopes), state),
-            #[cfg(feature = "_priv")]
-            Self::_X(_) => unreachable!(),
+            Self::_Priv(_) => unreachable!(),
         }
     }
 
@@ -171,8 +180,7 @@ where
                 user_info_endpoint: _,
                 client_with_user_info: _,
             } => flow.handle_callback(provider, query, state).await,
-            #[cfg(feature = "_priv")]
-            Self::_X(_) => unreachable!(),
+            Self::_Priv(_) => unreachable!(),
         };
 
         let access_token = match access_token_ret {
@@ -199,16 +207,15 @@ where
                 user_info_endpoint,
                 client_with_user_info: _,
             } => user_info_endpoint.obtain_from(access_token_obtain_from, &access_token),
-            #[cfg(feature = "_priv")]
-            Self::_X(_) => unreachable!(),
+            Self::_Priv(_) => unreachable!(),
         };
 
         match user_info_endpoint_obtain_from {
             EndpointOutputObtainFrom::None => {
-                return SigninFlowHandleCallbackRet::Ok((access_token, None));
+                return SigninFlowHandleCallbackRet::OkButUserInfoNone(access_token);
             }
             EndpointOutputObtainFrom::Build => {
-                let user_info_ret = match self {
+                let user_info_ret: Result<_, Box<dyn error::Error>> = match self {
                     #[cfg(feature = "with-github")]
                     Self::Github {
                         flow: _,
@@ -225,16 +232,15 @@ where
                         user_info_endpoint,
                         client_with_user_info: _,
                     } => user_info_endpoint.build(access_token_obtain_from, &access_token),
-                    #[cfg(feature = "_priv")]
-                    Self::_X(_) => unreachable!(),
+                    Self::_Priv(_) => unreachable!(),
                 };
 
                 match user_info_ret {
                     Ok(user_info) => {
-                        return SigninFlowHandleCallbackRet::Ok((access_token, Some(user_info)));
+                        return SigninFlowHandleCallbackRet::Ok((access_token, user_info));
                     }
                     Err(err) => {
-                        return SigninFlowHandleCallbackRet::FetchUserInfoError((
+                        return SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
                             access_token,
                             EndpointExecuteError::ParseResponseError(
                                 EndpointParseResponseError::Other(err.to_string()),
@@ -263,21 +269,20 @@ where
                 user_info_endpoint,
                 client_with_user_info: _,
             } => user_info_endpoint.render_request(access_token_obtain_from, &access_token),
-            #[cfg(feature = "_priv")]
-            Self::_X(_) => unreachable!(),
+            Self::_Priv(_) => unreachable!(),
         };
 
         let user_info_endpoint_request = match user_info_endpoint_request_ret {
             Ok(x) => x,
             Err(err) => {
-                return SigninFlowHandleCallbackRet::FetchUserInfoError((
+                return SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
                     access_token,
                     EndpointExecuteError::RenderRequestError(err),
                 ));
             }
         };
 
-        let user_info_endpoint_response_ret = match self {
+        let user_info_endpoint_response_ret: Result<_, <C as Client>::RespondError> = match self {
             #[cfg(feature = "with-github")]
             Self::Github {
                 flow: _,
@@ -302,14 +307,13 @@ where
                     .respond(user_info_endpoint_request)
                     .await
             }
-            #[cfg(feature = "_priv")]
-            Self::_X(_) => unreachable!(),
+            Self::_Priv(_) => unreachable!(),
         };
 
         let user_info_endpoint_response = match user_info_endpoint_response_ret {
             Ok(x) => x,
             Err(err) => {
-                return SigninFlowHandleCallbackRet::FetchUserInfoError((
+                return SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
                     access_token,
                     EndpointExecuteError::RespondFailed(err.to_string()),
                 ));
@@ -343,20 +347,19 @@ where
                 &access_token,
                 user_info_endpoint_response,
             ),
-            #[cfg(feature = "_priv")]
-            Self::_X(_) => unreachable!(),
+            Self::_Priv(_) => unreachable!(),
         };
 
         let user_info = match user_info_ret {
             Ok(x) => x,
             Err(err) => {
-                return SigninFlowHandleCallbackRet::FetchUserInfoError((
+                return SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
                     access_token,
                     EndpointExecuteError::ParseResponseError(err),
                 ));
             }
         };
 
-        SigninFlowHandleCallbackRet::Ok((access_token, Some(user_info)))
+        SigninFlowHandleCallbackRet::Ok((access_token, user_info))
     }
 }

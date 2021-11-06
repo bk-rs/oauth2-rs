@@ -15,8 +15,6 @@ default = [
 with-github = ["oauth2-github"]
 with-google = ["oauth2-google"]
 
-_priv = []
-
 [dependencies]
 oauth2-client = { version = "^0.0", path = "../oauth2-client", default-features = false, features = [
     "with-flow",
@@ -38,5 +36,4 @@ skip_optional_dependencies = true
 denylist = [
     "with-github",
     "with-google",
-    "_priv",
 ]

@@ -1,8 +1,12 @@
 pub mod signin_flow;
 pub mod signin_flow_with_dyn;
 
+pub mod types;
+
 pub use signin_flow::SigninFlow;
-pub use signin_flow_with_dyn::{SigninFlowHandleCallbackRet, SigninFlowWithDyn};
+pub use signin_flow_with_dyn::SigninFlowWithDyn;
+
+pub use types::{SigninFlowBuildAuthorizationUrlError, SigninFlowHandleCallbackRet};
 
 //
 #[cfg(feature = "with-github")]

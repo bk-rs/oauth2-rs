@@ -2,18 +2,23 @@ use std::fmt;
 
 use oauth2_client::{
     additional_endpoints::{
-        AccessTokenObtainFrom, AccessTokenResponseSuccessfulBody, EndpointExecuteError,
-        EndpointOutputObtainFrom, EndpointParseResponseError, UserInfo, UserInfoEndpoint,
+        AccessTokenObtainFrom, EndpointExecuteError, EndpointOutputObtainFrom,
+        EndpointParseResponseError, UserInfoEndpoint,
     },
     authorization_code_grant::{
         provider_ext::ProviderExtAuthorizationCodeGrantStringScopeWrapper, Flow,
-        FlowBuildAuthorizationUrlError, FlowHandleCallbackError,
+        FlowBuildAuthorizationUrlError,
     },
     oauth2_core::types::State,
     re_exports::{Client, Url},
     Provider, ProviderExtAuthorizationCodeGrant,
 };
 
+use super::SigninFlowHandleCallbackRet;
+
+//
+//
+//
 #[derive(Clone)]
 pub struct SigninFlowWithDyn<C>
 where
@@ -111,7 +116,7 @@ where
             .obtain_from(access_token_obtain_from, &access_token)
         {
             EndpointOutputObtainFrom::None => {
-                return SigninFlowHandleCallbackRet::Ok((access_token, None));
+                return SigninFlowHandleCallbackRet::OkButUserInfoNone(access_token);
             }
             EndpointOutputObtainFrom::Build => {
                 match self
@@ -119,10 +124,10 @@ where
                     .build(access_token_obtain_from, &access_token)
                 {
                     Ok(user_info) => {
-                        return SigninFlowHandleCallbackRet::Ok((access_token, Some(user_info)));
+                        return SigninFlowHandleCallbackRet::Ok((access_token, user_info));
                     }
                     Err(err) => {
-                        return SigninFlowHandleCallbackRet::FetchUserInfoError((
+                        return SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
                             access_token,
                             EndpointExecuteError::ParseResponseError(
                                 EndpointParseResponseError::Other(err.to_string()),
@@ -140,7 +145,7 @@ where
         {
             Ok(x) => x,
             Err(err) => {
-                return SigninFlowHandleCallbackRet::FetchUserInfoError((
+                return SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
                     access_token,
                     EndpointExecuteError::RenderRequestError(err),
                 ));
@@ -154,7 +159,7 @@ where
         {
             Ok(x) => x,
             Err(err) => {
-                return SigninFlowHandleCallbackRet::FetchUserInfoError((
+                return SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
                     access_token,
                     EndpointExecuteError::RespondFailed(err.to_string()),
                 ));
@@ -168,27 +173,15 @@ where
         ) {
             Ok(x) => x,
             Err(err) => {
-                return SigninFlowHandleCallbackRet::FetchUserInfoError((
+                return SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
                     access_token,
                     EndpointExecuteError::ParseResponseError(err),
                 ));
             }
         };
 
-        SigninFlowHandleCallbackRet::Ok((access_token, Some(user_info)))
+        SigninFlowHandleCallbackRet::Ok((access_token, user_info))
     }
-}
-
-#[derive(Debug)]
-pub enum SigninFlowHandleCallbackRet {
-    Ok((AccessTokenResponseSuccessfulBody<String>, Option<UserInfo>)),
-    FetchUserInfoError(
-        (
-            AccessTokenResponseSuccessfulBody<String>,
-            EndpointExecuteError,
-        ),
-    ),
-    FlowHandleCallbackError(FlowHandleCallbackError),
 }
 
 #[cfg(test)]
