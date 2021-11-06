@@ -11,7 +11,7 @@ use oauth2_core::{
     url::{ParseError as UrlParseError, Url},
 };
 
-use crate::{Provider, ProviderExtAuthorizationCodeGrant};
+use crate::ProviderExtAuthorizationCodeGrant;
 
 use super::{
     access_token_endpoint, authorization_endpoint, parse_redirect_uri_query,
@@ -59,56 +59,7 @@ impl<'a, C> Flow<C>
 where
     C: Client + Send + Sync,
 {
-    pub async fn handle_callback<P>(
-        &self,
-        provider: &'a P,
-        query: impl AsRef<str>,
-        state: impl Into<Option<State>>,
-    ) -> Result<AT_RES_SuccessfulBody<<P as Provider>::Scope>, FlowHandleCallbackError>
-    where
-        P: ProviderExtAuthorizationCodeGrant + Send + Sync,
-
-        <P as Provider>::Scope: Serialize + DeserializeOwned + Send + Sync,
-    {
-        // Step 3
-        let query = parse_redirect_uri_query(query.as_ref())
-            .map_err(FlowHandleCallbackError::ParseRedirectUriQueryError)?;
-
-        let query = query.map_err(FlowHandleCallbackError::AuthorizationFailed)?;
-
-        if let Some(ref state) = state.into() {
-            if let Some(query_state) = &query.state {
-                if state != query_state {
-                    return Err(FlowHandleCallbackError::StateMismatch);
-                }
-            } else {
-                return Err(FlowHandleCallbackError::StateMissing);
-            }
-        }
-
-        let access_token_endpoint_request =
-            access_token_endpoint::render_request(provider, query.code)
-                .map_err(FlowHandleCallbackError::AccessTokenEndpointError)?;
-
-        let access_token_endpoint_response = self
-            .client_with_token
-            .respond(access_token_endpoint_request)
-            .await
-            .map_err(|err| {
-                FlowHandleCallbackError::AccessTokenEndpointRespondFailed(err.to_string())
-            })?;
-
-        let access_token_ret =
-            access_token_endpoint::parse_response(provider, access_token_endpoint_response)
-                .map_err(FlowHandleCallbackError::AccessTokenEndpointError)?;
-
-        let access_token_successful_body =
-            access_token_ret.map_err(FlowHandleCallbackError::AccessTokenFailed)?;
-
-        Ok(access_token_successful_body)
-    }
-
-    pub async fn handle_callback_with_dyn<SCOPE>(
+    pub async fn handle_callback<SCOPE>(
         &self,
         provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
         query: impl AsRef<str>,
