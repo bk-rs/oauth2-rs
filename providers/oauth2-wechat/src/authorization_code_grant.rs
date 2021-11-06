@@ -372,7 +372,9 @@ mod tests {
             RedirectUri::new("https://client.example.com/cb")?,
         )?;
 
-        let response_body = include_str!("../tests/response_body_json_files/access_token.json");
+        let response_body = include_str!(
+            "../tests/response_body_json_files/access_token_with_authorization_code_grant.json"
+        );
         let body_ret = access_token_endpoint::parse_response(
             &provider,
             Response::builder().body(response_body.as_bytes().to_vec())?,
