@@ -13,7 +13,7 @@ use poem::{
     listener::{Listener, TcpListener, TlsConfig},
     session::{CookieConfig, CookieSession, Session},
     web::{Data, Path, Redirect},
-    EndpointExt, FromRequest, Request, RequestBody, Route, Server,
+    EndpointExt, Error as PoemError, FromRequest, Request, RequestBody, Route, Server,
 };
 
 use oauth2_client_web_app_flow_example::{config::Config, context::Context};
@@ -62,17 +62,20 @@ async fn auth_handler(
     Path(provider): Path<String>,
     ctx: Data<&Arc<Context>>,
     session: &Session,
-) -> Redirect {
-    let flow = ctx.signin_flow_map.get(provider.as_str()).unwrap();
+) -> Result<Redirect, PoemError> {
+    let flow = ctx
+        .signin_flow_map
+        .get(provider.as_str())
+        .ok_or_else(|| "provider not found")?;
 
     let state = gen_state();
 
     session.set(state_session_key(&provider).as_str(), state.to_owned());
-    let url = flow.build_authorization_url(state).unwrap();
+    let url = flow.build_authorization_url(state)?;
 
     info!("{} {:?}", provider, url.as_str());
 
-    Redirect::temporary(url.as_str().parse::<Uri>().unwrap())
+    Ok(Redirect::temporary(url.as_str().parse::<Uri>()?))
 }
 
 struct QueryRaw(String);
@@ -92,19 +95,24 @@ async fn auth_callback_handler(
     QueryRaw(query_raw): QueryRaw,
     ctx: Data<&Arc<Context>>,
     session: &Session,
-) -> String {
-    let flow = ctx.signin_flow_map.get(provider.as_str()).unwrap();
+) -> Result<String, PoemError> {
+    let flow = ctx
+        .signin_flow_map
+        .get(provider.as_str())
+        .ok_or_else(|| "provider not found")?;
 
-    let state = session
-        .get::<String>(state_session_key(&provider).as_str())
-        .unwrap();
+    // TODO, bug
+    // let state = session
+    //     .get::<String>(state_session_key(&provider).as_str())
+    //     .ok_or_else(|| "session state not found")?;
+    let state = session.get::<String>(state_session_key(&provider).as_str());
     session.remove(state_session_key(&provider).as_str());
 
     let ret = flow.handle_callback(query_raw, state).await;
 
     info!("{} {:?}", provider, ret);
 
-    format!("{:?}", ret)
+    Ok(format!("{:?}", ret))
 }
 
 fn state_session_key(provider: &str) -> String {
