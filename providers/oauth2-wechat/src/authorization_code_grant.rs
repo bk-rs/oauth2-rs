@@ -19,6 +19,8 @@ use oauth2_client::{
 
 use crate::{WeChatScope, AUTHORIZATION_URL, TOKEN_URL};
 
+pub const KEY_OPENID: &str = "openid";
+
 #[derive(Debug, Clone)]
 pub struct WeChatProviderWithWebApplication {
     appid: ClientId,
@@ -257,7 +259,6 @@ pub struct WeChatAccessTokenResponseSuccessfulBody {
     pub refresh_token: String,
     pub openid: String,
     pub scope: String,
-    pub unionid: Option<String>,
 }
 impl From<WeChatAccessTokenResponseSuccessfulBody>
     for AccessTokenResponseSuccessfulBody<WeChatScope>
@@ -273,10 +274,7 @@ impl From<WeChatAccessTokenResponseSuccessfulBody>
             .collect();
 
         let mut map = Map::new();
-        map.insert("openid".to_owned(), Value::String(body.openid.to_owned()));
-        if let Some(unionid) = &body.unionid {
-            map.insert("unionid".to_owned(), Value::String(unionid.to_owned()));
-        }
+        map.insert(KEY_OPENID.to_owned(), Value::String(body.openid.to_owned()));
 
         let mut body = Self::new(
             body.access_token.to_owned(),
@@ -345,7 +343,7 @@ mod tests {
             "3d6be0a4035d839573b04816624a415e".to_owned(),
         )?;
 
-        assert_eq!(request.uri(), "https://open.weixin.qq.com/connect/qrconnect?appid=APPID&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&response_type=code&scope=snsapi_login&state=3d6be0a4035d839573b04816624a415e#wechat_redirect");
+        assert_eq!(request.uri(), "https://open.weixin.qq.com/connect/oauth2/authorize?appid=APPID&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&response_type=code&scope=snsapi_login&state=3d6be0a4035d839573b04816624a415e#wechat_redirect");
 
         Ok(())
     }
@@ -374,15 +372,7 @@ mod tests {
             RedirectUri::new("https://client.example.com/cb")?,
         )?;
 
-        let response_body = r#"
-        { 
-            "access_token":"ACCESS_TOKEN", 
-            "expires_in":7200, 
-            "refresh_token":"REFRESH_TOKEN",
-            "openid":"OPENID", 
-            "scope":"SCOPE",
-            "unionid": "o6_bmasdasdsad6_2sgVt7hMZOPfL"
-        }"#;
+        let response_body = include_str!("../tests/response_body_json_files/access_token.json");
         let body_ret = access_token_endpoint::parse_response(
             &provider,
             Response::builder().body(response_body.as_bytes().to_vec())?,
@@ -400,7 +390,6 @@ mod tests {
                 );
                 let map = body.extensions().unwrap();
                 assert_eq!(map.get("openid").unwrap(), "OPENID");
-                assert_eq!(map.get("unionid").unwrap(), "o6_bmasdasdsad6_2sgVt7hMZOPfL");
             }
             Err(body) => panic!("{:?}", body),
         }

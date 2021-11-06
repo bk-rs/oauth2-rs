@@ -3,7 +3,7 @@ use oauth2_client::{
         AccessTokenObtainFrom, AccessTokenResponseSuccessfulBody, EndpointParseResponseError,
         EndpointRenderRequestError, UserInfo, UserInfoEndpoint,
     },
-    re_exports::{serde_json, Body, Endpoint, Request, Response, Scope},
+    re_exports::{serde_json, Body, Endpoint as _, Request, Response, Scope},
 };
 
 use super::internal_oauth2_v3_user_info_endpoint::{
