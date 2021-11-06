@@ -1,4 +1,4 @@
-use std::error;
+use std::{error, fmt};
 
 use downcast_rs::{impl_downcast, DowncastSync};
 use dyn_clone::{clone_trait_object, DynClone};
@@ -66,8 +66,29 @@ pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone + DowncastSync 
     }
 }
 
-clone_trait_object!(<SCOPE> ProviderExtAuthorizationCodeGrant<Scope = SCOPE> where SCOPE: Clone);
+clone_trait_object!(<SCOPE> ProviderExtAuthorizationCodeGrant<Scope = SCOPE> where SCOPE: self::Scope + Clone);
 impl_downcast!(ProviderExtAuthorizationCodeGrant assoc Scope where Scope: self::Scope);
+
+impl<SCOPE> fmt::Debug for dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>
+where
+    SCOPE: self::Scope,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ProviderExtAuthorizationCodeGrant")
+            .field("client_id", &self.client_id())
+            .field("token_endpoint_url", &self.token_endpoint_url().as_str())
+            .field(
+                "redirect_uri",
+                &self.redirect_uri().map(|x| x.url().as_str()),
+            )
+            .field("scopes_default", &self.scopes_default())
+            .field(
+                "authorization_endpoint_url",
+                &self.authorization_endpoint_url().as_str(),
+            )
+            .finish()
+    }
+}
 
 //
 //

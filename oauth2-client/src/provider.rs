@@ -16,7 +16,7 @@ pub trait Provider: DynClone + DowncastSync {
     fn token_endpoint_url(&self) -> &Url;
 }
 
-clone_trait_object!(<SCOPE> Provider<Scope = SCOPE> where SCOPE: Clone);
+clone_trait_object!(<SCOPE> Provider<Scope = SCOPE> where SCOPE: self::Scope + Clone);
 impl_downcast!(Provider assoc Scope where Scope: self::Scope);
 
 //

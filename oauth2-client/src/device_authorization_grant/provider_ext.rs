@@ -23,7 +23,7 @@ pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone + DowncastSyn
     }
 }
 
-clone_trait_object!(<SCOPE> ProviderExtDeviceAuthorizationGrant<Scope = SCOPE> where SCOPE: Clone);
+clone_trait_object!(<SCOPE> ProviderExtDeviceAuthorizationGrant<Scope = SCOPE> where SCOPE: self::Scope + Clone);
 impl_downcast!(ProviderExtDeviceAuthorizationGrant assoc Scope where Scope: self::Scope);
 
 //

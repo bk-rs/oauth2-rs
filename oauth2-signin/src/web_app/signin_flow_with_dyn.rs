@@ -1,3 +1,5 @@
+use std::fmt;
+
 use oauth2_client::{
     additional_endpoints::{
         AccessTokenObtainFrom, EndpointExecuteError, EndpointOutputObtainFrom,
@@ -24,6 +26,21 @@ where
     pub client_with_user_info: C,
     _priv: (),
 }
+impl<C> fmt::Debug for SigninFlowWithDyn<C>
+where
+    C: Client + fmt::Debug,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("SigninFlowWithDyn")
+            .field("flow", &self.flow)
+            .field("provider", &self.provider)
+            .field("scopes", &self.scopes)
+            .field("user_info_endpoint", &self.user_info_endpoint)
+            .field("client_with_user_info", &self.client_with_user_info)
+            .finish()
+    }
+}
+
 impl<C> SigninFlowWithDyn<C>
 where
     C: Client,
@@ -37,7 +54,6 @@ where
     where
         C: Clone,
         P: ProviderExtAuthorizationCodeGrant + Clone + 'static,
-
         UIEP: UserInfoEndpoint<String> + 'static,
     {
         Self {
@@ -241,6 +257,9 @@ mod tests {
 
         let google_auth_url = map.get("google").unwrap().build_authorization_url(None)?;
         println!("google_auth_url {}", google_auth_url);
+
+        //
+        println!("{:?}", map);
 
         Ok(())
     }

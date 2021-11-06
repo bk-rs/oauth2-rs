@@ -1,5 +1,6 @@
-use std::error;
+use std::{error, fmt};
 
+use downcast_rs::{impl_downcast, DowncastSync};
 use dyn_clone::{clone_trait_object, DynClone};
 
 use crate::re_exports::{AccessTokenResponseSuccessfulBody, Body, Request, Response, Scope};
@@ -12,7 +13,7 @@ use super::{
 //
 //
 //
-pub trait UserInfoEndpoint<SCOPE>: DynClone
+pub trait UserInfoEndpoint<SCOPE>: DynClone + DowncastSync
 where
     SCOPE: Scope,
 {
@@ -46,7 +47,17 @@ where
     ) -> Result<UserInfo, EndpointParseResponseError>;
 }
 
-clone_trait_object!(<SCOPE> UserInfoEndpoint<SCOPE> where SCOPE: Clone);
+clone_trait_object!(<SCOPE> UserInfoEndpoint<SCOPE> where SCOPE: self::Scope + Clone);
+impl_downcast!(UserInfoEndpoint<SCOPE> where SCOPE: self::Scope);
+
+impl<SCOPE> fmt::Debug for dyn UserInfoEndpoint<SCOPE>
+where
+    SCOPE: self::Scope,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("UserInfoEndpoint").finish()
+    }
+}
 
 //
 //
