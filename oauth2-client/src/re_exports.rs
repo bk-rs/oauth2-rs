@@ -9,7 +9,7 @@ pub use oauth2_core::{
     },
     serde::{de::DeserializeOwned, Deserialize, Serialize},
     serde_enum_str::{Deserialize_enum_str, Serialize_enum_str},
-    types::{AccessTokenType, ClientId, ClientSecret, RedirectUri, Scope},
+    types::{ClientId, ClientSecret, RedirectUri, Scope},
     url::{ParseError as UrlParseError, Url},
 };
 pub use serde_json::{self, Error as SerdeJsonError, Map, Value};
