@@ -1,5 +1,5 @@
 /*
-RUST_BACKTRACE=1 RUST_LOG=debug,isahc=off cargo run -p oauth2_client_device_flow_demo --bin github -- 'YOUR_CLIENT_ID'
+RUST_BACKTRACE=1 RUST_LOG=debug cargo run -p oauth2_client_device_flow_example --bin github -- 'YOUR_CLIENT_ID'
 */
 
 use std::{env, error};

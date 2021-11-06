@@ -3,14 +3,14 @@ cp config/clients.toml.example config/clients.toml
 
 CAROOT=$(pwd)/mkcert mkcert -install
 
-RUST_BACKTRACE=1 RUST_LOG=trace cargo run -p oauth2_client_web_app_flow_demo
+RUST_BACKTRACE=1 RUST_LOG=trace cargo run -p oauth2_client_web_app_flow_example
 
 sudo socat tcp-listen:80,reuseaddr,fork tcp:127.0.0.1:8080
 sudo socat tcp-listen:443,reuseaddr,fork tcp:127.0.0.1:8443
 
-open http://oauth2-rs.lvh.me/auth/github
+xdg-open http://oauth2-rs.lvh.me/auth/github
 
-open https://oauth2-rs.lvh.me/auth/google
+xdg-open https://oauth2-rs.lvh.me/auth/google
 */
 
 use std::{collections::HashMap, env, error, fs, path::PathBuf, sync::Arc};
@@ -181,7 +181,7 @@ async fn auth_callback_handler(
     provider: String,
     query_raw: Option<String>,
     ctx: Arc<Context>,
-    session_with_store: SessionWithStore<MemoryStore>,
+    mut session_with_store: SessionWithStore<MemoryStore>,
 ) -> Result<(impl warp::Reply, SessionWithStore<MemoryStore>), warp::Rejection> {
     let query_raw = query_raw.unwrap();
 
@@ -191,6 +191,9 @@ async fn auth_callback_handler(
         .session
         .get::<String>(format!("state_{}", provider).as_str())
         .unwrap();
+    session_with_store
+        .session
+        .remove(format!("state_{}", provider).as_str());
 
     let ret = flow.handle_callback(query_raw, state).await;
 

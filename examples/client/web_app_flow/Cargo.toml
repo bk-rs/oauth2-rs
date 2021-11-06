@@ -1,13 +1,13 @@
 [package]
-name = "oauth2_client_web_app_flow_demo"
+name = "oauth2_client_web_app_flow_example"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-oauth2-signin = { version = "^0.0", path = "../oauth2-signin" }
+oauth2-signin = { version = "^0.0", path = "../../../oauth2-signin" }
 
-oauth2-github = { version = "^0.0", path = "../providers/oauth2-github" }
-oauth2-google = { version = "^0.0", path = "../providers/oauth2-google" }
+oauth2-github = { version = "^0.0", path = "../../../providers/oauth2-github" }
+oauth2-google = { version = "^0.0", path = "../../../providers/oauth2-google" }
 
 tokio = { version = "1.12", default-features = false, features = ["macros", "rt-multi-thread"] }
 http-api-isahc-client = { version = "0.1" }

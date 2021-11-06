@@ -1,5 +1,5 @@
 [package]
-name = "oauth2_client_device_flow_demo"
+name = "oauth2_client_device_flow_example"
 version = "0.1.0"
 edition = "2021"
 
@@ -12,10 +12,10 @@ name = "google"
 path = "src/google.rs"
 
 [dependencies]
-oauth2-client = { version = "^0.0", path = "../oauth2-client", features = ["with-flow"] }
+oauth2-client = { version = "^0.0", path = "../../../oauth2-client", features = ["with-flow"] }
 
-oauth2-github = { version = "^0.0", path = "../providers/oauth2-github" }
-oauth2-google = { version = "^0.0", path = "../providers/oauth2-google" }
+oauth2-github = { version = "^0.0", path = "../../../providers/oauth2-github" }
+oauth2-google = { version = "^0.0", path = "../../../providers/oauth2-google" }
 
 tokio = { version = "1.12", default-features = false, features = ["macros", "rt-multi-thread"] }
 http-api-isahc-client = { version = "0.1", features = ["with-sleep-via-tokio"] }
