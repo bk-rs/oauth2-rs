@@ -17,7 +17,9 @@ use crate::{
 };
 
 //
-pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone + DowncastSync {
+pub trait ProviderExtAuthorizationCodeGrant:
+    Provider + DynClone + DowncastSync + Send + Sync
+{
     fn redirect_uri(&self) -> Option<&RedirectUri>;
 
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {

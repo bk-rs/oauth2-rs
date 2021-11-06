@@ -1,8 +1,4 @@
-#![allow(unused_imports)]
-#![allow(unreachable_code)]
-#![allow(unused_variables)]
-
-use std::{error, marker::PhantomData};
+use std::fmt;
 
 use oauth2_client::{
     additional_endpoints::{
@@ -15,90 +11,65 @@ use oauth2_client::{
     },
     oauth2_core::types::State,
     re_exports::{Client, Url},
+    Provider, ProviderExtAuthorizationCodeGrant,
 };
-
-#[cfg(feature = "with-github")]
-use super::{GithubProviderWithWebApplication, GithubScope, GithubUserInfoEndpoint};
-#[cfg(feature = "with-google")]
-use super::{GoogleProviderForWebServerApps, GoogleScope, GoogleUserInfoEndpoint};
 
 use super::SigninFlowHandleCallbackRet;
 
 //
 //
 //
-#[derive(Debug, Clone)]
-pub enum SigninFlow<C>
+#[derive(Clone)]
+pub struct SigninFlow<C>
 where
     C: Client,
 {
-    #[cfg(feature = "with-github")]
-    Github {
-        flow: Flow<C>,
-        provider:
-            ProviderExtAuthorizationCodeGrantStringScopeWrapper<GithubProviderWithWebApplication>,
-        scopes: Option<Vec<String>>,
-        user_info_endpoint: GithubUserInfoEndpoint,
-        client_with_user_info: C,
-    },
-    #[cfg(feature = "with-google")]
-    Google {
-        flow: Flow<C>,
-        provider:
-            ProviderExtAuthorizationCodeGrantStringScopeWrapper<GoogleProviderForWebServerApps>,
-        scopes: Option<Vec<String>>,
-        user_info_endpoint: GoogleUserInfoEndpoint,
-        client_with_user_info: C,
-    },
-    _Priv(_SigninFlowPrivVariant<C>),
+    pub flow: Flow<C>,
+    pub provider: Box<dyn ProviderExtAuthorizationCodeGrant<Scope = String>>,
+    pub scopes: Option<Vec<String>>,
+    pub user_info_endpoint: Box<dyn UserInfoEndpoint<String>>,
+    pub client_with_user_info: C,
 }
-
-#[derive(Debug, Clone)]
-pub struct _SigninFlowPrivVariant<C>(PhantomData<C>);
+impl<C> fmt::Debug for SigninFlow<C>
+where
+    C: Client + fmt::Debug,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("SigninFlow")
+            .field("flow", &self.flow)
+            .field("provider", &self.provider)
+            .field("scopes", &self.scopes)
+            .field("user_info_endpoint", &self.user_info_endpoint)
+            .field("client_with_user_info", &self.client_with_user_info)
+            .finish()
+    }
+}
 
 impl<C> SigninFlow<C>
 where
     C: Client,
 {
-    #[cfg(feature = "with-github")]
-    pub fn with_github(
+    pub fn new<P, UIEP>(
         client: C,
-        provider: GithubProviderWithWebApplication,
-        scopes: impl Into<Option<Vec<GithubScope>>>,
-        user_info_endpoint: GithubUserInfoEndpoint,
+        provider: P,
+        scopes: impl Into<Option<Vec<<P as Provider>::Scope>>>,
+        user_info_endpoint: UIEP,
     ) -> Self
     where
         C: Clone,
+        P: ProviderExtAuthorizationCodeGrant + Clone + 'static,
+        UIEP: UserInfoEndpoint<String> + 'static,
     {
-        Self::Github {
+        Self {
             flow: Flow::new(client.clone()),
-            provider: ProviderExtAuthorizationCodeGrantStringScopeWrapper::new(provider),
+            provider: Box::new(ProviderExtAuthorizationCodeGrantStringScopeWrapper::new(
+                provider,
+            )),
             scopes: scopes
                 .into()
                 .map(|x| x.iter().map(|y| y.to_string()).collect()),
-            user_info_endpoint,
-            client_with_user_info: client.clone(),
-        }
-    }
-
-    #[cfg(feature = "with-google")]
-    pub fn with_google(
-        client: C,
-        provider: GoogleProviderForWebServerApps,
-        scopes: impl Into<Option<Vec<GoogleScope>>>,
-        user_info_endpoint: GoogleUserInfoEndpoint,
-    ) -> Self
-    where
-        C: Clone,
-    {
-        Self::Google {
-            flow: Flow::new(client.clone()),
-            provider: ProviderExtAuthorizationCodeGrantStringScopeWrapper::new(provider),
-            scopes: scopes
-                .into()
-                .map(|x| x.iter().map(|y| y.to_string()).collect()),
-            user_info_endpoint,
-            client_with_user_info: client.clone(),
+            user_info_endpoint: Box::new(user_info_endpoint),
+            client_with_user_info: client,
         }
     }
 }
@@ -111,25 +82,8 @@ where
         &self,
         state: impl Into<Option<State>>,
     ) -> Result<Url, FlowBuildAuthorizationUrlError> {
-        match self {
-            #[cfg(feature = "with-github")]
-            Self::Github {
-                flow,
-                provider,
-                scopes,
-                user_info_endpoint: _,
-                client_with_user_info: _,
-            } => flow.build_authorization_url(provider, scopes.to_owned(), state),
-            #[cfg(feature = "with-google")]
-            Self::Google {
-                flow,
-                provider,
-                scopes,
-                user_info_endpoint: _,
-                client_with_user_info: _,
-            } => flow.build_authorization_url(provider, scopes.to_owned(), state),
-            Self::_Priv(_) => unreachable!(),
-        }
+        self.flow
+            .build_authorization_url(self.provider.as_ref(), self.scopes.to_owned(), state)
     }
 
     pub fn build_authorization_url_with_custom_scopes(
@@ -137,25 +91,8 @@ where
         custom_scopes: Vec<String>,
         state: impl Into<Option<State>>,
     ) -> Result<Url, FlowBuildAuthorizationUrlError> {
-        match self {
-            #[cfg(feature = "with-github")]
-            Self::Github {
-                flow,
-                provider,
-                scopes: _,
-                user_info_endpoint: _,
-                client_with_user_info: _,
-            } => flow.build_authorization_url(provider, Some(custom_scopes), state),
-            #[cfg(feature = "with-google")]
-            Self::Google {
-                flow,
-                provider,
-                scopes: _,
-                user_info_endpoint: _,
-                client_with_user_info: _,
-            } => flow.build_authorization_url(provider, Some(custom_scopes), state),
-            Self::_Priv(_) => unreachable!(),
-        }
+        self.flow
+            .build_authorization_url(self.provider.as_ref(), Some(custom_scopes), state)
     }
 
     pub async fn handle_callback(
@@ -163,79 +100,29 @@ where
         query: impl AsRef<str>,
         state: impl Into<Option<State>>,
     ) -> SigninFlowHandleCallbackRet {
-        let access_token_ret = match self {
-            #[cfg(feature = "with-github")]
-            Self::Github {
-                flow,
-                provider,
-                scopes: _,
-                user_info_endpoint: _,
-                client_with_user_info: _,
-            } => flow.handle_callback(provider, query, state).await,
-            #[cfg(feature = "with-google")]
-            Self::Google {
-                flow,
-                provider,
-                scopes: _,
-                user_info_endpoint: _,
-                client_with_user_info: _,
-            } => flow.handle_callback(provider, query, state).await,
-            Self::_Priv(_) => unreachable!(),
-        };
-
-        let access_token = match access_token_ret {
+        let access_token = match self
+            .flow
+            .handle_callback_with_dyn(self.provider.as_ref(), query, state)
+            .await
+        {
             Ok(x) => x,
             Err(err) => return SigninFlowHandleCallbackRet::FlowHandleCallbackError(err),
         };
 
         let access_token_obtain_from = AccessTokenObtainFrom::AuthorizationCodeGrant;
 
-        let user_info_endpoint_obtain_from = match self {
-            #[cfg(feature = "with-github")]
-            Self::Github {
-                flow: _,
-                provider: _,
-                scopes: _,
-                user_info_endpoint,
-                client_with_user_info: _,
-            } => user_info_endpoint.obtain_from(access_token_obtain_from, &access_token),
-            #[cfg(feature = "with-google")]
-            Self::Google {
-                flow: _,
-                provider: _,
-                scopes: _,
-                user_info_endpoint,
-                client_with_user_info: _,
-            } => user_info_endpoint.obtain_from(access_token_obtain_from, &access_token),
-            Self::_Priv(_) => unreachable!(),
-        };
-
-        match user_info_endpoint_obtain_from {
+        match self
+            .user_info_endpoint
+            .obtain_from(access_token_obtain_from, &access_token)
+        {
             EndpointOutputObtainFrom::None => {
                 return SigninFlowHandleCallbackRet::OkButUserInfoNone(access_token);
             }
             EndpointOutputObtainFrom::Build => {
-                let user_info_ret: Result<_, Box<dyn error::Error>> = match self {
-                    #[cfg(feature = "with-github")]
-                    Self::Github {
-                        flow: _,
-                        provider: _,
-                        scopes: _,
-                        user_info_endpoint,
-                        client_with_user_info: _,
-                    } => user_info_endpoint.build(access_token_obtain_from, &access_token),
-                    #[cfg(feature = "with-google")]
-                    Self::Google {
-                        flow: _,
-                        provider: _,
-                        scopes: _,
-                        user_info_endpoint,
-                        client_with_user_info: _,
-                    } => user_info_endpoint.build(access_token_obtain_from, &access_token),
-                    Self::_Priv(_) => unreachable!(),
-                };
-
-                match user_info_ret {
+                match self
+                    .user_info_endpoint
+                    .build(access_token_obtain_from, &access_token)
+                {
                     Ok(user_info) => {
                         return SigninFlowHandleCallbackRet::Ok((access_token, user_info));
                     }
@@ -247,32 +134,15 @@ where
                             ),
                         ));
                     }
-                }
+                };
             }
             EndpointOutputObtainFrom::Respond => {}
         }
 
-        let user_info_endpoint_request_ret = match self {
-            #[cfg(feature = "with-github")]
-            Self::Github {
-                flow: _,
-                provider: _,
-                scopes: _,
-                user_info_endpoint,
-                client_with_user_info: _,
-            } => user_info_endpoint.render_request(access_token_obtain_from, &access_token),
-            #[cfg(feature = "with-google")]
-            Self::Google {
-                flow: _,
-                provider: _,
-                scopes: _,
-                user_info_endpoint,
-                client_with_user_info: _,
-            } => user_info_endpoint.render_request(access_token_obtain_from, &access_token),
-            Self::_Priv(_) => unreachable!(),
-        };
-
-        let user_info_endpoint_request = match user_info_endpoint_request_ret {
+        let user_info_endpoint_request = match self
+            .user_info_endpoint
+            .render_request(access_token_obtain_from, &access_token)
+        {
             Ok(x) => x,
             Err(err) => {
                 return SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
@@ -282,35 +152,11 @@ where
             }
         };
 
-        let user_info_endpoint_response_ret: Result<_, <C as Client>::RespondError> = match self {
-            #[cfg(feature = "with-github")]
-            Self::Github {
-                flow: _,
-                provider: _,
-                scopes: _,
-                user_info_endpoint: _,
-                client_with_user_info,
-            } => {
-                client_with_user_info
-                    .respond(user_info_endpoint_request)
-                    .await
-            }
-            #[cfg(feature = "with-google")]
-            Self::Google {
-                flow: _,
-                provider: _,
-                scopes: _,
-                user_info_endpoint: _,
-                client_with_user_info,
-            } => {
-                client_with_user_info
-                    .respond(user_info_endpoint_request)
-                    .await
-            }
-            Self::_Priv(_) => unreachable!(),
-        };
-
-        let user_info_endpoint_response = match user_info_endpoint_response_ret {
+        let user_info_endpoint_response = match self
+            .client_with_user_info
+            .respond(user_info_endpoint_request)
+            .await
+        {
             Ok(x) => x,
             Err(err) => {
                 return SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
@@ -320,37 +166,11 @@ where
             }
         };
 
-        let user_info_ret = match self {
-            #[cfg(feature = "with-github")]
-            Self::Github {
-                flow: _,
-                provider: _,
-                scopes: _,
-                user_info_endpoint,
-                client_with_user_info: _,
-            } => UserInfoEndpoint::<String>::parse_response(
-                user_info_endpoint,
-                access_token_obtain_from,
-                &access_token,
-                user_info_endpoint_response,
-            ),
-            #[cfg(feature = "with-google")]
-            Self::Google {
-                flow: _,
-                provider: _,
-                scopes: _,
-                user_info_endpoint,
-                client_with_user_info: _,
-            } => UserInfoEndpoint::<String>::parse_response(
-                user_info_endpoint,
-                access_token_obtain_from,
-                &access_token,
-                user_info_endpoint_response,
-            ),
-            Self::_Priv(_) => unreachable!(),
-        };
-
-        let user_info = match user_info_ret {
+        let user_info = match self.user_info_endpoint.parse_response(
+            access_token_obtain_from,
+            &access_token,
+            user_info_endpoint_response,
+        ) {
             Ok(x) => x,
             Err(err) => {
                 return SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
@@ -361,5 +181,92 @@ where
         };
 
         SigninFlowHandleCallbackRet::Ok((access_token, user_info))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use std::{collections::HashMap, error};
+
+    use oauth2_github::{GithubProviderWithWebApplication, GithubScope, GithubUserInfoEndpoint};
+    use oauth2_google::{GoogleProviderForWebServerApps, GoogleScope, GoogleUserInfoEndpoint};
+
+    use http_api_isahc_client::IsahcClient;
+
+    #[test]
+    fn test_build_authorization_url() -> Result<(), Box<dyn error::Error>> {
+        let mut map = HashMap::new();
+
+        map.insert(
+            "github",
+            SigninFlow::new(
+                IsahcClient::new()?,
+                GithubProviderWithWebApplication::new(
+                    "client_id".to_owned(),
+                    "client_secret".to_owned(),
+                    "https://client.example.com/cb".parse()?,
+                )?,
+                vec![GithubScope::User],
+                GithubUserInfoEndpoint,
+            ),
+        );
+        map.insert(
+            "google",
+            SigninFlow::new(
+                IsahcClient::new()?,
+                GoogleProviderForWebServerApps::new(
+                    "client_id".to_owned(),
+                    "client_secret".to_owned(),
+                    "https://client.example.com/cb".parse()?,
+                )?,
+                vec![GoogleScope::Email],
+                GoogleUserInfoEndpoint,
+            ),
+        );
+
+        let github_auth_url = map
+            .get("github")
+            .unwrap()
+            .build_authorization_url_with_custom_scopes(
+                vec![GithubScope::User.to_string(), "custom".to_owned()],
+                "STATE".to_owned(),
+            )?;
+        println!("github_auth_url {}", github_auth_url);
+
+        let google_auth_url = map.get("google").unwrap().build_authorization_url(None)?;
+        println!("google_auth_url {}", google_auth_url);
+
+        //
+        println!("{:?}", map);
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_handle_callback() -> Result<(), Box<dyn error::Error>> {
+        let mut map = HashMap::new();
+        map.insert(
+            "github",
+            SigninFlow::new(
+                IsahcClient::new()?,
+                GithubProviderWithWebApplication::new(
+                    "client_id".to_owned(),
+                    "client_secret".to_owned(),
+                    "https://client.example.com/cb".parse()?,
+                )?,
+                vec![GithubScope::User],
+                GithubUserInfoEndpoint,
+            ),
+        );
+
+        let _ = map
+            .get("github")
+            .unwrap()
+            .handle_callback("code=CODE&state=STATE", "xxx".to_owned())
+            .await;
+
+        Ok(())
     }
 }

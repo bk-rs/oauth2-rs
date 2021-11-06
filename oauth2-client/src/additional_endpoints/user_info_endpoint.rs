@@ -13,7 +13,7 @@ use super::{
 //
 //
 //
-pub trait UserInfoEndpoint<SCOPE>: DynClone + DowncastSync
+pub trait UserInfoEndpoint<SCOPE>: DynClone + DowncastSync + Send + Sync
 where
     SCOPE: Scope,
 {

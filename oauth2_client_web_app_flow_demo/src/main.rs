@@ -18,14 +18,16 @@ use std::{collections::HashMap, env, error, fs, path::PathBuf, sync::Arc};
 use futures_util::future;
 use http_api_isahc_client::IsahcClient;
 use log::info;
+use oauth2_github::{GithubProviderWithWebApplication, GithubScope, GithubUserInfoEndpoint};
+use oauth2_google::{
+    GoogleProviderForWebServerApps, GoogleProviderForWebServerAppsAccessType, GoogleScope,
+    GoogleUserInfoEndpoint,
+};
 use oauth2_signin::{
     oauth2_client::re_exports::{ClientId, ClientSecret, RedirectUri},
-    web_app::{
-        GithubProviderWithWebApplication, GithubScope, GithubUserInfoEndpoint,
-        GoogleProviderForWebServerApps, GoogleProviderForWebServerAppsAccessType, GoogleScope,
-        GoogleUserInfoEndpoint, SigninFlow,
-    },
+    web_app::SigninFlow,
 };
+
 use rand::{distributions::Alphanumeric, thread_rng, Rng as _};
 use serde::Deserialize;
 use warp::{http::Uri, Filter};
@@ -75,7 +77,7 @@ async fn run(
     let mut signin_flow_map = HashMap::new();
     signin_flow_map.insert(
         "github",
-        SigninFlow::with_github(
+        SigninFlow::new(
             IsahcClient::new()?,
             GithubProviderWithWebApplication::new(
                 clients_config.github.client_id.to_owned(),
@@ -88,7 +90,7 @@ async fn run(
     );
     signin_flow_map.insert(
         "google",
-        SigninFlow::with_google(
+        SigninFlow::new(
             IsahcClient::new()?,
             GoogleProviderForWebServerApps::new(
                 clients_config.google.client_id.to_owned(),
