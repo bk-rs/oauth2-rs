@@ -3,7 +3,7 @@ use std::fmt;
 use oauth2_client::{
     additional_endpoints::{
         AccessTokenObtainFrom, AccessTokenResponseSuccessfulBody, EndpointExecuteError,
-        EndpointOutputObtainFrom, EndpointRenderRequestError, UserInfo, UserInfoEndpoint,
+        EndpointOutputObtainFrom, EndpointParseResponseError, UserInfo, UserInfoEndpoint,
     },
     authorization_code_grant::{
         provider_ext::ProviderExtAuthorizationCodeGrantStringScopeWrapper, Flow,
@@ -134,8 +134,8 @@ where
                     Err(err) => {
                         return SigninFlowHandleCallbackRet::FetchUserInfoError((
                             access_token,
-                            EndpointExecuteError::RenderRequestError(
-                                EndpointRenderRequestError::Other(err.to_string()),
+                            EndpointExecuteError::ParseResponseError(
+                                EndpointParseResponseError::Other(err.to_string()),
                             ),
                         ));
                     }
