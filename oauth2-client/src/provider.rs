@@ -6,7 +6,7 @@ use crate::re_exports::{ClientId, ClientSecret, Scope, Url};
 //
 //
 //
-pub trait Provider: DynClone + DowncastSync {
+pub trait Provider: DynClone + DowncastSync + Send + Sync {
     type Scope: Scope;
 
     fn client_id(&self) -> Option<&ClientId>;
