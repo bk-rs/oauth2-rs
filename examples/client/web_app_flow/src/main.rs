@@ -24,11 +24,13 @@ use oauth2_google::{
     GoogleUserInfoEndpoint,
 };
 use oauth2_signin::{
-    oauth2_client::re_exports::{ClientId, ClientSecret, RedirectUri},
+    oauth2_client::{
+        re_exports::{ClientId, ClientSecret, RedirectUri},
+        utils::gen_state,
+    },
     web_app::SigninFlow,
 };
 
-use rand::{distributions::Alphanumeric, thread_rng, Rng as _};
 use serde::Deserialize;
 use warp::{http::Uri, Filter};
 use warp_sessions::{MemoryStore, SessionWithStore};
@@ -157,11 +159,7 @@ async fn auth_handler(
 ) -> Result<(impl warp::Reply, SessionWithStore<MemoryStore>), warp::Rejection> {
     let flow = ctx.signin_flow_map.get(provider.as_str()).unwrap();
 
-    let state = thread_rng()
-        .sample_iter(&Alphanumeric)
-        .take(10)
-        .map(char::from)
-        .collect::<String>();
+    let state = gen_state();
 
     session_with_store
         .session

@@ -2,6 +2,7 @@ pub use oauth2_core;
 
 //
 pub mod re_exports;
+pub mod utils;
 
 //
 pub mod provider;
