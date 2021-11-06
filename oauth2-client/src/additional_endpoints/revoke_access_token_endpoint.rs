@@ -39,12 +39,12 @@ where
     ) -> Result<(), EndpointParseResponseError>;
 }
 
-clone_trait_object!(<SCOPE> RevokeAccessTokenEndpoint<SCOPE> where SCOPE: self::Scope + Clone);
-impl_downcast!(RevokeAccessTokenEndpoint<SCOPE> where SCOPE: self::Scope);
+clone_trait_object!(<SCOPE> RevokeAccessTokenEndpoint<SCOPE> where SCOPE: Scope + Clone);
+impl_downcast!(RevokeAccessTokenEndpoint<SCOPE> where SCOPE: Scope);
 
 impl<SCOPE> fmt::Debug for dyn RevokeAccessTokenEndpoint<SCOPE>
 where
-    SCOPE: self::Scope,
+    SCOPE: Scope,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("RevokeAccessTokenEndpoint").finish()

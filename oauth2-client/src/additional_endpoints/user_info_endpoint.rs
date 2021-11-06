@@ -47,12 +47,12 @@ where
     ) -> Result<UserInfo, EndpointParseResponseError>;
 }
 
-clone_trait_object!(<SCOPE> UserInfoEndpoint<SCOPE> where SCOPE: self::Scope + Clone);
-impl_downcast!(UserInfoEndpoint<SCOPE> where SCOPE: self::Scope);
+clone_trait_object!(<SCOPE> UserInfoEndpoint<SCOPE> where SCOPE: Scope + Clone);
+impl_downcast!(UserInfoEndpoint<SCOPE> where SCOPE: Scope);
 
 impl<SCOPE> fmt::Debug for dyn UserInfoEndpoint<SCOPE>
 where
-    SCOPE: self::Scope,
+    SCOPE: Scope,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("UserInfoEndpoint").finish()

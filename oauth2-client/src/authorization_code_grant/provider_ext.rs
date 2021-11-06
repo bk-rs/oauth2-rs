@@ -68,12 +68,12 @@ pub trait ProviderExtAuthorizationCodeGrant:
     }
 }
 
-clone_trait_object!(<SCOPE> ProviderExtAuthorizationCodeGrant<Scope = SCOPE> where SCOPE: self::Scope + Clone);
+clone_trait_object!(<SCOPE> ProviderExtAuthorizationCodeGrant<Scope = SCOPE> where SCOPE: Scope + Clone);
 impl_downcast!(ProviderExtAuthorizationCodeGrant assoc Scope where Scope: self::Scope);
 
 impl<SCOPE> fmt::Debug for dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>
 where
-    SCOPE: self::Scope,
+    SCOPE: Scope,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("ProviderExtAuthorizationCodeGrant")

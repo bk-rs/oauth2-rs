@@ -98,8 +98,7 @@ async fn auth_callback_handler(
 
     let state = session_with_store
         .session
-        .get::<String>(state_session_key(&provider).as_str())
-        .unwrap();
+        .get::<String>(state_session_key(&provider).as_str());
     session_with_store
         .session
         .remove(state_session_key(&provider).as_str());

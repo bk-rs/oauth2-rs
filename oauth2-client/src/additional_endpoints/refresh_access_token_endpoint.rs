@@ -47,12 +47,12 @@ where
     ) -> Result<AccessTokenResponseSuccessfulBody<SCOPE>, EndpointParseResponseError>;
 }
 
-clone_trait_object!(<SCOPE> RefreshAccessTokenEndpoint<SCOPE> where SCOPE: self::Scope + Clone);
-impl_downcast!(RefreshAccessTokenEndpoint<SCOPE> where SCOPE: self::Scope);
+clone_trait_object!(<SCOPE> RefreshAccessTokenEndpoint<SCOPE> where SCOPE: Scope + Clone);
+impl_downcast!(RefreshAccessTokenEndpoint<SCOPE> where SCOPE: Scope);
 
 impl<SCOPE> fmt::Debug for dyn RefreshAccessTokenEndpoint<SCOPE>
 where
-    SCOPE: self::Scope,
+    SCOPE: Scope,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("RefreshAccessTokenEndpoint").finish()

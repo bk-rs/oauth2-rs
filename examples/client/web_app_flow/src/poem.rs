@@ -101,10 +101,6 @@ async fn auth_callback_handler(
         .get(provider.as_str())
         .ok_or_else(|| "provider not found")?;
 
-    // TODO, bug
-    // let state = session
-    //     .get::<String>(state_session_key(&provider).as_str())
-    //     .ok_or_else(|| "session state not found")?;
     let state = session.get::<String>(state_session_key(&provider).as_str());
     session.remove(state_session_key(&provider).as_str());
 
