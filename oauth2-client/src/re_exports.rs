@@ -3,10 +3,6 @@ pub use http_api_endpoint::{
 };
 pub use oauth2_core::{
     http::{self, Error as HttpError},
-    re_exports::{
-        AccessTokenResponseErrorBody, AccessTokenResponseErrorBodyError,
-        AccessTokenResponseSuccessfulBody,
-    },
     serde::{de::DeserializeOwned, Deserialize, Serialize},
     serde_enum_str::{Deserialize_enum_str, Serialize_enum_str},
     types::{ClientId, ClientSecret, RedirectUri, Scope},

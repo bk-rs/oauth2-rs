@@ -1,11 +1,9 @@
 use oauth2_client::{
     additional_endpoints::{
-        AccessTokenObtainFrom, EndpointParseResponseError, EndpointRenderRequestError, UserInfo,
-        UserInfoEndpoint,
+        AccessTokenObtainFrom, AccessTokenResponseSuccessfulBody, EndpointParseResponseError,
+        EndpointRenderRequestError, UserInfo, UserInfoEndpoint,
     },
-    re_exports::{
-        serde_json, AccessTokenResponseSuccessfulBody, Body, Endpoint, Request, Response, Scope,
-    },
+    re_exports::{serde_json, Body, Endpoint, Request, Response, Scope},
 };
 
 use super::internal_oauth2_v3_user_info_endpoint::{

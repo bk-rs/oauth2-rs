@@ -6,12 +6,13 @@ use oauth2_client::{
         AuthorizationRequestQuery,
     },
     oauth2_core::{
-        access_token_request::GRANT_TYPE_WITH_AUTHORIZATION_CODE_GRANT, types::AccessTokenType,
+        access_token_request::GRANT_TYPE_WITH_AUTHORIZATION_CODE_GRANT,
+        re_exports::AccessTokenResponseErrorBodyError, types::AccessTokenType,
     },
     re_exports::{
-        serde_json, serde_qs, thiserror, AccessTokenResponseErrorBodyError, Body, ClientId,
-        ClientSecret, Deserialize, HttpError, Map, RedirectUri, Request, Response, SerdeJsonError,
-        SerdeQsError, Serialize, Url, UrlParseError, Value,
+        serde_json, serde_qs, thiserror, Body, ClientId, ClientSecret, Deserialize, HttpError, Map,
+        RedirectUri, Request, Response, SerdeJsonError, SerdeQsError, Serialize, Url,
+        UrlParseError, Value,
     },
     Provider, ProviderExtAuthorizationCodeGrant,
 };

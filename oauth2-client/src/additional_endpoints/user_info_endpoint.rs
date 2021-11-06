@@ -3,11 +3,11 @@ use std::{error, fmt};
 use downcast_rs::{impl_downcast, DowncastSync};
 use dyn_clone::{clone_trait_object, DynClone};
 
-use crate::re_exports::{AccessTokenResponseSuccessfulBody, Body, Request, Response, Scope};
+use crate::re_exports::{Body, Request, Response, Scope};
 
 use super::{
-    AccessTokenObtainFrom, EndpointOutputObtainFrom, EndpointParseResponseError,
-    EndpointRenderRequestError, UserInfo,
+    AccessTokenObtainFrom, AccessTokenResponseSuccessfulBody, EndpointOutputObtainFrom,
+    EndpointParseResponseError, EndpointRenderRequestError, UserInfo,
 };
 
 //

@@ -4,6 +4,11 @@ pub mod user_info;
 pub use access_token_obtain_from::AccessTokenObtainFrom;
 pub use user_info::UserInfo;
 
+pub use oauth2_core::re_exports::{
+    AccessTokenResponseErrorBody, AccessTokenResponseErrorBodyError,
+    AccessTokenResponseSuccessfulBody,
+};
+
 //
 pub mod endpoint_errors;
 pub mod endpoint_output_obtain_from;

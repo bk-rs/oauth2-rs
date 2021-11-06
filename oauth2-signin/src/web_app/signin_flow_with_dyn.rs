@@ -2,15 +2,15 @@ use std::fmt;
 
 use oauth2_client::{
     additional_endpoints::{
-        AccessTokenObtainFrom, EndpointExecuteError, EndpointOutputObtainFrom,
-        EndpointRenderRequestError, UserInfo, UserInfoEndpoint,
+        AccessTokenObtainFrom, AccessTokenResponseSuccessfulBody, EndpointExecuteError,
+        EndpointOutputObtainFrom, EndpointRenderRequestError, UserInfo, UserInfoEndpoint,
     },
     authorization_code_grant::{
         provider_ext::ProviderExtAuthorizationCodeGrantStringScopeWrapper, Flow,
         FlowBuildAuthorizationUrlError, FlowHandleCallbackError,
     },
     oauth2_core::types::State,
-    re_exports::{AccessTokenResponseSuccessfulBody, Client, Url},
+    re_exports::{Client, Url},
     Provider, ProviderExtAuthorizationCodeGrant,
 };
 

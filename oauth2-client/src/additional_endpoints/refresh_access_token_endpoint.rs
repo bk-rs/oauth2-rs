@@ -1,10 +1,10 @@
 use std::error;
 
-use crate::re_exports::{AccessTokenResponseSuccessfulBody, Body, Request, Response, Scope};
+use crate::re_exports::{Body, Request, Response, Scope};
 
 use super::{
-    AccessTokenObtainFrom, EndpointOutputObtainFrom, EndpointParseResponseError,
-    EndpointRenderRequestError,
+    AccessTokenObtainFrom, AccessTokenResponseSuccessfulBody, EndpointOutputObtainFrom,
+    EndpointParseResponseError, EndpointRenderRequestError,
 };
 
 //
