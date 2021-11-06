@@ -117,7 +117,7 @@ mod tests {
     use std::error;
 
     use oauth2_client::{
-        authorization_code_grant::{access_token_endpoint, AuthorizationEndpoint},
+        authorization_code_grant::{AccessTokenEndpoint, AuthorizationEndpoint},
         re_exports::Endpoint as _,
     };
 
@@ -153,7 +153,7 @@ mod tests {
             RedirectUri::new("https://client.example.com/cb")?,
         )?;
 
-        let request = access_token_endpoint::render_request(&provider, "CODE".to_owned())?;
+        let request = AccessTokenEndpoint::new(&provider, "CODE".to_owned()).render_request()?;
 
         assert_eq!(request.body(), b"grant_type=authorization_code&code=CODE&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&client_id=CLIENT_ID&client_secret=CLIENT_SECRET");
 
