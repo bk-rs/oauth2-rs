@@ -64,7 +64,10 @@ mod tests {
 
     use std::error;
 
-    use oauth2_client::authorization_code_grant::{access_token_endpoint, authorization_endpoint};
+    use oauth2_client::{
+        authorization_code_grant::{access_token_endpoint, AuthorizationEndpoint},
+        re_exports::Endpoint as _,
+    };
 
     #[test]
     fn authorization_request() -> Result<(), Box<dyn error::Error>> {
@@ -74,11 +77,12 @@ mod tests {
             RedirectUri::new("https://client.example.com/cb")?,
         )?;
 
-        let request = authorization_endpoint::render_request(
+        let request = AuthorizationEndpoint::new(
             &provider,
             vec![GithubScope::UserEmail],
             "ixax8kolzut108e1q5bgtm1er9xmklkn".to_owned(),
-        )?;
+        )
+        .render_request()?;
 
         assert_eq!(request.uri(), "https://github.com/login/oauth/authorize?response_type=code&client_id=CLIENT_ID&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&scope=user%3Aemail&state=ixax8kolzut108e1q5bgtm1er9xmklkn");
 

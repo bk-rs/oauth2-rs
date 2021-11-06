@@ -1,4 +1,5 @@
 use http_api_client::Client;
+use http_api_endpoint::Endpoint as _;
 use oauth2_core::{
     authorization_code_grant::{
         access_token_response::{
@@ -14,8 +15,8 @@ use oauth2_core::{
 use crate::ProviderExtAuthorizationCodeGrant;
 
 use super::{
-    access_token_endpoint, authorization_endpoint, parse_redirect_uri_query,
-    AccessTokenEndpointError, AuthorizationEndpointError, ParseRedirectUriQueryError,
+    access_token_endpoint, parse_redirect_uri_query, AccessTokenEndpointError,
+    AuthorizationEndpoint, AuthorizationEndpointError, ParseRedirectUriQueryError,
 };
 
 //
@@ -140,9 +141,11 @@ where
 {
     let scopes = scopes.into().or(provider.scopes_default());
 
-    let authorization_endpoint_request =
-        authorization_endpoint::render_request(provider, scopes, state)
-            .map_err(FlowBuildAuthorizationUrlError::AuthorizationEndpointError)?;
+    let authorization_endpoint = AuthorizationEndpoint::new(provider, scopes, state);
+
+    let authorization_endpoint_request = authorization_endpoint
+        .render_request()
+        .map_err(FlowBuildAuthorizationUrlError::AuthorizationEndpointError)?;
 
     let url = authorization_endpoint_request.uri();
 

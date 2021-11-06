@@ -322,8 +322,8 @@ mod tests {
     use std::error;
 
     use oauth2_client::{
-        authorization_code_grant::{access_token_endpoint, authorization_endpoint},
-        re_exports::Response,
+        authorization_code_grant::{access_token_endpoint, AuthorizationEndpoint},
+        re_exports::{Endpoint as _, Response},
     };
 
     #[test]
@@ -337,11 +337,12 @@ mod tests {
             x.wechat_redirect = Some(true);
         });
 
-        let request = authorization_endpoint::render_request(
+        let request = AuthorizationEndpoint::new(
             &provider,
             vec![WeChatScope::SnsapiLogin],
             "3d6be0a4035d839573b04816624a415e".to_owned(),
-        )?;
+        )
+        .render_request()?;
 
         assert_eq!(request.uri(), "https://open.weixin.qq.com/connect/oauth2/authorize?appid=APPID&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&response_type=code&scope=snsapi_login&state=3d6be0a4035d839573b04816624a415e#wechat_redirect");
 
