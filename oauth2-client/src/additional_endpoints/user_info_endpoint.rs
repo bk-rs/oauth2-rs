@@ -1,6 +1,5 @@
 use std::{error, fmt};
 
-use downcast_rs::{impl_downcast, DowncastSync};
 use dyn_clone::{clone_trait_object, DynClone};
 
 use crate::re_exports::{Body, Request, Response, Scope};
@@ -13,7 +12,7 @@ use super::{
 //
 //
 //
-pub trait UserInfoEndpoint<SCOPE>: DynClone + DowncastSync
+pub trait UserInfoEndpoint<SCOPE>: DynClone
 where
     SCOPE: Scope,
 {
@@ -48,7 +47,6 @@ where
 }
 
 clone_trait_object!(<SCOPE> UserInfoEndpoint<SCOPE> where SCOPE: Scope + Clone);
-impl_downcast!(UserInfoEndpoint<SCOPE> where SCOPE: Scope);
 
 impl<SCOPE> fmt::Debug for dyn UserInfoEndpoint<SCOPE> + Send + Sync
 where

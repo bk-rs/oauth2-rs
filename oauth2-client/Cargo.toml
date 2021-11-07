@@ -33,7 +33,6 @@ serde_qs = { version = "0.8", default-features = false }
 rand = { version = "0.8", default-features = false, features = ["std", "std_rng"] }
 thiserror = { version = "1.0", default-features = false }
 dyn-clone = { version = "1.0", default-features = false }
-downcast-rs = { version = "1.2", default-features = false }
 
 [package.metadata.cargo-all-features]
 skip_optional_dependencies = true

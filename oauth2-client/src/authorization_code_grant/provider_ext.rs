@@ -1,6 +1,5 @@
 use std::{error, fmt};
 
-use downcast_rs::{impl_downcast, DowncastSync};
 use dyn_clone::{clone_trait_object, DynClone};
 pub use oauth2_core::{
     access_token_request::BodyWithAuthorizationCodeGrant as AccessTokenRequestBody,
@@ -17,7 +16,7 @@ use crate::{
 };
 
 //
-pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone + DowncastSync {
+pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone + Send + Sync {
     fn redirect_uri(&self) -> Option<&RedirectUri>;
 
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
@@ -67,7 +66,6 @@ pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone + DowncastSync 
 }
 
 clone_trait_object!(<SCOPE> ProviderExtAuthorizationCodeGrant<Scope = SCOPE> where SCOPE: Scope + Clone);
-impl_downcast!(ProviderExtAuthorizationCodeGrant assoc Scope where Scope: self::Scope);
 
 impl<SCOPE> fmt::Debug for dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE> + Send + Sync
 where
@@ -200,52 +198,4 @@ where
     }
 
     // Note
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[derive(Clone)]
-    struct MyProviderStore<SCOPE>(Box<dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>>)
-    where
-        SCOPE: Scope;
-
-    #[derive(Clone)]
-    struct MyProvider;
-    impl MyProvider {
-        fn foo(&self) {}
-    }
-    impl Provider for MyProvider {
-        type Scope = String;
-
-        fn client_id(&self) -> Option<&ClientId> {
-            unreachable!()
-        }
-
-        fn client_secret(&self) -> Option<&ClientSecret> {
-            unreachable!()
-        }
-
-        fn token_endpoint_url(&self) -> &Url {
-            unreachable!()
-        }
-    }
-    impl ProviderExtAuthorizationCodeGrant for MyProvider {
-        fn redirect_uri(&self) -> Option<&RedirectUri> {
-            unreachable!()
-        }
-
-        fn authorization_endpoint_url(&self) -> &Url {
-            unreachable!()
-        }
-    }
-
-    #[test]
-    fn test_dyn_clone_and_downcast() {
-        let my_provider_store = MyProviderStore(Box::new(MyProvider));
-        let my_provider = my_provider_store.clone().0.clone();
-        let my_provider = my_provider.downcast_ref::<MyProvider>().unwrap();
-        my_provider.foo();
-    }
 }

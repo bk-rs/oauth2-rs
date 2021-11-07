@@ -1,4 +1,3 @@
-use downcast_rs::{impl_downcast, DowncastSync};
 use dyn_clone::{clone_trait_object, DynClone};
 
 use crate::{
@@ -7,7 +6,7 @@ use crate::{
 };
 
 //
-pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone + DowncastSync {
+pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone + Send + Sync {
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
         None
     }
@@ -24,7 +23,6 @@ pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone + DowncastSyn
 }
 
 clone_trait_object!(<SCOPE> ProviderExtDeviceAuthorizationGrant<Scope = SCOPE> where SCOPE: Scope + Clone);
-impl_downcast!(ProviderExtDeviceAuthorizationGrant assoc Scope where Scope: self::Scope);
 
 //
 //

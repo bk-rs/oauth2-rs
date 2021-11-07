@@ -1,6 +1,5 @@
 use std::fmt;
 
-use downcast_rs::{impl_downcast, DowncastSync};
 use dyn_clone::{clone_trait_object, DynClone};
 
 use crate::re_exports::{Body, Request, Response, Scope};
@@ -13,7 +12,7 @@ use super::{
 //
 //
 //
-pub trait RevokeAccessTokenEndpoint<SCOPE>: DynClone + DowncastSync
+pub trait RevokeAccessTokenEndpoint<SCOPE>: DynClone
 where
     SCOPE: Scope,
 {
@@ -40,7 +39,6 @@ where
 }
 
 clone_trait_object!(<SCOPE> RevokeAccessTokenEndpoint<SCOPE> where SCOPE: Scope + Clone);
-impl_downcast!(RevokeAccessTokenEndpoint<SCOPE> where SCOPE: Scope);
 
 impl<SCOPE> fmt::Debug for dyn RevokeAccessTokenEndpoint<SCOPE>
 where

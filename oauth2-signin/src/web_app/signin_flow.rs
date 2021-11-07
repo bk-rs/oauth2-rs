@@ -56,8 +56,8 @@ where
     ) -> Self
     where
         C: Clone,
-        P: ProviderExtAuthorizationCodeGrant + Clone + 'static,
-        UIEP: UserInfoEndpoint<String> + 'static,
+        P: ProviderExtAuthorizationCodeGrant + Clone + Send + Sync + 'static,
+        UIEP: UserInfoEndpoint<String> + Send + Sync + 'static,
     {
         Self {
             flow: Flow::new(client.clone()),
