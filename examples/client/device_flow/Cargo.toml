@@ -18,6 +18,6 @@ oauth2-github = { version = "^0.0", path = "../../../providers/oauth2-github" }
 oauth2-google = { version = "^0.0", path = "../../../providers/oauth2-google" }
 
 tokio = { version = "1.12", default-features = false, features = ["macros", "rt-multi-thread"] }
-http-api-isahc-client = { version = "0.1", path = "../../../../http-api-endpoint/http-api-isahc-client", features = ["with-sleep-via-tokio"] }
+http-api-isahc-client = { version = "0.2", path = "../../../../http-api-endpoint/http-api-isahc-client", features = ["with-sleep-via-tokio"] }
 
 pretty_env_logger = { version = "0.4" }
