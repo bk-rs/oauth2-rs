@@ -71,8 +71,7 @@ impl TryFrom<Oauth2V3UserInfo> for UserInfo {
             name: None,
             email: Some(user_info.email.to_string()),
             raw: serde_json::to_value(user_info)
-                .map(|x| x.as_object().cloned())
-                .map_err(|err| err.to_string())?
+                .map(|x| x.as_object().cloned())?
                 .ok_or_else(|| "unreachable".to_owned())?,
         })
     }

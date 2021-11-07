@@ -69,8 +69,7 @@ impl TryFrom<SnsUserinfo> for UserInfo {
             name: sns_userinfo.nickname.to_owned(),
             email: None,
             raw: serde_json::to_value(sns_userinfo)
-                .map(|x| x.as_object().cloned())
-                .map_err(|err| err.to_string())?
+                .map(|x| x.as_object().cloned())?
                 .ok_or_else(|| "unreachable".to_owned())?,
         })
     }

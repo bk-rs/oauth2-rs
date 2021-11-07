@@ -67,8 +67,7 @@ impl TryFrom<User> for UserInfo {
             name: Some(user.name.to_string()),
             email: Some(user.email.to_string()),
             raw: serde_json::to_value(user)
-                .map(|x| x.as_object().cloned())
-                .map_err(|err| err.to_string())?
+                .map(|x| x.as_object().cloned())?
                 .ok_or_else(|| "unreachable".to_owned())?,
         })
     }
