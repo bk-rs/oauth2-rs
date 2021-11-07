@@ -3,7 +3,7 @@
 use std::{cmp, error, fmt, marker::PhantomData, str};
 
 use serde::{
-    de::{self, Visitor},
+    de::{self, SeqAccess, Visitor},
     Deserialize, Deserializer, Serialize, Serializer,
 };
 
@@ -67,7 +67,7 @@ where
     type Value = ScopeParameter<T>;
 
     fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        formatter.write_str("should be a str")
+        formatter.write_str("should be a str or seq")
     }
 
     fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
@@ -85,6 +85,20 @@ where
 
         let mut inner = vec![];
         for s in v.split(split_char) {
+            inner.push(
+                T::from_str(s)
+                    .map_err(|_| de::Error::custom(ScopeFromStrError::Unknown(s.to_owned())))?,
+            );
+        }
+        Ok(inner.into())
+    }
+
+    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+    where
+        A: SeqAccess<'de>,
+    {
+        let mut inner = vec![];
+        while let Some(s) = seq.next_element::<&str>()? {
             inner.push(
                 T::from_str(s)
                     .map_err(|_| de::Error::custom(ScopeFromStrError::Unknown(s.to_owned())))?,
@@ -127,3 +141,37 @@ impl fmt::Display for ScopeFromStrError {
     }
 }
 impl error::Error for ScopeFromStrError {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[derive(Serialize, Deserialize)]
+    struct Foo {
+        scope: ScopeParameter<String>,
+    }
+
+    #[test]
+    fn de() {
+        match serde_json::from_str::<Foo>(r#"{"scope":"a b"}"#) {
+            Ok(v) => {
+                assert_eq!(v.scope, vec!["a".to_owned(), "b".to_owned()].into());
+            }
+            Err(err) => panic!("{}", err),
+        }
+
+        match serde_json::from_str::<Foo>(r#"{"scope":"a,b"}"#) {
+            Ok(v) => {
+                assert_eq!(v.scope, vec!["a".to_owned(), "b".to_owned()].into());
+            }
+            Err(err) => panic!("{}", err),
+        }
+
+        match serde_json::from_str::<Foo>(r#"{"scope":["a", "b"]}"#) {
+            Ok(v) => {
+                assert_eq!(v.scope, vec!["a".to_owned(), "b".to_owned()].into());
+            }
+            Err(err) => panic!("{}", err),
+        }
+    }
+}

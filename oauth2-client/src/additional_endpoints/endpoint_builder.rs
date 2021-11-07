@@ -4,7 +4,7 @@ use dyn_clone::{clone_trait_object, DynClone};
 
 use crate::re_exports::Scope;
 
-use super::{AccessTokenObtainFrom, AccessTokenResponseSuccessfulBody, UserInfoObtainOutput};
+use super::{AccessTokenProvider, AccessTokenResponseSuccessfulBody, UserInfoObtainOutput};
 
 //
 //
@@ -15,7 +15,7 @@ where
 {
     fn user_info_obtain(
         &self,
-        _access_token_obtain_from: AccessTokenObtainFrom,
+        _access_token_provider: AccessTokenProvider<SCOPE>,
         _access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
     ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>>;
 }

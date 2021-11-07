@@ -2,7 +2,7 @@ use std::error;
 
 use oauth2_client::{
     additional_endpoints::{
-        AccessTokenObtainFrom, AccessTokenResponseSuccessfulBody, EndpointBuilder, UserInfo,
+        AccessTokenProvider, AccessTokenResponseSuccessfulBody, EndpointBuilder, UserInfo,
         UserInfoObtainOutput,
     },
     oauth2_core::types::ScopeParameter,
@@ -23,7 +23,7 @@ where
 {
     fn user_info_obtain(
         &self,
-        access_token_obtain_from: AccessTokenObtainFrom,
+        access_token_provider: AccessTokenProvider<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
     ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>> {
         if let Some(scope) = &access_token.scope {
@@ -44,8 +44,8 @@ where
             }
         }
 
-        match access_token_obtain_from {
-            AccessTokenObtainFrom::AuthorizationCodeGrant => {
+        match access_token_provider {
+            AccessTokenProvider::AuthorizationCodeGrant(_) => {
                 let uid = access_token
                     .extensions()
                     .ok_or_else(|| "extensions missing")?
@@ -62,7 +62,7 @@ where
                     raw: Default::default(),
                 }));
             }
-            AccessTokenObtainFrom::DeviceAuthorizationGrant => {}
+            AccessTokenProvider::DeviceAuthorizationGrant(_) => {}
         }
 
         Ok(UserInfoObtainOutput::None)

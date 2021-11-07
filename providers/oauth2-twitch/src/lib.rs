@@ -1,7 +1,7 @@
 use oauth2_client::re_exports::{Deserialize_enum_str, Scope, Serialize_enum_str};
 
-pub const TOKEN_URL: &str = "https://id.twitch.tv/oauth2/authorize";
-pub const AUTHORIZATION_URL: &str = "https://id.twitch.tv/oauth2/token";
+pub const TOKEN_URL: &str = "https://id.twitch.tv/oauth2/token";
+pub const AUTHORIZATION_URL: &str = "https://id.twitch.tv/oauth2/authorize";
 
 pub mod authorization_code_grant;
 

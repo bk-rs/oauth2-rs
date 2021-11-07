@@ -7,6 +7,7 @@ use oauth2_google::{
     GoogleProviderForWebServerAppsAccessType, GoogleScope,
 };
 use oauth2_signin::web_app::SigninFlow;
+use oauth2_twitch::{TwitchEndpointBuilder, TwitchProviderForWebServerApps, TwitchScope};
 
 use crate::config::Config;
 
@@ -48,6 +49,19 @@ impl Context {
                 }),
                 vec![GoogleScope::Email, GoogleScope::DriveFile],
                 GoogleEndpointBuilder,
+            ),
+        );
+        signin_flow_map.insert(
+            "twitch",
+            SigninFlow::new(
+                IsahcClient::new()?,
+                TwitchProviderForWebServerApps::new(
+                    clients_config.twitch.client_id.to_owned(),
+                    clients_config.twitch.client_secret.to_owned(),
+                    clients_config.twitch.redirect_uri.to_owned(),
+                )?,
+                vec![TwitchScope::UserReadEmail],
+                TwitchEndpointBuilder,
             ),
         );
 

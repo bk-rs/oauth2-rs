@@ -1,0 +1,9 @@
+{
+    "access_token": "x*30",
+    "expires_in": 14828,
+    "refresh_token": "x*50",
+    "scope": [
+        "user:read:email"
+    ],
+    "token_type": "bearer"
+}

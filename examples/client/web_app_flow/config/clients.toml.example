@@ -7,3 +7,8 @@ redirect_uri = "http://oauth2-rs.lvh.me/auth/github/callback"
 client_id = "xxx"
 client_secret = "xxx"
 redirect_uri = "https://oauth2-rs.lvh.me/auth/google/callback"
+
+[twitch]
+client_id = "xxx"
+client_secret = "xxx"
+redirect_uri = "https://oauth2-rs.lvh.me/auth/twitch/callback"

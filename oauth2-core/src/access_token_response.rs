@@ -108,6 +108,8 @@ where
 //
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ErrorBody {
+    // e.g. twitch {"status":400, "message":"Invalid authorization code"}
+    #[serde(default)]
     pub error: ErrorBodyError,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error_description: Option<String>,
@@ -190,8 +192,19 @@ pub enum ErrorBodyError {
     //
     //
     //
+    // MOCK
+    #[serde(rename = "___")]
+    ErrorKeyNotFound,
+    //
+    //
+    //
     #[serde(other)]
     Other(String),
+}
+impl Default for ErrorBodyError {
+    fn default() -> Self {
+        Self::ErrorKeyNotFound
+    }
 }
 
 #[cfg(test)]

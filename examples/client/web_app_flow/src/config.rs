@@ -37,6 +37,7 @@ impl Config {
 pub struct ClientsConfig {
     pub github: ClientConfig,
     pub google: ClientConfig,
+    pub twitch: ClientConfig,
 }
 
 #[derive(Deserialize, Debug, Clone)]

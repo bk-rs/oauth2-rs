@@ -2,7 +2,7 @@ use std::error;
 
 use oauth2_client::{
     additional_endpoints::{
-        AccessTokenObtainFrom, AccessTokenResponseSuccessfulBody, EndpointBuilder,
+        AccessTokenProvider, AccessTokenResponseSuccessfulBody, EndpointBuilder,
         UserInfoObtainOutput,
     },
     re_exports::Scope,
@@ -20,7 +20,7 @@ where
 {
     fn user_info_obtain(
         &self,
-        _access_token_obtain_from: AccessTokenObtainFrom,
+        _access_token_provider: AccessTokenProvider<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
     ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>> {
         Ok(UserInfoObtainOutput::Respond(Box::new(

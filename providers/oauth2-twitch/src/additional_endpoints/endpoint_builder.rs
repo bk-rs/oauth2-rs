@@ -2,7 +2,7 @@ use std::error;
 
 use oauth2_client::{
     additional_endpoints::{
-        AccessTokenObtainFrom, AccessTokenResponseSuccessfulBody, EndpointBuilder,
+        AccessTokenProvider, AccessTokenResponseSuccessfulBody, EndpointBuilder,
         UserInfoObtainOutput,
     },
     re_exports::Scope,
@@ -20,11 +20,17 @@ where
 {
     fn user_info_obtain(
         &self,
-        _access_token_obtain_from: AccessTokenObtainFrom,
+        access_token_provider: AccessTokenProvider<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
     ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>> {
+        let client_id = match access_token_provider {
+            AccessTokenProvider::AuthorizationCodeGrant(p) => p.client_id(),
+            AccessTokenProvider::DeviceAuthorizationGrant(p) => p.client_id(),
+        };
+        let client_id = client_id.ok_or_else(|| "missing client_id")?;
+
         Ok(UserInfoObtainOutput::Respond(Box::new(
-            TwitchUserInfoEndpoint::new(&access_token.access_token, ""),
+            TwitchUserInfoEndpoint::new(&access_token.access_token, client_id),
         )))
     }
 }
