@@ -1,3 +1,5 @@
+use std::fmt;
+
 use dyn_clone::{clone_trait_object, DynClone};
 
 use crate::{
@@ -6,7 +8,7 @@ use crate::{
 };
 
 //
-pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone + Send + Sync {
+pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone {
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
         None
     }
@@ -23,6 +25,23 @@ pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone + Send + Sync
 }
 
 clone_trait_object!(<SCOPE> ProviderExtDeviceAuthorizationGrant<Scope = SCOPE> where SCOPE: Scope + Clone);
+
+impl<SCOPE> fmt::Debug for dyn ProviderExtDeviceAuthorizationGrant<Scope = SCOPE> + Send + Sync
+where
+    SCOPE: Scope,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ProviderExtDeviceAuthorizationGrant")
+            .field("client_id", &self.client_id())
+            .field("token_endpoint_url", &self.token_endpoint_url().as_str())
+            .field("scopes_default", &self.scopes_default())
+            .field(
+                "device_authorization_endpoint_url",
+                &self.device_authorization_endpoint_url().as_str(),
+            )
+            .finish()
+    }
+}
 
 //
 //

@@ -62,9 +62,9 @@ impl<C> Flow<C>
 where
     C: Client + Send + Sync,
 {
-    pub async fn handle_callback<'a, SCOPE>(
+    pub async fn handle_callback<SCOPE>(
         &self,
-        provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
+        provider: &(dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE> + Send + Sync),
         query: impl AsRef<str>,
         state: impl Into<Option<State>>,
     ) -> Result<AT_RES_SuccessfulBody<SCOPE>, FlowHandleCallbackError>

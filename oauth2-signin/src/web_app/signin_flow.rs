@@ -23,7 +23,7 @@ where
     C: Client,
 {
     pub flow: Flow<C>,
-    pub provider: Box<dyn ProviderExtAuthorizationCodeGrant<Scope = String>>,
+    pub provider: Box<dyn ProviderExtAuthorizationCodeGrant<Scope = String> + Send + Sync>,
     pub scopes: Option<Vec<String>>,
     pub endpoint_builder: Box<dyn EndpointBuilder<String> + Send + Sync>,
     pub client_with_user_info: C,

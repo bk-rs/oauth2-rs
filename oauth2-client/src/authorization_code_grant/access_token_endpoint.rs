@@ -30,7 +30,7 @@ pub struct AccessTokenEndpoint<'a, SCOPE>
 where
     SCOPE: Scope,
 {
-    provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
+    provider: &'a (dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE> + Send + Sync),
     code: Code,
 }
 impl<'a, SCOPE> AccessTokenEndpoint<'a, SCOPE>
@@ -38,7 +38,7 @@ where
     SCOPE: Scope,
 {
     pub fn new(
-        provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
+        provider: &'a (dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE> + Send + Sync),
         code: Code,
     ) -> Self {
         Self { provider, code }

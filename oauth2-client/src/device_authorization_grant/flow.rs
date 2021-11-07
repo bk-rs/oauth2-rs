@@ -60,7 +60,7 @@ where
         user_interaction: UI,
     ) -> Result<DAT_RES_SuccessfulBody<<P as Provider>::Scope>, FlowExecuteError>
     where
-        P: ProviderExtDeviceAuthorizationGrant,
+        P: ProviderExtDeviceAuthorizationGrant + Send + Sync,
 
         <P as Provider>::Scope: Serialize + DeserializeOwned + Send + Sync,
         UI: FnOnce(UserCode, VerificationUri, Option<VerificationUriComplete>),
