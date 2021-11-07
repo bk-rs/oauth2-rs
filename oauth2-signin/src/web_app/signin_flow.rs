@@ -2,14 +2,13 @@ use std::fmt;
 
 use oauth2_client::{
     additional_endpoints::{
-        AccessTokenObtainFrom, EndpointExecuteError, EndpointOutputObtainFrom,
-        EndpointParseResponseError, UserInfoEndpoint,
+        AccessTokenObtainFrom, EndpointBuilder, EndpointExecuteError, UserInfoEndpointBuildOutput,
     },
     authorization_code_grant::{
         provider_ext::ProviderExtAuthorizationCodeGrantStringScopeWrapper, Flow,
     },
     oauth2_core::types::State,
-    re_exports::{Client, Url},
+    re_exports::{Client, ClientRespondEndpointError, Url},
     Provider, ProviderExtAuthorizationCodeGrant,
 };
 
@@ -26,7 +25,7 @@ where
     pub flow: Flow<C>,
     pub provider: Box<dyn ProviderExtAuthorizationCodeGrant<Scope = String>>,
     pub scopes: Option<Vec<String>>,
-    pub user_info_endpoint: Box<dyn UserInfoEndpoint<String> + Send + Sync>,
+    pub endpoint_builder: Box<dyn EndpointBuilder<String> + Send + Sync>,
     pub client_with_user_info: C,
 }
 impl<C> fmt::Debug for SigninFlow<C>
@@ -38,7 +37,7 @@ where
             .field("flow", &self.flow)
             .field("provider", &self.provider)
             .field("scopes", &self.scopes)
-            .field("user_info_endpoint", &self.user_info_endpoint)
+            .field("endpoint_builder", &self.endpoint_builder)
             .field("client_with_user_info", &self.client_with_user_info)
             .finish()
     }
@@ -48,16 +47,16 @@ impl<C> SigninFlow<C>
 where
     C: Client,
 {
-    pub fn new<P, UIEP>(
+    pub fn new<P, EPB>(
         client: C,
         provider: P,
         scopes: impl Into<Option<Vec<<P as Provider>::Scope>>>,
-        user_info_endpoint: UIEP,
+        endpoint_builder: EPB,
     ) -> Self
     where
         C: Clone,
         P: ProviderExtAuthorizationCodeGrant + Clone + Send + Sync + 'static,
-        UIEP: UserInfoEndpoint<String> + Send + Sync + 'static,
+        EPB: EndpointBuilder<String> + Send + Sync + 'static,
     {
         Self {
             flow: Flow::new(client.clone()),
@@ -67,7 +66,7 @@ where
             scopes: scopes
                 .into()
                 .map(|x| x.iter().map(|y| y.to_string()).collect()),
-            user_info_endpoint: Box::new(user_info_endpoint),
+            endpoint_builder: Box::new(endpoint_builder),
             client_with_user_info: client,
         }
     }
@@ -111,75 +110,45 @@ where
         let access_token_obtain_from = AccessTokenObtainFrom::AuthorizationCodeGrant;
 
         match self
-            .user_info_endpoint
-            .obtain_from(access_token_obtain_from, &access_token)
+            .endpoint_builder
+            .user_info_endpoint_build(access_token_obtain_from, &access_token)
         {
-            EndpointOutputObtainFrom::None => {
-                return SigninFlowHandleCallbackRet::OkButUserInfoNone(access_token);
+            UserInfoEndpointBuildOutput::None => {
+                SigninFlowHandleCallbackRet::OkButUserInfoNone(access_token)
             }
-            EndpointOutputObtainFrom::Build => {
+            UserInfoEndpointBuildOutput::Static(user_info) => {
+                SigninFlowHandleCallbackRet::Ok((access_token, user_info))
+            }
+            UserInfoEndpointBuildOutput::Respond(user_info_endpoint) => {
                 match self
-                    .user_info_endpoint
-                    .build(access_token_obtain_from, &access_token)
+                    .client_with_user_info
+                    .respond_dyn_endpoint(&user_info_endpoint)
+                    .await
                 {
-                    Ok(user_info) => {
-                        return SigninFlowHandleCallbackRet::Ok((access_token, user_info));
-                    }
-                    Err(err) => {
-                        return SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
-                            access_token,
-                            EndpointExecuteError::ParseResponseError(
-                                EndpointParseResponseError::Other(err.to_string()),
-                            ),
-                        ));
-                    }
-                };
+                    Ok(user_info) => SigninFlowHandleCallbackRet::Ok((access_token, user_info)),
+                    Err(err) => match err {
+                        ClientRespondEndpointError::RespondFailed(err) => {
+                            SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
+                                access_token,
+                                EndpointExecuteError::RespondFailed(err.to_string()),
+                            ))
+                        }
+                        ClientRespondEndpointError::EndpointRenderRequestFailed(err) => {
+                            SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
+                                access_token,
+                                EndpointExecuteError::RenderRequestError(err),
+                            ))
+                        }
+                        ClientRespondEndpointError::EndpointParseResponseFailed(err) => {
+                            SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
+                                access_token,
+                                EndpointExecuteError::ParseResponseError(err),
+                            ))
+                        }
+                    },
+                }
             }
-            EndpointOutputObtainFrom::Respond => {}
         }
-
-        let user_info_endpoint_request = match self
-            .user_info_endpoint
-            .render_request(access_token_obtain_from, &access_token)
-        {
-            Ok(x) => x,
-            Err(err) => {
-                return SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
-                    access_token,
-                    EndpointExecuteError::RenderRequestError(err),
-                ));
-            }
-        };
-
-        let user_info_endpoint_response = match self
-            .client_with_user_info
-            .respond(user_info_endpoint_request)
-            .await
-        {
-            Ok(x) => x,
-            Err(err) => {
-                return SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
-                    access_token,
-                    EndpointExecuteError::RespondFailed(err.to_string()),
-                ));
-            }
-        };
-
-        let user_info = match self.user_info_endpoint.parse_response(
-            access_token_obtain_from,
-            &access_token,
-            user_info_endpoint_response,
-        ) {
-            Ok(x) => x,
-            Err(err) => {
-                return SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
-                    access_token,
-                    EndpointExecuteError::ParseResponseError(err),
-                ));
-            }
-        };
-
-        SigninFlowHandleCallbackRet::Ok((access_token, user_info))
     }
 }
 
@@ -189,8 +158,8 @@ mod tests {
 
     use std::{collections::HashMap, error};
 
-    use oauth2_github::{GithubProviderWithWebApplication, GithubScope, GithubUserInfoEndpoint};
-    use oauth2_google::{GoogleProviderForWebServerApps, GoogleScope, GoogleUserInfoEndpoint};
+    use oauth2_github::{GithubEndpointBuilder, GithubProviderWithWebApplication, GithubScope};
+    use oauth2_google::{GoogleEndpointBuilder, GoogleProviderForWebServerApps, GoogleScope};
 
     use http_api_isahc_client::IsahcClient;
 
@@ -208,7 +177,7 @@ mod tests {
                     "https://client.example.com/cb".parse()?,
                 )?,
                 vec![GithubScope::User],
-                GithubUserInfoEndpoint,
+                GithubEndpointBuilder,
             ),
         );
         map.insert(
@@ -221,7 +190,7 @@ mod tests {
                     "https://client.example.com/cb".parse()?,
                 )?,
                 vec![GoogleScope::Email],
-                GoogleUserInfoEndpoint,
+                GoogleEndpointBuilder,
             ),
         );
 
@@ -256,7 +225,7 @@ mod tests {
                     "https://client.example.com/cb".parse()?,
                 )?,
                 vec![GithubScope::User],
-                GithubUserInfoEndpoint,
+                GithubEndpointBuilder,
             ),
         );
 

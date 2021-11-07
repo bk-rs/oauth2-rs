@@ -1,9 +1,6 @@
 use oauth2_client::{
-    additional_endpoints::{
-        AccessTokenObtainFrom, AccessTokenResponseSuccessfulBody, EndpointParseResponseError,
-        EndpointRenderRequestError, UserInfo, UserInfoEndpoint,
-    },
-    re_exports::{serde_json, Body, Endpoint as _, Request, Response, Scope},
+    additional_endpoints::{EndpointParseResponseError, EndpointRenderRequestError, UserInfo},
+    re_exports::{serde_json, Body, Endpoint, Request, Response},
 };
 
 use super::internal_oauth2_v3_user_info_endpoint::{
@@ -12,33 +9,33 @@ use super::internal_oauth2_v3_user_info_endpoint::{
 
 //
 #[derive(Debug, Clone)]
-pub struct GoogleUserInfoEndpoint;
+pub struct GoogleUserInfoEndpoint {
+    inner: Oauth2V3UserInfoEndpoint,
+}
+impl GoogleUserInfoEndpoint {
+    pub fn new(access_token: impl AsRef<str>) -> Self {
+        Self {
+            inner: Oauth2V3UserInfoEndpoint::new(access_token),
+        }
+    }
+}
 
-impl<SCOPE> UserInfoEndpoint<SCOPE> for GoogleUserInfoEndpoint
-where
-    SCOPE: Scope,
-{
-    fn render_request(
-        &self,
-        _access_token_obtain_from: AccessTokenObtainFrom,
-        access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> Result<Request<Body>, EndpointRenderRequestError> {
-        let endpoint = Oauth2V3UserInfoEndpoint::new(&access_token.access_token);
+impl Endpoint for GoogleUserInfoEndpoint {
+    type RenderRequestError = EndpointRenderRequestError;
 
-        endpoint.render_request().map_err(Into::into)
+    type ParseResponseOutput = UserInfo;
+    type ParseResponseError = EndpointParseResponseError;
+
+    fn render_request(&self) -> Result<Request<Body>, Self::RenderRequestError> {
+        self.inner.render_request().map_err(Into::into)
     }
 
     fn parse_response(
         &self,
-        _access_token_obtain_from: AccessTokenObtainFrom,
-        _access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
         response: Response<Body>,
-    ) -> Result<UserInfo, EndpointParseResponseError> {
-        let endpoint = Oauth2V3UserInfoEndpoint::new("");
-
-        let user = endpoint.parse_response(response)?;
-
-        Ok(UserInfo::try_from(user).map_err(EndpointParseResponseError::ToOutputFailed)?)
+    ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
+        Ok(UserInfo::try_from(self.inner.parse_response(response)?)
+            .map_err(EndpointParseResponseError::ToOutputFailed)?)
     }
 }
 

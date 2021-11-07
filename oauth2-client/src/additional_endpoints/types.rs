@@ -8,3 +8,9 @@ pub struct UserInfo {
     //
     pub raw: Map<String, Value>,
 }
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+pub enum AccessTokenObtainFrom {
+    AuthorizationCodeGrant,
+    DeviceAuthorizationGrant,
+}

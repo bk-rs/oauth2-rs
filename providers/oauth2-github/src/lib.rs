@@ -11,7 +11,7 @@ pub use authorization_code_grant::GithubProviderWithWebApplication;
 pub use device_authorization_grant::GithubProviderWithDevice;
 
 pub mod additional_endpoints;
-pub use additional_endpoints::GithubUserInfoEndpoint;
+pub use additional_endpoints::GithubEndpointBuilder;
 
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
 pub enum GithubScope {

@@ -13,7 +13,7 @@ pub use authorization_code_grant::{
 pub use device_authorization_grant::GoogleProviderForTvAndDeviceApps;
 
 pub mod additional_endpoints;
-pub use additional_endpoints::GoogleUserInfoEndpoint;
+pub use additional_endpoints::GoogleEndpointBuilder;
 
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
 pub enum GoogleScope {

@@ -7,10 +7,11 @@ use oauth2_client::re_exports::{
 pub const USER_INFO_URL: &str = "https://api.github.com/user";
 
 //
+#[derive(Debug, Clone)]
 pub struct UserEndpoint {
     access_token: String,
 }
-impl<'a> UserEndpoint {
+impl UserEndpoint {
     pub fn new(access_token: impl AsRef<str>) -> Self {
         Self {
             access_token: access_token.as_ref().to_owned(),

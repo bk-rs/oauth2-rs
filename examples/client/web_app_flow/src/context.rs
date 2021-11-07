@@ -1,10 +1,10 @@
 use std::{collections::HashMap, error};
 
 use http_api_isahc_client::IsahcClient;
-use oauth2_github::{GithubProviderWithWebApplication, GithubScope, GithubUserInfoEndpoint};
+use oauth2_github::{GithubEndpointBuilder, GithubProviderWithWebApplication, GithubScope};
 use oauth2_google::{
-    GoogleProviderForWebServerApps, GoogleProviderForWebServerAppsAccessType, GoogleScope,
-    GoogleUserInfoEndpoint,
+    GoogleEndpointBuilder, GoogleProviderForWebServerApps,
+    GoogleProviderForWebServerAppsAccessType, GoogleScope,
 };
 use oauth2_signin::web_app::SigninFlow;
 
@@ -30,7 +30,7 @@ impl Context {
                     clients_config.github.redirect_uri.to_owned(),
                 )?,
                 vec![GithubScope::PublicRepo, GithubScope::UserEmail],
-                GithubUserInfoEndpoint,
+                GithubEndpointBuilder,
             ),
         );
         signin_flow_map.insert(
@@ -47,7 +47,7 @@ impl Context {
                     x.include_granted_scopes = Some(true);
                 }),
                 vec![GoogleScope::Email, GoogleScope::DriveFile],
-                GoogleUserInfoEndpoint,
+                GoogleEndpointBuilder,
             ),
         );
 

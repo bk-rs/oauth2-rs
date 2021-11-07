@@ -7,7 +7,7 @@ use oauth2_client::re_exports::{
 pub const USER_INFO_URL: &str = "https://www.googleapis.com/oauth2/v3/userinfo";
 
 //
-
+#[derive(Debug, Clone)]
 pub struct Oauth2V3UserInfoEndpoint {
     access_token: String,
 }
