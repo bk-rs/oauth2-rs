@@ -1,7 +1,7 @@
 use oauth2_client::{
     additional_endpoints::{
         AccessTokenObtainFrom, AccessTokenResponseSuccessfulBody, EndpointBuilder,
-        UserInfoEndpointBuildOutput,
+        UserInfoObtainRet,
     },
     re_exports::Scope,
 };
@@ -16,12 +16,12 @@ impl<SCOPE> EndpointBuilder<SCOPE> for GithubEndpointBuilder
 where
     SCOPE: Scope,
 {
-    fn user_info_endpoint_build(
+    fn user_info_obtain(
         &self,
         _access_token_obtain_from: AccessTokenObtainFrom,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> UserInfoEndpointBuildOutput {
-        UserInfoEndpointBuildOutput::Respond(Box::new(GithubUserInfoEndpoint::new(
+    ) -> UserInfoObtainRet {
+        UserInfoObtainRet::Respond(Box::new(GithubUserInfoEndpoint::new(
             &access_token.access_token,
         )))
     }

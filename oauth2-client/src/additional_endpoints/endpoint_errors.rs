@@ -1,8 +1,6 @@
 use crate::re_exports::{HttpError, SerdeJsonError};
 
 //
-//
-//
 #[derive(thiserror::Error, Debug)]
 pub enum EndpointRenderRequestError {
     #[error("MakeRequestFailed {0}")]

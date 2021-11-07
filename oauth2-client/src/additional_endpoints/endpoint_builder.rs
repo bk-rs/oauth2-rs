@@ -2,12 +2,9 @@ use std::fmt;
 
 use dyn_clone::{clone_trait_object, DynClone};
 
-use crate::re_exports::{Endpoint, Scope};
+use crate::re_exports::Scope;
 
-use super::{
-    AccessTokenObtainFrom, AccessTokenResponseSuccessfulBody, EndpointParseResponseError,
-    EndpointRenderRequestError, UserInfo,
-};
+use super::{AccessTokenObtainFrom, AccessTokenResponseSuccessfulBody, UserInfoObtainRet};
 
 //
 //
@@ -16,11 +13,11 @@ pub trait EndpointBuilder<SCOPE>: DynClone
 where
     SCOPE: Scope,
 {
-    fn user_info_endpoint_build(
+    fn user_info_obtain(
         &self,
         _access_token_obtain_from: AccessTokenObtainFrom,
         _access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> UserInfoEndpointBuildOutput;
+    ) -> UserInfoObtainRet;
 }
 
 clone_trait_object!(<SCOPE> EndpointBuilder<SCOPE> where SCOPE: Scope + Clone);
@@ -32,23 +29,4 @@ where
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("EndpointBuilder").finish()
     }
-}
-
-//
-//
-//
-#[derive(Debug)]
-pub enum UserInfoEndpointBuildOutput {
-    None,
-    Static(UserInfo),
-    Respond(
-        Box<
-            dyn Endpoint<
-                    RenderRequestError = EndpointRenderRequestError,
-                    ParseResponseOutput = UserInfo,
-                    ParseResponseError = EndpointParseResponseError,
-                > + Send
-                + Sync,
-        >,
-    ),
 }

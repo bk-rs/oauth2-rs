@@ -2,7 +2,7 @@ use std::fmt;
 
 use oauth2_client::{
     additional_endpoints::{
-        AccessTokenObtainFrom, EndpointBuilder, EndpointExecuteError, UserInfoEndpointBuildOutput,
+        AccessTokenObtainFrom, EndpointBuilder, EndpointExecuteError, UserInfoObtainRet,
     },
     authorization_code_grant::{
         provider_ext::ProviderExtAuthorizationCodeGrantStringScopeWrapper, Flow,
@@ -111,15 +111,13 @@ where
 
         match self
             .endpoint_builder
-            .user_info_endpoint_build(access_token_obtain_from, &access_token)
+            .user_info_obtain(access_token_obtain_from, &access_token)
         {
-            UserInfoEndpointBuildOutput::None => {
-                SigninFlowHandleCallbackRet::OkButUserInfoNone(access_token)
-            }
-            UserInfoEndpointBuildOutput::Static(user_info) => {
+            UserInfoObtainRet::None => SigninFlowHandleCallbackRet::OkButUserInfoNone(access_token),
+            UserInfoObtainRet::Static(user_info) => {
                 SigninFlowHandleCallbackRet::Ok((access_token, user_info))
             }
-            UserInfoEndpointBuildOutput::Respond(user_info_endpoint) => {
+            UserInfoObtainRet::Respond(user_info_endpoint) => {
                 match self
                     .client_with_user_info
                     .respond_dyn_endpoint(&user_info_endpoint)
