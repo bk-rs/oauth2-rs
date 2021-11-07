@@ -1,33 +1,22 @@
 use oauth2_client::{
-    re_exports::{
-        ClientId, ClientSecret, Map, RedirectUri, Serialize_enum_str, Url, UrlParseError, Value,
-    },
+    re_exports::{ClientId, ClientSecret, Map, RedirectUri, Url, UrlParseError, Value},
     Provider, ProviderExtAuthorizationCodeGrant,
 };
 
-use crate::{GoogleScope, AUTHORIZATION_URL, TOKEN_URL};
+use crate::{TwitchScope, AUTHORIZATION_URL, TOKEN_URL};
 
 #[derive(Debug, Clone)]
-pub struct GoogleProviderForWebServerApps {
+pub struct TwitchProviderForWebServerApps {
     client_id: ClientId,
     client_secret: ClientSecret,
     redirect_uri: RedirectUri,
-    pub access_type: Option<GoogleProviderForWebServerAppsAccessType>,
-    pub include_granted_scopes: Option<bool>,
+    pub force_verify: Option<bool>,
     //
     token_endpoint_url: Url,
     authorization_endpoint_url: Url,
 }
 
-#[derive(Serialize_enum_str, Debug, Clone)]
-pub enum GoogleProviderForWebServerAppsAccessType {
-    #[serde(rename = "online")]
-    Online,
-    #[serde(rename = "offline")]
-    Offline,
-}
-
-impl GoogleProviderForWebServerApps {
+impl TwitchProviderForWebServerApps {
     pub fn new(
         client_id: ClientId,
         client_secret: ClientSecret,
@@ -37,8 +26,7 @@ impl GoogleProviderForWebServerApps {
             client_id,
             client_secret,
             redirect_uri,
-            access_type: None,
-            include_granted_scopes: None,
+            force_verify: None,
             token_endpoint_url: TOKEN_URL.parse()?,
             authorization_endpoint_url: AUTHORIZATION_URL.parse()?,
         })
@@ -52,8 +40,8 @@ impl GoogleProviderForWebServerApps {
         self
     }
 }
-impl Provider for GoogleProviderForWebServerApps {
-    type Scope = GoogleScope;
+impl Provider for TwitchProviderForWebServerApps {
+    type Scope = TwitchScope;
 
     fn client_id(&self) -> Option<&ClientId> {
         Some(&self.client_id)
@@ -67,17 +55,13 @@ impl Provider for GoogleProviderForWebServerApps {
         &self.token_endpoint_url
     }
 }
-impl ProviderExtAuthorizationCodeGrant for GoogleProviderForWebServerApps {
+impl ProviderExtAuthorizationCodeGrant for TwitchProviderForWebServerApps {
     fn redirect_uri(&self) -> Option<&RedirectUri> {
         Some(&self.redirect_uri)
     }
 
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
-        Some(vec![
-            GoogleScope::Profile,
-            GoogleScope::Email,
-            GoogleScope::Openid,
-        ])
+        Some(vec![TwitchScope::UserReadEmail])
     }
 
     fn authorization_endpoint_url(&self) -> &Url {
@@ -87,18 +71,9 @@ impl ProviderExtAuthorizationCodeGrant for GoogleProviderForWebServerApps {
     fn authorization_request_query_extensions(&self) -> Option<Map<String, Value>> {
         let mut map = Map::new();
 
-        if let Some(access_type) = &self.access_type {
-            map.insert(
-                "access_type".to_owned(),
-                Value::String(access_type.to_string()),
-            );
-        }
-        if let Some(include_granted_scopes) = &self.include_granted_scopes {
-            if *include_granted_scopes {
-                map.insert(
-                    "include_granted_scopes".to_owned(),
-                    Value::String(true.to_string()),
-                );
+        if let Some(force_verify) = &self.force_verify {
+            if *force_verify {
+                map.insert("force_verify".to_owned(), Value::String(true.to_string()));
             }
         }
 
@@ -123,28 +98,30 @@ mod tests {
 
     #[test]
     fn authorization_request() -> Result<(), Box<dyn error::Error>> {
-        let provider = GoogleProviderForWebServerApps::new(
+        let provider = TwitchProviderForWebServerApps::new(
             "CLIENT_ID".to_owned(),
             "CLIENT_SECRET".to_owned(),
             RedirectUri::new("https://client.example.com/cb")?,
         )?
         .configure(|x| {
-            x.access_type = Some(GoogleProviderForWebServerAppsAccessType::Offline);
-            x.include_granted_scopes = Some(true);
+            x.force_verify = Some(true);
         });
 
-        let request =
-            AuthorizationEndpoint::new(&provider, vec![GoogleScope::Email], "STATE".to_owned())
-                .render_request()?;
+        let request = AuthorizationEndpoint::new(
+            &provider,
+            vec![TwitchScope::UserReadEmail],
+            "STATE".to_owned(),
+        )
+        .render_request()?;
 
-        assert_eq!(request.uri(), "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=CLIENT_ID&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&scope=email&state=STATE&access_type=offline&include_granted_scopes=true");
+        assert_eq!(request.uri(), "https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=CLIENT_ID&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&scope=email&state=STATE&force_verify=true");
 
         Ok(())
     }
 
     #[test]
     fn access_token_request() -> Result<(), Box<dyn error::Error>> {
-        let provider = GoogleProviderForWebServerApps::new(
+        let provider = TwitchProviderForWebServerApps::new(
             "CLIENT_ID".to_owned(),
             "CLIENT_SECRET".to_owned(),
             RedirectUri::new("https://client.example.com/cb")?,
