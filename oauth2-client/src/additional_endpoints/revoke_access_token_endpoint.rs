@@ -13,7 +13,7 @@ use super::{
 //
 //
 //
-pub trait RevokeAccessTokenEndpoint<SCOPE>: DynClone + DowncastSync + Send + Sync
+pub trait RevokeAccessTokenEndpoint<SCOPE>: DynClone + DowncastSync
 where
     SCOPE: Scope,
 {

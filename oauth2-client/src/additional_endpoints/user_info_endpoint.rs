@@ -13,7 +13,7 @@ use super::{
 //
 //
 //
-pub trait UserInfoEndpoint<SCOPE>: DynClone + DowncastSync + Send + Sync
+pub trait UserInfoEndpoint<SCOPE>: DynClone + DowncastSync
 where
     SCOPE: Scope,
 {
@@ -50,7 +50,7 @@ where
 clone_trait_object!(<SCOPE> UserInfoEndpoint<SCOPE> where SCOPE: Scope + Clone);
 impl_downcast!(UserInfoEndpoint<SCOPE> where SCOPE: Scope);
 
-impl<SCOPE> fmt::Debug for dyn UserInfoEndpoint<SCOPE>
+impl<SCOPE> fmt::Debug for dyn UserInfoEndpoint<SCOPE> + Send + Sync
 where
     SCOPE: Scope,
 {

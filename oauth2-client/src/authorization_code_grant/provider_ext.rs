@@ -17,9 +17,7 @@ use crate::{
 };
 
 //
-pub trait ProviderExtAuthorizationCodeGrant:
-    Provider + DynClone + DowncastSync + Send + Sync
-{
+pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone + DowncastSync {
     fn redirect_uri(&self) -> Option<&RedirectUri>;
 
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
@@ -71,7 +69,7 @@ pub trait ProviderExtAuthorizationCodeGrant:
 clone_trait_object!(<SCOPE> ProviderExtAuthorizationCodeGrant<Scope = SCOPE> where SCOPE: Scope + Clone);
 impl_downcast!(ProviderExtAuthorizationCodeGrant assoc Scope where Scope: self::Scope);
 
-impl<SCOPE> fmt::Debug for dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>
+impl<SCOPE> fmt::Debug for dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE> + Send + Sync
 where
     SCOPE: Scope,
 {

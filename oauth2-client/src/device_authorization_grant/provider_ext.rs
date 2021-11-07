@@ -7,9 +7,7 @@ use crate::{
 };
 
 //
-pub trait ProviderExtDeviceAuthorizationGrant:
-    Provider + DynClone + DowncastSync + Send + Sync
-{
+pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone + DowncastSync {
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
         None
     }
