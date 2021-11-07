@@ -1,3 +1,5 @@
+use std::error;
+
 use oauth2_client::{
     additional_endpoints::{EndpointParseResponseError, EndpointRenderRequestError, UserInfo},
     re_exports::{serde_json, Body, Endpoint, Request, Response},
@@ -44,16 +46,14 @@ impl From<Oauth2V3UserInfoEndpointError> for EndpointRenderRequestError {
     fn from(err: Oauth2V3UserInfoEndpointError) -> Self {
         match err {
             Oauth2V3UserInfoEndpointError::MakeRequestFailed(err) => Self::MakeRequestFailed(err),
-            Oauth2V3UserInfoEndpointError::DeResponseBodyFailed(err) => {
-                Self::Other(err.to_string())
-            }
+            Oauth2V3UserInfoEndpointError::DeResponseBodyFailed(err) => Self::Other(Box::new(err)),
         }
     }
 }
 impl From<Oauth2V3UserInfoEndpointError> for EndpointParseResponseError {
     fn from(err: Oauth2V3UserInfoEndpointError) -> Self {
         match err {
-            Oauth2V3UserInfoEndpointError::MakeRequestFailed(err) => Self::Other(err.to_string()),
+            Oauth2V3UserInfoEndpointError::MakeRequestFailed(err) => Self::Other(Box::new(err)),
             Oauth2V3UserInfoEndpointError::DeResponseBodyFailed(err) => {
                 Self::DeResponseBodyFailed(err)
             }
@@ -63,7 +63,7 @@ impl From<Oauth2V3UserInfoEndpointError> for EndpointParseResponseError {
 
 //
 impl TryFrom<Oauth2V3UserInfo> for UserInfo {
-    type Error = String;
+    type Error = Box<dyn error::Error + Send + Sync>;
 
     fn try_from(user_info: Oauth2V3UserInfo) -> Result<Self, Self::Error> {
         Ok(Self {

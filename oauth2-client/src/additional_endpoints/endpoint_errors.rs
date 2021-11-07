@@ -1,3 +1,5 @@
+use std::error;
+
 use crate::re_exports::{HttpError, SerdeJsonError};
 
 //
@@ -7,7 +9,7 @@ pub enum EndpointRenderRequestError {
     MakeRequestFailed(HttpError),
     //
     #[error("Other {0}")]
-    Other(String),
+    Other(Box<dyn error::Error + Send + Sync>),
 }
 
 #[derive(thiserror::Error, Debug)]
@@ -15,10 +17,10 @@ pub enum EndpointParseResponseError {
     #[error("DeResponseBodyFailed {0}")]
     DeResponseBodyFailed(SerdeJsonError),
     #[error("ToUserInfoFailed {0}")]
-    ToOutputFailed(String),
+    ToOutputFailed(Box<dyn error::Error + Send + Sync>),
     //
     #[error("Other {0}")]
-    Other(String),
+    Other(Box<dyn error::Error + Send + Sync>),
 }
 
 #[derive(thiserror::Error, Debug)]
@@ -27,7 +29,7 @@ pub enum EndpointExecuteError {
     RenderRequestError(EndpointRenderRequestError),
     //
     #[error("RespondFailed {0}")]
-    RespondFailed(String),
+    RespondFailed(Box<dyn error::Error + Send + Sync>),
     //
     #[error("ParseResponseError {0}")]
     ParseResponseError(EndpointParseResponseError),

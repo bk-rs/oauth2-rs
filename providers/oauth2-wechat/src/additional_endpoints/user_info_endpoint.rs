@@ -1,3 +1,5 @@
+use std::error;
+
 use oauth2_client::{
     additional_endpoints::{EndpointParseResponseError, EndpointRenderRequestError, UserInfo},
     re_exports::{serde_json, Body, Endpoint, Request, Response},
@@ -44,14 +46,14 @@ impl From<SnsUserinfoEndpointError> for EndpointRenderRequestError {
     fn from(err: SnsUserinfoEndpointError) -> Self {
         match err {
             SnsUserinfoEndpointError::MakeRequestFailed(err) => Self::MakeRequestFailed(err),
-            SnsUserinfoEndpointError::DeResponseBodyFailed(err) => Self::Other(err.to_string()),
+            SnsUserinfoEndpointError::DeResponseBodyFailed(err) => Self::Other(Box::new(err)),
         }
     }
 }
 impl From<SnsUserinfoEndpointError> for EndpointParseResponseError {
     fn from(err: SnsUserinfoEndpointError) -> Self {
         match err {
-            SnsUserinfoEndpointError::MakeRequestFailed(err) => Self::Other(err.to_string()),
+            SnsUserinfoEndpointError::MakeRequestFailed(err) => Self::Other(Box::new(err)),
             SnsUserinfoEndpointError::DeResponseBodyFailed(err) => Self::DeResponseBodyFailed(err),
         }
     }
@@ -59,7 +61,7 @@ impl From<SnsUserinfoEndpointError> for EndpointParseResponseError {
 
 //
 impl TryFrom<SnsUserinfo> for UserInfo {
-    type Error = String;
+    type Error = Box<dyn error::Error + Send + Sync>;
 
     fn try_from(sns_userinfo: SnsUserinfo) -> Result<Self, Self::Error> {
         Ok(Self {

@@ -130,7 +130,7 @@ where
                         ClientRespondEndpointError::RespondFailed(err) => {
                             SigninFlowHandleCallbackRet::OkButUserInfoEndpointExecuteError((
                                 access_token,
-                                EndpointExecuteError::RespondFailed(err.to_string()),
+                                EndpointExecuteError::RespondFailed(Box::new(err)),
                             ))
                         }
                         ClientRespondEndpointError::EndpointRenderRequestFailed(err) => {

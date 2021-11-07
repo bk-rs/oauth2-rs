@@ -1,3 +1,5 @@
+use std::error;
+
 use oauth2_client::{
     additional_endpoints::{EndpointParseResponseError, EndpointRenderRequestError, UserInfo},
     re_exports::{serde_json, Body, Endpoint, Request, Response},
@@ -42,14 +44,14 @@ impl From<UserEndpointError> for EndpointRenderRequestError {
     fn from(err: UserEndpointError) -> Self {
         match err {
             UserEndpointError::MakeRequestFailed(err) => Self::MakeRequestFailed(err),
-            UserEndpointError::DeResponseBodyFailed(err) => Self::Other(err.to_string()),
+            UserEndpointError::DeResponseBodyFailed(err) => Self::Other(Box::new(err)),
         }
     }
 }
 impl From<UserEndpointError> for EndpointParseResponseError {
     fn from(err: UserEndpointError) -> Self {
         match err {
-            UserEndpointError::MakeRequestFailed(err) => Self::Other(err.to_string()),
+            UserEndpointError::MakeRequestFailed(err) => Self::Other(Box::new(err)),
             UserEndpointError::DeResponseBodyFailed(err) => Self::DeResponseBodyFailed(err),
         }
     }
@@ -57,7 +59,7 @@ impl From<UserEndpointError> for EndpointParseResponseError {
 
 //
 impl TryFrom<User> for UserInfo {
-    type Error = String;
+    type Error = Box<dyn error::Error + Send + Sync>;
 
     fn try_from(user: User) -> Result<Self, Self::Error> {
         Ok(Self {
