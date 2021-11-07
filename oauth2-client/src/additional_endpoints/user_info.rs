@@ -16,7 +16,7 @@ pub struct UserInfo {
 
 //
 #[derive(Debug)]
-pub enum UserInfoObtainRet {
+pub enum UserInfoObtainOutput {
     None,
     Static(UserInfo),
     Respond(

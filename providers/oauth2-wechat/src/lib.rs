@@ -5,12 +5,12 @@ pub const AUTHORIZATION_URL: &str = "https://open.weixin.qq.com/connect/oauth2/a
 
 pub mod authorization_code_grant;
 
-pub use authorization_code_grant::WeChatProviderWithWebApplication;
+pub use authorization_code_grant::WechatProviderWithWebApplication;
 
 pub mod additional_endpoints;
 
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
-pub enum WeChatScope {
+pub enum WechatScope {
     //
     #[serde(rename = "snsapi_login")]
     SnsapiLogin,
@@ -20,4 +20,4 @@ pub enum WeChatScope {
     #[serde(other)]
     Other(String),
 }
-impl Scope for WeChatScope {}
+impl Scope for WechatScope {}

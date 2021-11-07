@@ -6,6 +6,7 @@ use oauth2_client::re_exports::{
 pub const USER_INFO_URL: &str = "https://api.weixin.qq.com/sns/userinfo";
 
 //
+#[derive(Debug, Clone)]
 pub struct SnsUserinfoEndpoint {
     access_token: String,
     openid: String,

@@ -1,10 +1,10 @@
-use std::fmt;
+use std::{error, fmt};
 
 use dyn_clone::{clone_trait_object, DynClone};
 
 use crate::re_exports::Scope;
 
-use super::{AccessTokenObtainFrom, AccessTokenResponseSuccessfulBody, UserInfoObtainRet};
+use super::{AccessTokenObtainFrom, AccessTokenResponseSuccessfulBody, UserInfoObtainOutput};
 
 //
 //
@@ -17,7 +17,7 @@ where
         &self,
         _access_token_obtain_from: AccessTokenObtainFrom,
         _access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> UserInfoObtainRet;
+    ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + 'static>>;
 }
 
 clone_trait_object!(<SCOPE> EndpointBuilder<SCOPE> where SCOPE: Scope + Clone);

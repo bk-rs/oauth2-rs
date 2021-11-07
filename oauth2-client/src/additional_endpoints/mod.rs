@@ -12,7 +12,7 @@ pub use access_token_obtain_from::AccessTokenObtainFrom;
 pub use endpoint_errors::{
     EndpointExecuteError, EndpointParseResponseError, EndpointRenderRequestError,
 };
-pub use user_info::{UserInfo, UserInfoObtainRet};
+pub use user_info::{UserInfo, UserInfoObtainOutput};
 
 //
 pub mod endpoint_builder;

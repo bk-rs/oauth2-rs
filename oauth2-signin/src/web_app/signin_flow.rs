@@ -2,7 +2,7 @@ use std::fmt;
 
 use oauth2_client::{
     additional_endpoints::{
-        AccessTokenObtainFrom, EndpointBuilder, EndpointExecuteError, UserInfoObtainRet,
+        AccessTokenObtainFrom, EndpointBuilder, EndpointExecuteError, UserInfoObtainOutput,
     },
     authorization_code_grant::{
         provider_ext::ProviderExtAuthorizationCodeGrantStringScopeWrapper, Flow,
@@ -113,11 +113,13 @@ where
             .endpoint_builder
             .user_info_obtain(access_token_obtain_from, &access_token)
         {
-            UserInfoObtainRet::None => SigninFlowHandleCallbackRet::OkButUserInfoNone(access_token),
-            UserInfoObtainRet::Static(user_info) => {
+            Ok(UserInfoObtainOutput::None) => {
+                SigninFlowHandleCallbackRet::OkButUserInfoNone(access_token)
+            }
+            Ok(UserInfoObtainOutput::Static(user_info)) => {
                 SigninFlowHandleCallbackRet::Ok((access_token, user_info))
             }
-            UserInfoObtainRet::Respond(user_info_endpoint) => {
+            Ok(UserInfoObtainOutput::Respond(user_info_endpoint)) => {
                 match self
                     .client_with_user_info
                     .respond_dyn_endpoint(&user_info_endpoint)
@@ -126,19 +128,19 @@ where
                     Ok(user_info) => SigninFlowHandleCallbackRet::Ok((access_token, user_info)),
                     Err(err) => match err {
                         ClientRespondEndpointError::RespondFailed(err) => {
-                            SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
+                            SigninFlowHandleCallbackRet::OkButUserInfoEndpointExecuteError((
                                 access_token,
                                 EndpointExecuteError::RespondFailed(err.to_string()),
                             ))
                         }
                         ClientRespondEndpointError::EndpointRenderRequestFailed(err) => {
-                            SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
+                            SigninFlowHandleCallbackRet::OkButUserInfoEndpointExecuteError((
                                 access_token,
                                 EndpointExecuteError::RenderRequestError(err),
                             ))
                         }
                         ClientRespondEndpointError::EndpointParseResponseFailed(err) => {
-                            SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
+                            SigninFlowHandleCallbackRet::OkButUserInfoEndpointExecuteError((
                                 access_token,
                                 EndpointExecuteError::ParseResponseError(err),
                             ))
@@ -146,6 +148,10 @@ where
                     },
                 }
             }
+            Err(err) => SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
+                access_token,
+                err.to_string(),
+            )),
         }
     }
 }

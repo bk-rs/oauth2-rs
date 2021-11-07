@@ -12,7 +12,8 @@ pub type SigninFlowBuildAuthorizationUrlError = FlowBuildAuthorizationUrlError;
 pub enum SigninFlowHandleCallbackRet {
     Ok((AccessTokenResponseSuccessfulBody<String>, UserInfo)),
     OkButUserInfoNone(AccessTokenResponseSuccessfulBody<String>),
-    OkButUserInfoObtainError(
+    OkButUserInfoObtainError((AccessTokenResponseSuccessfulBody<String>, String)),
+    OkButUserInfoEndpointExecuteError(
         (
             AccessTokenResponseSuccessfulBody<String>,
             EndpointExecuteError,

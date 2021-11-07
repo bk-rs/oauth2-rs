@@ -17,12 +17,12 @@ use oauth2_client::{
     Provider, ProviderExtAuthorizationCodeGrant,
 };
 
-use crate::{WeChatScope, AUTHORIZATION_URL, TOKEN_URL};
+use crate::{WechatScope, AUTHORIZATION_URL, TOKEN_URL};
 
 pub const KEY_OPENID: &str = "openid";
 
 #[derive(Debug, Clone)]
-pub struct WeChatProviderWithWebApplication {
+pub struct WechatProviderWithWebApplication {
     appid: ClientId,
     secret: ClientSecret,
     redirect_uri: RedirectUri,
@@ -31,7 +31,7 @@ pub struct WeChatProviderWithWebApplication {
     token_endpoint_url: Url,
     authorization_endpoint_url: Url,
 }
-impl WeChatProviderWithWebApplication {
+impl WechatProviderWithWebApplication {
     pub fn new(
         appid: ClientId,
         secret: ClientSecret,
@@ -55,8 +55,8 @@ impl WeChatProviderWithWebApplication {
         self
     }
 }
-impl Provider for WeChatProviderWithWebApplication {
-    type Scope = WeChatScope;
+impl Provider for WechatProviderWithWebApplication {
+    type Scope = WechatScope;
 
     fn client_id(&self) -> Option<&ClientId> {
         Some(&self.appid)
@@ -70,13 +70,13 @@ impl Provider for WeChatProviderWithWebApplication {
         &self.token_endpoint_url
     }
 }
-impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
+impl ProviderExtAuthorizationCodeGrant for WechatProviderWithWebApplication {
     fn redirect_uri(&self) -> Option<&RedirectUri> {
         Some(&self.redirect_uri)
     }
 
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
-        Some(vec![WeChatScope::SnsapiLogin])
+        Some(vec![WechatScope::SnsapiLogin])
     }
 
     fn authorization_endpoint_url(&self) -> &Url {
@@ -89,7 +89,7 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
     ) -> Option<Result<String, Box<dyn error::Error + 'static>>> {
         fn doing(
             query: &AuthorizationRequestQuery<
-                <WeChatProviderWithWebApplication as Provider>::Scope,
+                <WechatProviderWithWebApplication as Provider>::Scope,
             >,
         ) -> Result<String, Box<dyn error::Error + 'static>> {
             let redirect_uri = query
@@ -111,7 +111,7 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
                 .collect::<Vec<_>>()
                 .join(",");
 
-            let query = WeChatAuthorizationRequestQuery {
+            let query = WechatAuthorizationRequestQuery {
                 appid: query.client_id.to_owned(),
                 redirect_uri,
                 response_type: query.response_type.to_owned(),
@@ -139,7 +139,7 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
         body: &AccessTokenRequestBody,
     ) -> Option<Result<Request<Body>, Box<dyn error::Error + 'static>>> {
         fn doing(
-            this: &WeChatProviderWithWebApplication,
+            this: &WechatProviderWithWebApplication,
             body: &AccessTokenRequestBody,
         ) -> Result<Request<Body>, Box<dyn error::Error + 'static>> {
             let appid = body
@@ -147,7 +147,7 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
                 .to_owned()
                 .ok_or_else(|| AccessTokenRequestRenderingError::ClientIdMissing)?;
 
-            let query = WeChatAccessTokenRequestQuery {
+            let query = WechatAccessTokenRequestQuery {
                 appid,
                 secret: this.secret.to_owned(),
                 code: body.code.to_owned(),
@@ -185,14 +185,14 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
         fn doing(
             response: &Response<Body>,
         ) -> Result<
-            Result<WeChatAccessTokenResponseSuccessfulBody, WeChatAccessTokenResponseErrorBody>,
+            Result<WechatAccessTokenResponseSuccessfulBody, WechatAccessTokenResponseErrorBody>,
             Box<dyn error::Error + 'static>,
         > {
             if response.status().is_success() {
                 let map = serde_json::from_slice::<Map<String, Value>>(&response.body())
                     .map_err(AccessTokenResponseParsingError::DeResponseBodyFailed)?;
                 if !map.contains_key("errcode") {
-                    let body = serde_json::from_slice::<WeChatAccessTokenResponseSuccessfulBody>(
+                    let body = serde_json::from_slice::<WechatAccessTokenResponseSuccessfulBody>(
                         &response.body(),
                     )
                     .map_err(AccessTokenResponseParsingError::DeResponseBodyFailed)?;
@@ -202,7 +202,7 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
             }
 
             let body =
-                serde_json::from_slice::<WeChatAccessTokenResponseErrorBody>(&response.body())
+                serde_json::from_slice::<WechatAccessTokenResponseErrorBody>(&response.body())
                     .map_err(AccessTokenResponseParsingError::DeResponseBodyFailed)?;
             Ok(Err(body))
         }
@@ -213,7 +213,7 @@ impl ProviderExtAuthorizationCodeGrant for WeChatProviderWithWebApplication {
 
 //
 #[derive(Serialize, Deserialize)]
-pub struct WeChatAuthorizationRequestQuery {
+pub struct WechatAuthorizationRequestQuery {
     pub appid: String,
     pub redirect_uri: String,
     pub response_type: String,
@@ -234,7 +234,7 @@ pub enum AuthorizationRequestQuerySerializingError {
 
 //
 #[derive(Serialize, Deserialize)]
-pub struct WeChatAccessTokenRequestQuery {
+pub struct WechatAccessTokenRequestQuery {
     pub appid: String,
     pub secret: String,
     pub code: String,
@@ -253,23 +253,23 @@ pub enum AccessTokenRequestRenderingError {
 
 //
 #[derive(Serialize, Deserialize)]
-pub struct WeChatAccessTokenResponseSuccessfulBody {
+pub struct WechatAccessTokenResponseSuccessfulBody {
     pub access_token: String,
     pub expires_in: usize,
     pub refresh_token: String,
     pub openid: String,
     pub scope: String,
 }
-impl From<WeChatAccessTokenResponseSuccessfulBody>
-    for AccessTokenResponseSuccessfulBody<WeChatScope>
+impl From<WechatAccessTokenResponseSuccessfulBody>
+    for AccessTokenResponseSuccessfulBody<WechatScope>
 {
-    fn from(body: WeChatAccessTokenResponseSuccessfulBody) -> Self {
+    fn from(body: WechatAccessTokenResponseSuccessfulBody) -> Self {
         let scope: Vec<_> = body
             .scope
             .split(',')
             .map(|x| {
-                x.parse::<WeChatScope>()
-                    .unwrap_or(WeChatScope::Other(x.to_owned()))
+                x.parse::<WechatScope>()
+                    .unwrap_or(WechatScope::Other(x.to_owned()))
             })
             .collect();
 
@@ -294,12 +294,12 @@ impl From<WeChatAccessTokenResponseSuccessfulBody>
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct WeChatAccessTokenResponseErrorBody {
+pub struct WechatAccessTokenResponseErrorBody {
     pub errcode: usize,
     pub errmsg: String,
 }
-impl From<WeChatAccessTokenResponseErrorBody> for AccessTokenResponseErrorBody {
-    fn from(body: WeChatAccessTokenResponseErrorBody) -> Self {
+impl From<WechatAccessTokenResponseErrorBody> for AccessTokenResponseErrorBody {
+    fn from(body: WechatAccessTokenResponseErrorBody) -> Self {
         Self::new(
             AccessTokenResponseErrorBodyError::Other(body.errcode.to_string()),
             Some(body.errmsg),
@@ -328,7 +328,7 @@ mod tests {
 
     #[test]
     fn authorization_request() -> Result<(), Box<dyn error::Error>> {
-        let provider = WeChatProviderWithWebApplication::new(
+        let provider = WechatProviderWithWebApplication::new(
             "APPID".to_owned(),
             "SECRET".to_owned(),
             RedirectUri::new("https://client.example.com/cb")?,
@@ -339,7 +339,7 @@ mod tests {
 
         let request = AuthorizationEndpoint::new(
             &provider,
-            vec![WeChatScope::SnsapiLogin],
+            vec![WechatScope::SnsapiLogin],
             "3d6be0a4035d839573b04816624a415e".to_owned(),
         )
         .render_request()?;
@@ -351,7 +351,7 @@ mod tests {
 
     #[test]
     fn access_token_request() -> Result<(), Box<dyn error::Error>> {
-        let provider = WeChatProviderWithWebApplication::new(
+        let provider = WechatProviderWithWebApplication::new(
             "APPID".to_owned(),
             "SECRET".to_owned(),
             RedirectUri::new("https://client.example.com/cb")?,
@@ -367,7 +367,7 @@ mod tests {
 
     #[test]
     fn access_token_response() -> Result<(), Box<dyn error::Error>> {
-        let provider = WeChatProviderWithWebApplication::new(
+        let provider = WechatProviderWithWebApplication::new(
             "APPID".to_owned(),
             "SECRET".to_owned(),
             RedirectUri::new("https://client.example.com/cb")?,
@@ -387,7 +387,7 @@ mod tests {
                 assert_eq!(body.refresh_token, Some("REFRESH_TOKEN".to_owned()));
                 assert_eq!(
                     body.scope,
-                    Some(vec![WeChatScope::Other("SCOPE".to_owned())].into())
+                    Some(vec![WechatScope::Other("SCOPE".to_owned())].into())
                 );
                 let map = body.extensions().unwrap();
                 assert_eq!(map.get("openid").unwrap(), "OPENID");

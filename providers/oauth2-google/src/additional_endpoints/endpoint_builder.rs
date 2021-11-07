@@ -1,7 +1,9 @@
+use std::error;
+
 use oauth2_client::{
     additional_endpoints::{
         AccessTokenObtainFrom, AccessTokenResponseSuccessfulBody, EndpointBuilder,
-        UserInfoObtainRet,
+        UserInfoObtainOutput,
     },
     re_exports::Scope,
 };
@@ -20,9 +22,9 @@ where
         &self,
         _access_token_obtain_from: AccessTokenObtainFrom,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> UserInfoObtainRet {
-        UserInfoObtainRet::Respond(Box::new(GoogleUserInfoEndpoint::new(
-            &access_token.access_token,
+    ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + 'static>> {
+        Ok(UserInfoObtainOutput::Respond(Box::new(
+            GoogleUserInfoEndpoint::new(&access_token.access_token),
         )))
     }
 }
