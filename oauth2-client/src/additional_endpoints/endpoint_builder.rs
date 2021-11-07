@@ -17,7 +17,7 @@ where
         &self,
         _access_token_obtain_from: AccessTokenObtainFrom,
         _access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + 'static>>;
+    ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>>;
 }
 
 clone_trait_object!(<SCOPE> EndpointBuilder<SCOPE> where SCOPE: Scope + Clone);

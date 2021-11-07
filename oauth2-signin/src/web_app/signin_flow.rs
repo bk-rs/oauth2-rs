@@ -148,10 +148,7 @@ where
                     },
                 }
             }
-            Err(err) => SigninFlowHandleCallbackRet::OkButUserInfoObtainError((
-                access_token,
-                err.to_string(),
-            )),
+            Err(err) => SigninFlowHandleCallbackRet::OkButUserInfoObtainError((access_token, err)),
         }
     }
 }

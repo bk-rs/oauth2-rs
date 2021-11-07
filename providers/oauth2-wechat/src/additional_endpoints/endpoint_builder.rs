@@ -25,7 +25,7 @@ where
         &self,
         access_token_obtain_from: AccessTokenObtainFrom,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + 'static>> {
+    ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>> {
         if let Some(scope) = &access_token.scope {
             let scope = ScopeParameter::<String>::from(scope).0;
             if scope.contains(&WechatScope::SnsapiLogin.to_string()) {
