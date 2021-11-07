@@ -1,3 +1,5 @@
+use std::error;
+
 use http_api_client::{Client, ClientRespondEndpointError};
 use http_api_endpoint::Endpoint as _;
 use oauth2_core::{
@@ -93,7 +95,7 @@ where
             .await
             .map_err(|err| match err {
                 ClientRespondEndpointError::RespondFailed(err) => {
-                    FlowHandleCallbackError::AccessTokenEndpointRespondFailed(err.to_string())
+                    FlowHandleCallbackError::AccessTokenEndpointRespondFailed(Box::new(err))
                 }
                 ClientRespondEndpointError::EndpointRenderRequestFailed(err) => {
                     FlowHandleCallbackError::AccessTokenEndpointError(err)
@@ -123,7 +125,7 @@ pub enum FlowHandleCallbackError {
     StateMissing,
     //
     #[error("AccessTokenEndpointRespondFailed {0}")]
-    AccessTokenEndpointRespondFailed(String),
+    AccessTokenEndpointRespondFailed(Box<dyn error::Error + Send + Sync>),
     #[error("AccessTokenEndpointError {0}")]
     AccessTokenEndpointError(AccessTokenEndpointError),
     #[error("AccessTokenFailed {0:?}")]

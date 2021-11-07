@@ -32,7 +32,7 @@ pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone + Send + Sync {
     fn authorization_request_query_serializing(
         &self,
         _query: &AuthorizationRequestQuery<<Self as Provider>::Scope>,
-    ) -> Option<Result<String, Box<dyn error::Error + 'static>>> {
+    ) -> Option<Result<String, Box<dyn error::Error + Send + Sync + 'static>>> {
         None
     }
 
@@ -45,7 +45,7 @@ pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone + Send + Sync {
     fn access_token_request_rendering(
         &self,
         _body: &AccessTokenRequestBody,
-    ) -> Option<Result<Request<Body>, Box<dyn error::Error + 'static>>> {
+    ) -> Option<Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>>> {
         None
     }
 
@@ -58,7 +58,7 @@ pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone + Send + Sync {
                 AccessTokenResponseSuccessfulBody<<Self as Provider>::Scope>,
                 AccessTokenResponseErrorBody,
             >,
-            Box<dyn error::Error + 'static>,
+            Box<dyn error::Error + Send + Sync + 'static>,
         >,
     > {
         None
@@ -152,7 +152,7 @@ where
     fn authorization_request_query_serializing(
         &self,
         query: &AuthorizationRequestQuery<<Self as Provider>::Scope>,
-    ) -> Option<Result<String, Box<dyn error::Error + 'static>>> {
+    ) -> Option<Result<String, Box<dyn error::Error + Send + Sync + 'static>>> {
         let query =
             match AuthorizationRequestQuery::<<P as Provider>::Scope>::try_from_t_with_string(query)
             {
@@ -174,7 +174,7 @@ where
     fn access_token_request_rendering(
         &self,
         body: &AccessTokenRequestBody,
-    ) -> Option<Result<Request<Body>, Box<dyn error::Error + 'static>>> {
+    ) -> Option<Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>>> {
         self.inner.access_token_request_rendering(body)
     }
 
@@ -187,7 +187,7 @@ where
                 AccessTokenResponseSuccessfulBody<<Self as Provider>::Scope>,
                 AccessTokenResponseErrorBody,
             >,
-            Box<dyn error::Error + 'static>,
+            Box<dyn error::Error + Send + Sync + 'static>,
         >,
     > {
         self.inner.access_token_response_parsing(response).map(|x| {

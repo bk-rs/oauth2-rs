@@ -1,3 +1,5 @@
+use std::error;
+
 use http_api_endpoint::{Body, Endpoint, Request, Response};
 use oauth2_core::{
     access_token_request::{
@@ -64,9 +66,8 @@ where
         }
 
         if let Some(request_ret) = self.provider.access_token_request_rendering(&body) {
-            let request = request_ret.map_err(|err| {
-                AccessTokenEndpointError::CustomRenderingRequestFailed(err.to_string())
-            })?;
+            let request = request_ret
+                .map_err(|err| AccessTokenEndpointError::CustomRenderingRequestFailed(err))?;
 
             return Ok(request);
         }
@@ -93,9 +94,8 @@ where
         response: Response<Body>,
     ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
         if let Some(body_ret_ret) = self.provider.access_token_response_parsing(&response) {
-            let body_ret = body_ret_ret.map_err(|err| {
-                AccessTokenEndpointError::CustomparsingResponseFailed(err.to_string())
-            })?;
+            let body_ret = body_ret_ret
+                .map_err(|err| AccessTokenEndpointError::CustomparsingResponseFailed(err))?;
 
             return Ok(body_ret);
         }
@@ -121,7 +121,7 @@ where
 #[derive(thiserror::Error, Debug)]
 pub enum AccessTokenEndpointError {
     #[error("CustomRenderingRequestFailed {0}")]
-    CustomRenderingRequestFailed(String),
+    CustomRenderingRequestFailed(Box<dyn error::Error + Send + Sync>),
     //
     #[error("SerRequestBodyFailed {0}")]
     SerRequestBodyFailed(SerdeUrlencodedSerError),
@@ -129,7 +129,7 @@ pub enum AccessTokenEndpointError {
     MakeRequestFailed(HttpError),
     //
     #[error("CustomparsingResponseFailed {0}")]
-    CustomparsingResponseFailed(String),
+    CustomparsingResponseFailed(Box<dyn error::Error + Send + Sync>),
     //
     #[error("DeResponseBodyFailed {0}")]
     DeResponseBodyFailed(SerdeJsonError),

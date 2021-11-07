@@ -1,4 +1,4 @@
-use std::convert::Infallible;
+use std::{convert::Infallible, error};
 
 use http_api_endpoint::{Body, Endpoint, Request, Response};
 use oauth2_core::{
@@ -74,9 +74,8 @@ where
             .provider
             .authorization_request_query_serializing(&query)
         {
-            query_str_ret.map_err(|err| {
-                AuthorizationEndpointError::CustomSerRequestQueryFailed(err.to_string())
-            })?
+            query_str_ret
+                .map_err(|err| AuthorizationEndpointError::CustomSerRequestQueryFailed(err))?
         } else {
             serde_qs::to_string(&query)
                 .map_err(AuthorizationEndpointError::SerRequestQueryFailed)?
@@ -112,7 +111,7 @@ pub enum AuthorizationEndpointError {
     ClientIdMissing,
     //
     #[error("CustomSerRequestQueryFailed {0}")]
-    CustomSerRequestQueryFailed(String),
+    CustomSerRequestQueryFailed(Box<dyn error::Error + Send + Sync>),
     //
     #[error("SerRequestQueryFailed {0}")]
     SerRequestQueryFailed(SerdeQsError),

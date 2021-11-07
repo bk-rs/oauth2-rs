@@ -1,3 +1,5 @@
+use std::error;
+
 use http_api_client::{
     Client, ClientRespondEndpointError, RetryableClient,
     RetryableClientRespondEndpointUntilDoneError,
@@ -74,7 +76,7 @@ where
             .await
             .map_err(|err| match err {
                 ClientRespondEndpointError::RespondFailed(err) => {
-                    FlowExecuteError::DeviceAuthorizationEndpointRespondFailed(err.to_string())
+                    FlowExecuteError::DeviceAuthorizationEndpointRespondFailed(Box::new(err))
                 }
                 ClientRespondEndpointError::EndpointRenderRequestFailed(err) => {
                     FlowExecuteError::DeviceAuthorizationEndpointError(err)
@@ -111,7 +113,7 @@ where
             .await
             .map_err(|err| match err {
                 RetryableClientRespondEndpointUntilDoneError::RespondFailed(err) => {
-                    FlowExecuteError::DeviceAccessTokenEndpointRespondFailed(err.to_string())
+                    FlowExecuteError::DeviceAccessTokenEndpointRespondFailed(Box::new(err))
                 }
                 RetryableClientRespondEndpointUntilDoneError::EndpointRenderRequestFailed(err) => {
                     FlowExecuteError::DeviceAccessTokenEndpointError(err)
@@ -120,9 +122,7 @@ where
                     FlowExecuteError::DeviceAccessTokenEndpointError(err)
                 }
                 RetryableClientRespondEndpointUntilDoneError::ReachedMaxRetries => {
-                    FlowExecuteError::DeviceAccessTokenEndpointRespondFailed(
-                        "ReachedMaxRetries".to_owned(),
-                    )
+                    FlowExecuteError::DeviceAccessTokenEndpointErrorWithReachedMaxRetries
                 }
             })?;
 
@@ -136,16 +136,18 @@ where
 #[derive(thiserror::Error, Debug)]
 pub enum FlowExecuteError {
     #[error("DeviceAuthorizationEndpointRespondFailed {0}")]
-    DeviceAuthorizationEndpointRespondFailed(String),
+    DeviceAuthorizationEndpointRespondFailed(Box<dyn error::Error + Send + Sync>),
     #[error("DeviceAuthorizationEndpointError {0}")]
     DeviceAuthorizationEndpointError(DeviceAuthorizationEndpointError),
     #[error("DeviceAuthorizationFailed {0:?}")]
     DeviceAuthorizationFailed(DA_RES_ErrorBody),
     //
     #[error("DeviceAccessTokenEndpointRespondFailed {0}")]
-    DeviceAccessTokenEndpointRespondFailed(String),
+    DeviceAccessTokenEndpointRespondFailed(Box<dyn error::Error + Send + Sync>),
     #[error("DeviceAccessTokenEndpointError {0}")]
     DeviceAccessTokenEndpointError(DeviceAccessTokenEndpointError),
+    #[error("DeviceAccessTokenEndpointErrorWithReachedMaxRetries")]
+    DeviceAccessTokenEndpointErrorWithReachedMaxRetries,
     #[error("DeviceAccessTokenFailed {0:?}")]
     DeviceAccessTokenFailed(DAT_RES_ErrorBody),
 }
