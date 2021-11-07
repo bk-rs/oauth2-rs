@@ -13,7 +13,7 @@ path = "src/poem.rs"
 
 [dependencies]
 oauth2-signin = { version = "^0.0", path = "../../../oauth2-signin" }
-http-api-isahc-client = { version = "0.1" }
+http-api-isahc-client = { version = "0.1", path = "../../../../http-api-endpoint/http-api-isahc-client" }
 
 oauth2-github = { version = "^0.0", path = "../../../providers/oauth2-github" }
 oauth2-google = { version = "^0.0", path = "../../../providers/oauth2-google" }

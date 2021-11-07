@@ -55,8 +55,6 @@ where
     <P as Provider>::Scope: DeserializeOwned,
 {
     type RetryReason = DeviceAccessTokenEndpointRetryReason;
-    // 1800 / 5
-    const MAX_RETRY_COUNT: usize = 360;
 
     type RenderRequestError = DeviceAccessTokenEndpointError;
 
@@ -132,6 +130,11 @@ where
             DeviceAccessTokenEndpointRetryReason::AuthorizationPending => self.interval,
             DeviceAccessTokenEndpointRetryReason::SlowDown => self.interval,
         }
+    }
+
+    fn max_retry_count(&self) -> usize {
+        // 1800 / 5
+        360
     }
 }
 
