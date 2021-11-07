@@ -15,26 +15,30 @@ use oauth2_core::{
         Error as HttpError,
     },
     serde::Serialize,
+    types::Scope,
 };
 use serde_json::{Error as SerdeJsonError, Map, Value};
 use serde_urlencoded::ser::Error as SerdeUrlencodedSerError;
 
-use crate::{Provider, ProviderExtDeviceAuthorizationGrant};
+use crate::ProviderExtDeviceAuthorizationGrant;
 
 //
 #[derive(Clone)]
-pub struct DeviceAuthorizationEndpoint<'a, P>
+pub struct DeviceAuthorizationEndpoint<'a, SCOPE>
 where
-    P: ProviderExtDeviceAuthorizationGrant,
+    SCOPE: Scope,
 {
-    provider: &'a P,
-    scopes: Option<Vec<<P as Provider>::Scope>>,
+    provider: &'a (dyn ProviderExtDeviceAuthorizationGrant<Scope = SCOPE> + Send + Sync),
+    scopes: Option<Vec<SCOPE>>,
 }
-impl<'a, P> DeviceAuthorizationEndpoint<'a, P>
+impl<'a, SCOPE> DeviceAuthorizationEndpoint<'a, SCOPE>
 where
-    P: ProviderExtDeviceAuthorizationGrant,
+    SCOPE: Scope,
 {
-    pub fn new(provider: &'a P, scopes: impl Into<Option<Vec<<P as Provider>::Scope>>>) -> Self {
+    pub fn new(
+        provider: &'a (dyn ProviderExtDeviceAuthorizationGrant<Scope = SCOPE> + Send + Sync),
+        scopes: impl Into<Option<Vec<SCOPE>>>,
+    ) -> Self {
         Self {
             provider,
             scopes: scopes.into(),
@@ -42,11 +46,9 @@ where
     }
 }
 
-impl<'a, P> Endpoint for DeviceAuthorizationEndpoint<'a, P>
+impl<'a, SCOPE> Endpoint for DeviceAuthorizationEndpoint<'a, SCOPE>
 where
-    P: ProviderExtDeviceAuthorizationGrant,
-
-    <P as Provider>::Scope: Serialize,
+    SCOPE: Scope + Serialize,
 {
     type RenderRequestError = DeviceAuthorizationEndpointError;
 

@@ -22,27 +22,32 @@ use oauth2_core::{
         Error as HttpError,
     },
     serde::de::DeserializeOwned,
+    types::Scope,
 };
 use serde_json::{Error as SerdeJsonError, Map, Value};
 use serde_urlencoded::ser::Error as SerdeUrlencodedSerError;
 
-use crate::{Provider, ProviderExtDeviceAuthorizationGrant};
+use crate::ProviderExtDeviceAuthorizationGrant;
 
 //
 #[derive(Clone)]
-pub struct DeviceAccessTokenEndpoint<'a, P>
+pub struct DeviceAccessTokenEndpoint<'a, SCOPE>
 where
-    P: ProviderExtDeviceAuthorizationGrant,
+    SCOPE: Scope,
 {
-    provider: &'a P,
+    provider: &'a (dyn ProviderExtDeviceAuthorizationGrant<Scope = SCOPE> + Send + Sync),
     device_code: DeviceCode,
     interval: Duration,
 }
-impl<'a, P> DeviceAccessTokenEndpoint<'a, P>
+impl<'a, SCOPE> DeviceAccessTokenEndpoint<'a, SCOPE>
 where
-    P: ProviderExtDeviceAuthorizationGrant,
+    SCOPE: Scope,
 {
-    pub fn new(provider: &'a P, device_code: DeviceCode, interval: Duration) -> Self {
+    pub fn new(
+        provider: &'a (dyn ProviderExtDeviceAuthorizationGrant<Scope = SCOPE> + Send + Sync),
+        device_code: DeviceCode,
+        interval: Duration,
+    ) -> Self {
         Self {
             provider,
             device_code,
@@ -51,17 +56,15 @@ where
     }
 }
 
-impl<'a, P> RetryableEndpoint for DeviceAccessTokenEndpoint<'a, P>
+impl<'a, SCOPE> RetryableEndpoint for DeviceAccessTokenEndpoint<'a, SCOPE>
 where
-    P: ProviderExtDeviceAuthorizationGrant,
-
-    <P as Provider>::Scope: DeserializeOwned,
+    SCOPE: Scope + DeserializeOwned,
 {
     type RetryReason = DeviceAccessTokenEndpointRetryReason;
 
     type RenderRequestError = DeviceAccessTokenEndpointError;
 
-    type ParseResponseOutput = Result<RES_SuccessfulBody<<P as Provider>::Scope>, RES_ErrorBody>;
+    type ParseResponseOutput = Result<RES_SuccessfulBody<SCOPE>, RES_ErrorBody>;
     type ParseResponseError = DeviceAccessTokenEndpointError;
 
     fn render_request(
@@ -103,10 +106,8 @@ where
             let map = serde_json::from_slice::<Map<String, Value>>(&response.body())
                 .map_err(DeviceAccessTokenEndpointError::DeResponseBodyFailed)?;
             if !map.contains_key(GENERAL_ERROR_BODY_KEY_ERROR) {
-                let body = serde_json::from_slice::<RES_SuccessfulBody<<P as Provider>::Scope>>(
-                    &response.body(),
-                )
-                .map_err(DeviceAccessTokenEndpointError::DeResponseBodyFailed)?;
+                let body = serde_json::from_slice::<RES_SuccessfulBody<SCOPE>>(&response.body())
+                    .map_err(DeviceAccessTokenEndpointError::DeResponseBodyFailed)?;
 
                 return Ok(Ok(Ok(body)));
             }

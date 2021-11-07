@@ -14,9 +14,10 @@ use oauth2_core::{
         },
     },
     serde::{de::DeserializeOwned, Serialize},
+    types::Scope,
 };
 
-use crate::{Provider, ProviderExtDeviceAuthorizationGrant};
+use crate::ProviderExtDeviceAuthorizationGrant;
 
 use super::{
     DeviceAccessTokenEndpoint, DeviceAccessTokenEndpointError, DeviceAuthorizationEndpoint,
@@ -48,21 +49,19 @@ where
     }
 }
 
-impl<'a, C1, C2> Flow<C1, C2>
+impl<C1, C2> Flow<C1, C2>
 where
     C1: Client + Send + Sync,
     C2: RetryableClient + Send + Sync,
 {
-    pub async fn execute<P, UI>(
+    pub async fn execute<SCOPE, UI>(
         &self,
-        provider: &'a P,
-        scopes: impl Into<Option<Vec<<P as Provider>::Scope>>>,
+        provider: &(dyn ProviderExtDeviceAuthorizationGrant<Scope = SCOPE> + Send + Sync),
+        scopes: impl Into<Option<Vec<SCOPE>>>,
         user_interaction: UI,
-    ) -> Result<DAT_RES_SuccessfulBody<<P as Provider>::Scope>, FlowExecuteError>
+    ) -> Result<DAT_RES_SuccessfulBody<SCOPE>, FlowExecuteError>
     where
-        P: ProviderExtDeviceAuthorizationGrant + Send + Sync,
-
-        <P as Provider>::Scope: Serialize + DeserializeOwned + Send + Sync,
+        SCOPE: Scope + Serialize + DeserializeOwned + Send + Sync,
         UI: FnOnce(UserCode, VerificationUri, Option<VerificationUriComplete>),
     {
         // Step 1
