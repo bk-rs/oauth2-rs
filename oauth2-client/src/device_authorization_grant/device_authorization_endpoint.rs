@@ -22,6 +22,7 @@ use serde_urlencoded::ser::Error as SerdeUrlencodedSerError;
 use crate::{Provider, ProviderExtDeviceAuthorizationGrant};
 
 //
+#[derive(Clone)]
 pub struct DeviceAuthorizationEndpoint<'a, P>
 where
     P: ProviderExtDeviceAuthorizationGrant,

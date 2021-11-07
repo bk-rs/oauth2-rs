@@ -23,6 +23,7 @@ use crate::ProviderExtAuthorizationCodeGrant;
 //
 //
 //
+#[derive(Clone)]
 pub struct AccessTokenEndpoint<'a, SCOPE>
 where
     SCOPE: Scope,
