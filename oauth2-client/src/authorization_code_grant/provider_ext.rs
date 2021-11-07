@@ -67,7 +67,7 @@ pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone + Send + Sync {
 
 clone_trait_object!(<SCOPE> ProviderExtAuthorizationCodeGrant<Scope = SCOPE> where SCOPE: Scope + Clone);
 
-impl<SCOPE> fmt::Debug for dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE> + Send + Sync
+impl<SCOPE> fmt::Debug for dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>
 where
     SCOPE: Scope,
 {

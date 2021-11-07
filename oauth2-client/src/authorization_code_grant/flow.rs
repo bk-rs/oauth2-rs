@@ -56,11 +56,11 @@ where
     }
 }
 
-impl<'a, C> Flow<C>
+impl<C> Flow<C>
 where
     C: Client + Send + Sync,
 {
-    pub async fn handle_callback<SCOPE>(
+    pub async fn handle_callback<'a, SCOPE>(
         &self,
         provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
         query: impl AsRef<str>,
