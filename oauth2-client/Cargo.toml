@@ -23,7 +23,7 @@ with-flow = ["http-api-client"]
 [dependencies]
 oauth2-core = { version = "^0.0", path = "../oauth2-core" }
 
-http-api-endpoint = { version = "0.1", path = "../../http-api-endpoint/http-api-endpoint", default-features = false }
+http-api-client-endpoint = { version = "0.1", path = "../../http-api-endpoint/http-api-client-endpoint", default-features = false }
 http-api-client = { version = "0.1", path = "../../http-api-endpoint/http-api-client", default-features = false, optional = true }
 
 serde_json = { version = "1.0", default-features = false, features = ["std"] }

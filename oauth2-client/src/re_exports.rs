@@ -1,4 +1,4 @@
-pub use http_api_endpoint::{
+pub use http_api_client_endpoint::{
     self, Body, Endpoint, Request, Response, RetryableEndpoint, MIME_APPLICATION_JSON,
 };
 pub use oauth2_core::{

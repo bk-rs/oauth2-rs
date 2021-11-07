@@ -122,7 +122,7 @@ where
             Ok(UserInfoObtainOutput::Respond(user_info_endpoint)) => {
                 match self
                     .client_with_user_info
-                    .respond_dyn_endpoint(&user_info_endpoint)
+                    .respond_dyn_endpoint(user_info_endpoint.as_ref())
                     .await
                 {
                     Ok(user_info) => SigninFlowHandleCallbackRet::Ok((access_token, user_info)),

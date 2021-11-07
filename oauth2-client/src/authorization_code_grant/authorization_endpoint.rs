@@ -1,6 +1,6 @@
 use std::{convert::Infallible, error};
 
-use http_api_endpoint::{Body, Endpoint, Request, Response};
+use http_api_client_endpoint::{Body, Endpoint, Request, Response};
 use oauth2_core::{
     access_token_response::GENERAL_ERROR_BODY_KEY_ERROR,
     authorization_code_grant::{

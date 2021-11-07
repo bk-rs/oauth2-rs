@@ -1,6 +1,6 @@
 use std::error;
 
-use http_api_endpoint::{Body, Endpoint, Request, Response};
+use http_api_client_endpoint::{Body, Endpoint, Request, Response};
 use oauth2_core::{
     access_token_request::{
         Body as REQ_Body, BodyWithAuthorizationCodeGrant, CONTENT_TYPE as REQ_CONTENT_TYPE,

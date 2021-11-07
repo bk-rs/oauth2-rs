@@ -1,7 +1,7 @@
 use std::error;
 
 use http_api_client::{Client, ClientRespondEndpointError};
-use http_api_endpoint::Endpoint as _;
+use http_api_client_endpoint::Endpoint as _;
 use oauth2_core::{
     authorization_code_grant::{
         access_token_response::{
