@@ -107,12 +107,12 @@ where
             Err(err) => return SigninFlowHandleCallbackRet::FlowHandleCallbackError(err),
         };
 
-        let access_token_obtain_from =
+        let access_token_provider =
             AccessTokenProvider::AuthorizationCodeGrant(self.provider.as_ref());
 
         match self
             .endpoint_builder
-            .user_info_obtain(access_token_obtain_from, &access_token)
+            .user_info_obtain(access_token_provider, &access_token)
         {
             Ok(UserInfoObtainOutput::None) => {
                 SigninFlowHandleCallbackRet::OkButUserInfoNone(access_token)
