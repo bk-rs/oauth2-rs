@@ -1,6 +1,6 @@
 use dyn_clone::{clone_trait_object, DynClone};
 
-use crate::re_exports::{ClientId, ClientSecret, Scope, Url};
+use crate::re_exports::{ClientId, ClientSecret, Map, Scope, Url, Value};
 
 //
 //
@@ -13,6 +13,11 @@ pub trait Provider: DynClone {
     fn client_secret(&self) -> Option<&ClientSecret>;
 
     fn token_endpoint_url(&self) -> &Url;
+
+    // e.g. Mastodon's base_url
+    fn extensions(&self) -> Option<Map<String, Value>> {
+        None
+    }
 }
 
 clone_trait_object!(<SCOPE> Provider<Scope = SCOPE> where SCOPE: Scope + Clone);

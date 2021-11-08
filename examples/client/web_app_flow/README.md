@@ -16,4 +16,5 @@ sudo socat tcp-listen:443,reuseaddr,fork tcp:127.0.0.1:8443
 xdg-open http://oauth2-rs.lvh.me/auth/github
 xdg-open https://oauth2-rs.lvh.me/auth/google
 xdg-open https://oauth2-rs.lvh.me/auth/twitch
+xdg-open http://oauth2-rs.lvh.me/auth/mastodon-social
 ```

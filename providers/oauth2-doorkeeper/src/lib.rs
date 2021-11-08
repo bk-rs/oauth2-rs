@@ -1,1 +1,3 @@
+pub mod authorization_code_grant;
 
+pub use authorization_code_grant::DoorkeeperProviderWithAuthorizationCodeFlow;

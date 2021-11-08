@@ -125,6 +125,12 @@ where
     fn token_endpoint_url(&self) -> &Url {
         self.inner.token_endpoint_url()
     }
+
+    fn extensions(&self) -> Option<Map<String, Value>> {
+        self.inner.extensions()
+    }
+
+    // Note
 }
 
 impl<P> ProviderExtAuthorizationCodeGrant for ProviderExtAuthorizationCodeGrantStringScopeWrapper<P>
