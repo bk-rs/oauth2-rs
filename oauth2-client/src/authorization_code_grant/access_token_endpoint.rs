@@ -14,7 +14,7 @@ use oauth2_core::{
         header::{ACCEPT, CONTENT_TYPE},
         Error as HttpError,
     },
-    serde::de::DeserializeOwned,
+    serde::{de::DeserializeOwned, Serialize},
     types::{Code, Scope},
 };
 use serde_json::{Error as SerdeJsonError, Map, Value};
@@ -47,7 +47,7 @@ where
 
 impl<'a, SCOPE> Endpoint for AccessTokenEndpoint<'a, SCOPE>
 where
-    SCOPE: Scope + DeserializeOwned,
+    SCOPE: Scope + Serialize + DeserializeOwned,
 {
     type RenderRequestError = AccessTokenEndpointError;
 
@@ -73,7 +73,7 @@ where
         }
 
         //
-        let body = REQ_Body::AuthorizationCodeGrant(body);
+        let body = REQ_Body::<SCOPE>::AuthorizationCodeGrant(body);
 
         let body_str = serde_urlencoded::to_string(body)
             .map_err(AccessTokenEndpointError::SerRequestBodyFailed)?;

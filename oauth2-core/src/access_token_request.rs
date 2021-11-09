@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 use url::Url;
 
-use crate::types::{ClientId, ClientSecret, Code};
+use crate::types::{ClientId, ClientPassword, ClientSecret, Code, Scope, ScopeParameter};
 
 pub const METHOD: Method = Method::POST;
 pub const CONTENT_TYPE: Mime = mime::APPLICATION_WWW_FORM_URLENCODED;
@@ -20,13 +20,19 @@ pub const GRANT_TYPE_WITH_AUTHORIZATION_CODE_GRANT: &str = "authorization_code";
 //
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(tag = "grant_type")]
-pub enum Body {
+pub enum Body<SCOPE>
+where
+    SCOPE: Scope,
+{
     /// https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.3
     #[serde(rename = "authorization_code")]
     AuthorizationCodeGrant(BodyWithAuthorizationCodeGrant),
     /// https://datatracker.ietf.org/doc/html/rfc8628#section-3.4
     #[serde(rename = "urn:ietf:params:oauth:grant-type:device_code")]
     DeviceAuthorizationGrant(BodyWithDeviceAuthorizationGrant),
+    /// https://datatracker.ietf.org/doc/html/rfc6749#section-4.4
+    #[serde(rename = "client_credentials")]
+    ClientCredentialsGrant(BodyWithClientCredentialsGrant<SCOPE>),
 }
 
 //
@@ -105,6 +111,52 @@ impl BodyWithDeviceAuthorizationGrant {
     }
 }
 
+//
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct BodyWithClientCredentialsGrant<SCOPE>
+where
+    SCOPE: Scope,
+{
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub scope: Option<ScopeParameter<SCOPE>>,
+    #[serde(flatten, skip_serializing_if = "Option::is_none")]
+    pub client_password: Option<ClientPassword>,
+
+    #[serde(flatten, skip_serializing_if = "Option::is_none")]
+    _extensions: Option<Map<String, Value>>,
+}
+
+impl<SCOPE> BodyWithClientCredentialsGrant<SCOPE>
+where
+    SCOPE: Scope,
+{
+    pub fn new(scope: Option<ScopeParameter<SCOPE>>) -> Self {
+        Self {
+            scope,
+            client_password: None,
+            _extensions: None,
+        }
+    }
+
+    pub fn with_client_password(
+        scope: Option<ScopeParameter<SCOPE>>,
+        client_password: ClientPassword,
+    ) -> Self {
+        Self {
+            scope,
+            client_password: Some(client_password),
+            _extensions: None,
+        }
+    }
+
+    pub fn set_extensions(&mut self, extensions: Map<String, Value>) {
+        self._extensions = Some(extensions);
+    }
+    pub fn extensions(&self) -> Option<&Map<String, Value>> {
+        self._extensions.as_ref()
+    }
+}
+
 #[cfg(test)]
 mod tests_with_authorization_code_grant {
     use super::*;
@@ -112,7 +164,7 @@ mod tests_with_authorization_code_grant {
     #[test]
     fn test_ser_de() {
         let body_str = "grant_type=authorization_code&code=SplxlOBeZQQYbYS6WxSbIA&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb";
-        match serde_urlencoded::from_str::<Body>(body_str) {
+        match serde_urlencoded::from_str::<Body<String>>(body_str) {
             Ok(Body::AuthorizationCodeGrant(body)) => {
                 assert_eq!(body.code, "SplxlOBeZQQYbYS6WxSbIA");
                 assert_eq!(
@@ -134,7 +186,7 @@ mod tests_with_device_authorization_grant {
     #[test]
     fn test_ser_de() {
         let body_str = "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Adevice_code&device_code=GmRhmhcxhwAzkoEqiMEg_DnyEysNkuNhszIySk9eS&client_id=1406020730";
-        match serde_urlencoded::from_str::<Body>(body_str) {
+        match serde_urlencoded::from_str::<Body<String>>(body_str) {
             Ok(Body::DeviceAuthorizationGrant(body)) => {
                 assert_eq!(
                     body.device_code,
@@ -144,7 +196,8 @@ mod tests_with_device_authorization_grant {
 
                 assert_eq!(
                     body_str,
-                    serde_urlencoded::to_string(Body::DeviceAuthorizationGrant(body)).unwrap()
+                    serde_urlencoded::to_string(Body::<String>::DeviceAuthorizationGrant(body))
+                        .unwrap()
                 );
             }
             #[allow(unreachable_patterns)]
@@ -164,13 +217,87 @@ mod tests_with_device_authorization_grant {
             Some("your_client_secret".to_owned()),
         );
         body.set_extensions(extensions.to_owned());
-        let body = Body::DeviceAuthorizationGrant(body);
+        let body = Body::<String>::DeviceAuthorizationGrant(body);
         let body_str = serde_urlencoded::to_string(body).unwrap();
         assert_eq!(body_str, "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Adevice_code&device_code=your_device_code&client_id=your_client_id&client_secret=your_client_secret&foo=bar");
 
-        match serde_urlencoded::from_str::<Body>(body_str.as_str()) {
+        match serde_urlencoded::from_str::<Body<String>>(body_str.as_str()) {
             Ok(Body::DeviceAuthorizationGrant(body)) => {
                 assert_eq!(body.extensions(), Some(&extensions));
+            }
+            #[allow(unreachable_patterns)]
+            Ok(body) => panic!("{:?}", body),
+            Err(err) => panic!("{}", err),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests_with_client_credentials_grant {
+    use super::*;
+
+    #[test]
+    fn test_ser_de() {
+        let body_str = "grant_type=client_credentials";
+        match serde_urlencoded::from_str::<Body<String>>(body_str) {
+            Ok(Body::ClientCredentialsGrant(body)) => {
+                assert_eq!(body.client_password, None);
+            }
+            #[allow(unreachable_patterns)]
+            Ok(body) => panic!("{:?}", body),
+            Err(err) => panic!("{}", err),
+        }
+
+        let body_str =
+            "grant_type=client_credentials&client_id=CLIENT_ID&client_secret=CLIENT_SECRET";
+        match serde_urlencoded::from_str::<Body<String>>(body_str) {
+            Ok(Body::ClientCredentialsGrant(body)) => {
+                assert_eq!(body.client_password.unwrap().client_id, "CLIENT_ID");
+            }
+            #[allow(unreachable_patterns)]
+            Ok(body) => panic!("{:?}", body),
+            Err(err) => panic!("{}", err),
+        }
+
+        let body_str = "grant_type=client_credentials&client_id=CLIENT_ID";
+        match serde_urlencoded::from_str::<Body<String>>(body_str) {
+            Ok(Body::ClientCredentialsGrant(body)) => {
+                assert_eq!(body.client_password, None);
+            }
+            #[allow(unreachable_patterns)]
+            Ok(body) => panic!("{:?}", body),
+            Err(err) => panic!("{}", err),
+        }
+    }
+
+    #[test]
+    fn test_ser_de_extensions() {
+        let body_str = "grant_type=client_credentials&foo=bar";
+        match serde_urlencoded::from_str::<Body<String>>(body_str) {
+            Ok(Body::ClientCredentialsGrant(body)) => {
+                assert_eq!(body.client_password, None);
+                assert_eq!(
+                    body.extensions().unwrap().get("foo").unwrap().as_str(),
+                    Some("bar")
+                )
+            }
+            #[allow(unreachable_patterns)]
+            Ok(body) => panic!("{:?}", body),
+            Err(err) => panic!("{}", err),
+        }
+
+        let body_str =
+            "grant_type=client_credentials&client_id=CLIENT_ID&client_secret=CLIENT_SECRET&foo=bar";
+        match serde_urlencoded::from_str::<Body<String>>(body_str) {
+            Ok(Body::ClientCredentialsGrant(body)) => {
+                assert_eq!(
+                    body.client_password.to_owned().unwrap().client_id,
+                    "CLIENT_ID"
+                );
+                assert_eq!(
+                    body.extensions().unwrap().get("foo").unwrap().as_str(),
+                    Some("bar")
+                )
             }
             #[allow(unreachable_patterns)]
             Ok(body) => panic!("{:?}", body),

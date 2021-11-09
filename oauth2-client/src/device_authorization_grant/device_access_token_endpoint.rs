@@ -21,7 +21,7 @@ use oauth2_core::{
         header::{ACCEPT, CONTENT_TYPE},
         Error as HttpError,
     },
-    serde::de::DeserializeOwned,
+    serde::{de::DeserializeOwned, Serialize},
     types::Scope,
 };
 use serde_json::{Error as SerdeJsonError, Map, Value};
@@ -58,7 +58,7 @@ where
 
 impl<'a, SCOPE> RetryableEndpoint for DeviceAccessTokenEndpoint<'a, SCOPE>
 where
-    SCOPE: Scope + DeserializeOwned,
+    SCOPE: Scope + Serialize + DeserializeOwned,
 {
     type RetryReason = DeviceAccessTokenEndpointRetryReason;
 
@@ -80,7 +80,7 @@ where
             body.set_extensions(extensions);
         }
 
-        let body = REQ_Body::DeviceAuthorizationGrant(body);
+        let body = REQ_Body::<SCOPE>::DeviceAuthorizationGrant(body);
 
         let body_str = serde_urlencoded::to_string(body)
             .map_err(DeviceAccessTokenEndpointError::SerRequestBodyFailed)?;

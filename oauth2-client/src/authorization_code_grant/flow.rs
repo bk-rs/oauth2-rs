@@ -69,7 +69,7 @@ where
         state: impl Into<Option<State>>,
     ) -> Result<AT_RES_SuccessfulBody<SCOPE>, FlowHandleCallbackError>
     where
-        SCOPE: Scope + DeserializeOwned + Send + Sync,
+        SCOPE: Scope + Serialize + DeserializeOwned + Send + Sync,
     {
         // Step 3
         let query = parse_redirect_uri_query(query.as_ref())
