@@ -192,18 +192,12 @@ pub enum ErrorBodyError {
     //
     //
     //
-    // MOCK
-    #[serde(rename = "___")]
-    ErrorKeyNotFound,
-    //
-    //
-    //
     #[serde(other)]
     Other(String),
 }
 impl Default for ErrorBodyError {
     fn default() -> Self {
-        Self::ErrorKeyNotFound
+        Self::Other("".to_owned())
     }
 }
 

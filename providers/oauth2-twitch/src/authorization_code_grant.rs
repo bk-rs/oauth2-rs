@@ -1,5 +1,14 @@
+use std::error;
+
 use oauth2_client::{
-    re_exports::{ClientId, ClientSecret, Map, RedirectUri, Url, UrlParseError, Value},
+    authorization_code_grant::provider_ext::{
+        AccessTokenResponseErrorBody, AccessTokenResponseSuccessfulBody,
+    },
+    oauth2_core::re_exports::AccessTokenResponseErrorBodyError,
+    re_exports::{
+        serde_json, thiserror, Body, ClientId, ClientSecret, Deserialize, Map, RedirectUri,
+        Response, SerdeJsonError, Serialize, Url, UrlParseError, Value,
+    },
     Provider, ProviderExtAuthorizationCodeGrant,
 };
 
@@ -83,6 +92,77 @@ impl ProviderExtAuthorizationCodeGrant for TwitchProviderForWebServerApps {
             Some(map)
         }
     }
+
+    fn access_token_response_parsing(
+        &self,
+        response: &Response<Body>,
+    ) -> Option<
+        Result<
+            Result<
+                AccessTokenResponseSuccessfulBody<<Self as Provider>::Scope>,
+                AccessTokenResponseErrorBody,
+            >,
+            Box<dyn error::Error + Send + Sync + 'static>,
+        >,
+    > {
+        fn doing(
+            response: &Response<Body>,
+        ) -> Result<
+            Result<
+                AccessTokenResponseSuccessfulBody<
+                    <TwitchProviderForWebServerApps as Provider>::Scope,
+                >,
+                TwitchAccessTokenResponseErrorBody,
+            >,
+            Box<dyn error::Error + Send + Sync + 'static>,
+        > {
+            if response.status().is_success() {
+                let map = serde_json::from_slice::<Map<String, Value>>(&response.body())
+                    .map_err(AccessTokenResponseParsingError::DeResponseBodyFailed)?;
+                if !map.contains_key("errcode") {
+                    let body = serde_json::from_slice::<
+                        AccessTokenResponseSuccessfulBody<
+                            <TwitchProviderForWebServerApps as Provider>::Scope,
+                        >,
+                    >(&response.body())
+                    .map_err(AccessTokenResponseParsingError::DeResponseBodyFailed)?;
+
+                    return Ok(Ok(body));
+                }
+            }
+
+            let body =
+                serde_json::from_slice::<TwitchAccessTokenResponseErrorBody>(&response.body())
+                    .map_err(AccessTokenResponseParsingError::DeResponseBodyFailed)?;
+            Ok(Err(body))
+        }
+
+        Some(doing(response).map(|ret| ret.map(Into::into).map_err(Into::into)))
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct TwitchAccessTokenResponseErrorBody {
+    pub status: usize,
+    pub message: String,
+}
+impl From<TwitchAccessTokenResponseErrorBody> for AccessTokenResponseErrorBody {
+    fn from(body: TwitchAccessTokenResponseErrorBody) -> Self {
+        let error = if body.message.to_ascii_lowercase().contains("invalid") {
+            AccessTokenResponseErrorBodyError::InvalidRequest
+        } else {
+            AccessTokenResponseErrorBodyError::Other(body.status.to_string())
+        };
+
+        Self::new(error, Some(body.message), None)
+    }
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum AccessTokenResponseParsingError {
+    //
+    #[error("DeResponseBodyFailed {0}")]
+    DeResponseBodyFailed(SerdeJsonError),
 }
 
 #[cfg(test)]
@@ -93,7 +173,7 @@ mod tests {
 
     use oauth2_client::{
         authorization_code_grant::{AccessTokenEndpoint, AuthorizationEndpoint},
-        re_exports::Endpoint as _,
+        re_exports::{http::StatusCode, Endpoint as _},
     };
 
     #[test]
@@ -130,6 +210,38 @@ mod tests {
         let request = AccessTokenEndpoint::new(&provider, "CODE".to_owned()).render_request()?;
 
         assert_eq!(request.body(), b"grant_type=authorization_code&code=CODE&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&client_id=CLIENT_ID&client_secret=CLIENT_SECRET");
+
+        Ok(())
+    }
+
+    #[test]
+    fn access_token_response() -> Result<(), Box<dyn error::Error>> {
+        let provider = TwitchProviderForWebServerApps::new(
+            "APPID".to_owned(),
+            "SECRET".to_owned(),
+            RedirectUri::new("https://client.example.com/cb")?,
+        )?;
+
+        let response_body = r#"{"status":400, "message":"Invalid authorization code"}"#;
+        let body_ret = AccessTokenEndpoint::new(&provider, "CODE".to_owned()).parse_response(
+            Response::builder()
+                .status(StatusCode::BAD_REQUEST)
+                .body(response_body.as_bytes().to_vec())?,
+        )?;
+
+        match body_ret {
+            Ok(body) => panic!("{:?}", body),
+            Err(body) => {
+                assert_eq!(
+                    body.error,
+                    AccessTokenResponseErrorBodyError::InvalidRequest
+                );
+                assert!(body
+                    .error_description
+                    .unwrap()
+                    .contains("Invalid authorization code"));
+            }
+        }
 
         Ok(())
     }
