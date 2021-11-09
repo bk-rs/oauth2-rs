@@ -23,5 +23,5 @@ Your Client key: "x*43"
 
 Your Client secret: "x*43"
 
-Your access token: "x*43" # This is "App token"
+Your access token: "x*43" # This is "App token" and "User token"
 ```
