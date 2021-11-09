@@ -2,7 +2,7 @@
 RUST_BACKTRACE=1 RUST_LOG=debug cargo run -p oauth2_client_desktop_app_flow_example -- 'YOUR_CLIENT_ID' 'YOUR_CLIENT_SECRET'
 */
 
-use std::{env, error, io::stdin, thread};
+use std::{env, error, io, thread};
 
 use http_api_isahc_client::IsahcClient;
 use oauth2_client::{authorization_code_grant::Flow, oauth2_core::types::RedirectUri};
@@ -34,27 +34,28 @@ async fn run(client_id: String, client_secret: String) -> Result<(), Box<dyn err
 
     println!("authorization_url: {:?}", authorization_url.as_str());
 
-    let t = thread::spawn(move || {
+    thread::spawn(move || {
         WebViewBuilder::new()
             .title("OAuth2")
             .content(Content::Url(authorization_url.as_str()))
             .size(800, 600)
             .resizable(true)
-            .debug(true)
+            .debug(false)
             .user_data(())
             .invoke_handler(|_webview, _arg| Ok(()))
             .build()
             .unwrap()
             .run()
             .unwrap();
-    });
-    t.join().unwrap();
+    })
+    .join()
+    .unwrap();
 
+    println!("Enter code: ");
     let mut code = String::new();
-    stdin()
-        .read_line(&mut code)
-        .ok()
-        .expect("Failed to read input");
+    let stdin = io::stdin();
+    stdin.read_line(&mut code)?;
+    code = code.trim_end().to_owned();
     println!("code: {:?}", code);
 
     let access_token_body = flow.handle_callback(&provider, code).await?;
