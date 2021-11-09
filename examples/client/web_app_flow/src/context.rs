@@ -6,7 +6,9 @@ use oauth2_google::{
     GoogleEndpointBuilder, GoogleProviderForWebServerApps,
     GoogleProviderForWebServerAppsAccessType, GoogleScope,
 };
-use oauth2_mastodon::{MastodonEndpointBuilder, MastodonProviderForEndUsers, MastodonScope};
+use oauth2_mastodon::{
+    MastodonEndpointBuilder, MastodonProviderForEndUsers, MastodonScope, BASE_URL_MASTODON_SOCIAL,
+};
 use oauth2_signin::web_app::SigninFlow;
 use oauth2_twitch::{TwitchEndpointBuilder, TwitchProviderForWebServerApps, TwitchScope};
 
@@ -70,7 +72,7 @@ impl Context {
             SigninFlow::new(
                 IsahcClient::new()?,
                 MastodonProviderForEndUsers::new(
-                    "https://mastodon.social/",
+                    BASE_URL_MASTODON_SOCIAL,
                     clients_config.mastodon_social.client_id.to_owned(),
                     clients_config.mastodon_social.client_secret.to_owned(),
                     clients_config.mastodon_social.redirect_uri.to_owned(),

@@ -36,7 +36,7 @@ impl<C> Flow<C>
 where
     C: Client + Send + Sync,
 {
-    pub async fn execute<SCOPE, UI>(
+    pub async fn execute<SCOPE>(
         &self,
         provider: &(dyn ProviderExtClientCredentialsGrant<Scope = SCOPE> + Send + Sync),
         scopes: impl Into<Option<Vec<SCOPE>>>,

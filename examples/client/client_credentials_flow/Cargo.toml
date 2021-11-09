@@ -1,0 +1,18 @@
+[package]
+name = "oauth2_client_client_credentials_flow_example"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "mastodon_social"
+path = "src/mastodon_social.rs"
+
+[dependencies]
+oauth2-client = { version = "^0.0", path = "../../../oauth2-client", features = ["with-flow"] }
+
+oauth2-mastodon = { version = "^0.0", path = "../../../providers/oauth2-mastodon" }
+
+tokio = { version = "1.12", default-features = false, features = ["macros", "rt-multi-thread"] }
+http-api-isahc-client = { version = "0.2", path = "../../../../http-api-endpoint/http-api-isahc-client", features = ["with-sleep-via-tokio"] }
+
+pretty_env_logger = { version = "0.4" }
