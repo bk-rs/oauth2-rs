@@ -57,7 +57,7 @@ where
     fn render_request(&self) -> Result<Request<Body>, Self::RenderRequestError> {
         let mut body = BodyWithAuthorizationCodeGrant::new(
             self.code.to_owned(),
-            self.provider.redirect_uri().map(|x| x.url().to_owned()),
+            self.provider.redirect_uri().map(|x| x.to_string()),
             self.provider.client_id().cloned(),
             self.provider.client_secret().cloned(),
         );

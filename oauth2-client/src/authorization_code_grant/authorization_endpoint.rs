@@ -62,7 +62,7 @@ where
                 .client_id()
                 .cloned()
                 .ok_or_else(|| AuthorizationEndpointError::ClientIdMissing)?,
-            self.provider.redirect_uri().map(|x| x.url().to_owned()),
+            self.provider.redirect_uri().map(|x| x.to_string()),
             self.scopes.to_owned().map(Into::into),
             self.state.to_owned(),
         );

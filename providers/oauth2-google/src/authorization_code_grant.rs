@@ -1,6 +1,7 @@
 use oauth2_client::{
     re_exports::{
-        ClientId, ClientSecret, Map, RedirectUri, Serialize_enum_str, Url, UrlParseError, Value,
+        thiserror, ClientId, ClientSecret, Map, RedirectUri, Serialize_enum_str, Url,
+        UrlParseError, Value,
     },
     Provider, ProviderExtAuthorizationCodeGrant,
 };
@@ -32,7 +33,11 @@ impl GoogleProviderForWebServerApps {
         client_id: ClientId,
         client_secret: ClientSecret,
         redirect_uri: RedirectUri,
-    ) -> Result<Self, UrlParseError> {
+    ) -> Result<Self, GoogleProviderForWebServerAppsNewError> {
+        if !matches!(redirect_uri, RedirectUri::Url(_)) {
+            return Err(GoogleProviderForWebServerAppsNewError::RedirectUriShouldBeAUrl);
+        }
+
         Ok(Self {
             client_id,
             client_secret,
@@ -52,6 +57,16 @@ impl GoogleProviderForWebServerApps {
         self
     }
 }
+
+#[derive(thiserror::Error, Debug)]
+pub enum GoogleProviderForWebServerAppsNewError {
+    #[error("UrlParseError {0}")]
+    UrlParseError(#[from] UrlParseError),
+    //
+    #[error("RedirectUriShouldBeAUrl")]
+    RedirectUriShouldBeAUrl,
+}
+
 impl Provider for GoogleProviderForWebServerApps {
     type Scope = GoogleScope;
 
@@ -120,6 +135,19 @@ mod tests {
         authorization_code_grant::{AccessTokenEndpoint, AuthorizationEndpoint},
         re_exports::Endpoint as _,
     };
+
+    #[test]
+    fn test_new() {
+        match GoogleProviderForWebServerApps::new(
+            "CLIENT_ID".to_owned(),
+            "CLIENT_SECRET".to_owned(),
+            RedirectUri::Oob,
+        ) {
+            Ok(p) => panic!("{:?}", p),
+            Err(GoogleProviderForWebServerAppsNewError::RedirectUriShouldBeAUrl) => {}
+            Err(err) => panic!("{}", err),
+        }
+    }
 
     #[test]
     fn authorization_request() -> Result<(), Box<dyn error::Error>> {

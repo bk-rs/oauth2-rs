@@ -7,7 +7,6 @@ use http::Method;
 use mime::Mime;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
-use url::Url;
 
 use crate::types::{ClientId, ClientPassword, ClientSecret, Code, Scope, ScopeParameter};
 
@@ -42,7 +41,7 @@ where
 pub struct BodyWithAuthorizationCodeGrant {
     pub code: Code,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub redirect_uri: Option<Url>,
+    pub redirect_uri: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub client_id: Option<ClientId>,
     // Note: Not in rfc6749, but usually need.
@@ -56,7 +55,7 @@ pub struct BodyWithAuthorizationCodeGrant {
 impl BodyWithAuthorizationCodeGrant {
     pub fn new(
         code: Code,
-        redirect_uri: Option<Url>,
+        redirect_uri: Option<String>,
         client_id: Option<ClientId>,
         client_secret: Option<ClientSecret>,
     ) -> Self {

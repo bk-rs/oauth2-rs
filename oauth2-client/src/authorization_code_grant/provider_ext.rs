@@ -75,10 +75,7 @@ where
         f.debug_struct("ProviderExtAuthorizationCodeGrant")
             .field("client_id", &self.client_id())
             .field("token_endpoint_url", &self.token_endpoint_url().as_str())
-            .field(
-                "redirect_uri",
-                &self.redirect_uri().map(|x| x.url().as_str()),
-            )
+            .field("redirect_uri", &self.redirect_uri().map(|x| x.to_string()))
             .field("scopes_default", &self.scopes_default())
             .field(
                 "authorization_endpoint_url",

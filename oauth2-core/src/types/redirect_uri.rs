@@ -4,30 +4,51 @@ use std::{fmt, str};
 
 use serde::{
     de::{self, Visitor},
-    Deserialize, Deserializer, Serialize,
+    Deserialize, Deserializer, Serialize, Serializer,
 };
 use url::Url;
 
-#[derive(Serialize, Debug, Clone, PartialEq)]
-pub struct RedirectUri(Url);
+#[derive(Debug, Clone, PartialEq)]
+pub enum RedirectUri {
+    Url(Url),
+    /// https://developers.google.com/identity/protocols/oauth2/native-app
+    Oob,
+    /// https://developers.google.com/identity/protocols/oauth2/native-app
+    OobAuto,
+    Other(String),
+}
 
 impl RedirectUri {
     pub fn new(url: impl AsRef<str>) -> Result<Self, String> {
         url.as_ref().parse()
-    }
-
-    pub fn url(&self) -> &Url {
-        &self.0
     }
 }
 
 impl str::FromStr for RedirectUri {
     type Err = String;
 
-    fn from_str(str: &str) -> Result<Self, Self::Err> {
-        let url = Url::parse(str).map_err(|err| err.to_string())?;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s.starts_with("http://") || s.starts_with("https://") {
+            let url = Url::parse(s).map_err(|err| err.to_string())?;
 
-        Self::try_from(url)
+            Self::try_from(url)
+        } else {
+            match s {
+                "urn:ietf:wg:oauth:2.0:oob" => Ok(Self::Oob),
+                "urn:ietf:wg:oauth:2.0:oob:auto" => Ok(Self::OobAuto),
+                s => Ok(Self::Other(s.to_owned())),
+            }
+        }
+    }
+}
+impl fmt::Display for RedirectUri {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Url(url) => write!(f, "{}", url.as_str()),
+            Self::Oob => write!(f, "urn:ietf:wg:oauth:2.0:oob"),
+            Self::OobAuto => write!(f, "urn:ietf:wg:oauth:2.0:oob:auto"),
+            Self::Other(s) => write!(f, "{}", s),
+        }
     }
 }
 
@@ -39,7 +60,16 @@ impl TryFrom<Url> for RedirectUri {
             return Err(format!("Invalid scheme: {}", url.scheme()));
         }
 
-        Ok(Self(url))
+        Ok(Self::Url(url))
+    }
+}
+
+impl Serialize for RedirectUri {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_str(self.to_string().as_str())
     }
 }
 
@@ -51,6 +81,7 @@ impl<'de> Deserialize<'de> for RedirectUri {
         deserializer.deserialize_any(RedirectUriVisitor)
     }
 }
+
 struct RedirectUriVisitor;
 impl<'de> Visitor<'de> for RedirectUriVisitor {
     type Value = RedirectUri;
@@ -79,10 +110,37 @@ mod tests {
     #[test]
     fn ser() {
         match serde_json::to_string(&Foo {
-            redirect_uri: "https://client.example.com/cb".parse().unwrap(),
+            redirect_uri: RedirectUri::Url("https://client.example.com/cb".parse().unwrap()),
         }) {
             Ok(v) => {
                 assert_eq!(v, r#"{"redirect_uri":"https://client.example.com/cb"}"#);
+            }
+            Err(err) => panic!("{}", err),
+        }
+
+        match serde_json::to_string(&Foo {
+            redirect_uri: RedirectUri::Oob,
+        }) {
+            Ok(v) => {
+                assert_eq!(v, r#"{"redirect_uri":"urn:ietf:wg:oauth:2.0:oob"}"#);
+            }
+            Err(err) => panic!("{}", err),
+        }
+
+        match serde_json::to_string(&Foo {
+            redirect_uri: RedirectUri::OobAuto,
+        }) {
+            Ok(v) => {
+                assert_eq!(v, r#"{"redirect_uri":"urn:ietf:wg:oauth:2.0:oob:auto"}"#);
+            }
+            Err(err) => panic!("{}", err),
+        }
+
+        match serde_json::to_string(&Foo {
+            redirect_uri: RedirectUri::Other("com.example.app:redirect_uri_path".to_owned()),
+        }) {
+            Ok(v) => {
+                assert_eq!(v, r#"{"redirect_uri":"com.example.app:redirect_uri_path"}"#);
             }
             Err(err) => panic!("{}", err),
         }
@@ -94,7 +152,32 @@ mod tests {
             Ok(v) => {
                 assert_eq!(
                     v.redirect_uri,
-                    "https://client.example.com/cb".parse().unwrap()
+                    RedirectUri::Url("https://client.example.com/cb".parse().unwrap())
+                );
+            }
+            Err(err) => panic!("{}", err),
+        }
+
+        match serde_json::from_str::<Foo>(r#"{"redirect_uri":"urn:ietf:wg:oauth:2.0:oob"}"#) {
+            Ok(v) => {
+                assert_eq!(v.redirect_uri, RedirectUri::Oob);
+            }
+            Err(err) => panic!("{}", err),
+        }
+
+        match serde_json::from_str::<Foo>(r#"{"redirect_uri":"urn:ietf:wg:oauth:2.0:oob:auto"}"#) {
+            Ok(v) => {
+                assert_eq!(v.redirect_uri, RedirectUri::OobAuto);
+            }
+            Err(err) => panic!("{}", err),
+        }
+
+        match serde_json::from_str::<Foo>(r#"{"redirect_uri":"com.example.app:redirect_uri_path"}"#)
+        {
+            Ok(v) => {
+                assert_eq!(
+                    v.redirect_uri,
+                    RedirectUri::Other("com.example.app:redirect_uri_path".to_owned())
                 );
             }
             Err(err) => panic!("{}", err),

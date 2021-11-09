@@ -3,7 +3,6 @@
 use http::Method;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
-use url::Url;
 
 use crate::types::{ClientId, Scope, ScopeFromStrError, ScopeParameter, State};
 
@@ -21,7 +20,7 @@ where
     pub response_type: String,
     pub client_id: ClientId,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub redirect_uri: Option<Url>,
+    pub redirect_uri: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scope: Option<ScopeParameter<SCOPE>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -36,7 +35,7 @@ where
 {
     pub fn new(
         client_id: ClientId,
-        redirect_uri: Option<Url>,
+        redirect_uri: Option<String>,
         scope: Option<ScopeParameter<SCOPE>>,
         state: Option<State>,
     ) -> Self {
