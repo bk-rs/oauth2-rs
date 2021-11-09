@@ -25,3 +25,13 @@ Your Client secret: "x*43"
 
 Your access token: "x*43" # This is "App token" and "User token"
 ```
+
+### Create OAuth App for Mobile & Desktop Apps
+
+```
+Application name: oauth2-rs-desktop-demo
+
+Redirect URI: urn:ietf:wg:oauth:2.0:oob
+
+Scopes: read write follow
+```

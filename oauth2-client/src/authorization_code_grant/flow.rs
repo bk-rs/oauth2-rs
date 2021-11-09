@@ -10,7 +10,7 @@ use oauth2_core::{
         authorization_response::ErrorQuery as A_RES_ErrorQuery,
     },
     serde::{de::DeserializeOwned, Serialize},
-    types::{Scope, State},
+    types::{Code, Scope, State},
     url::{ParseError as UrlParseError, Url},
 };
 
@@ -44,6 +44,7 @@ impl<'a, C> Flow<C>
 where
     C: Client,
 {
+    /// Don't require state if for Mobile & Desktop Apps
     pub fn build_authorization_url<SCOPE>(
         &self,
         provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
@@ -62,7 +63,7 @@ impl<C> Flow<C>
 where
     C: Client + Send + Sync,
 {
-    pub async fn handle_callback<SCOPE>(
+    pub async fn handle_callback_with_query<SCOPE>(
         &self,
         provider: &(dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE> + Send + Sync),
         query: impl AsRef<str>,
@@ -87,7 +88,18 @@ where
             }
         }
 
-        let access_token_endpoint = AccessTokenEndpoint::new(provider, query.code);
+        self.handle_callback(provider, query.code).await
+    }
+
+    pub async fn handle_callback<SCOPE>(
+        &self,
+        provider: &(dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE> + Send + Sync),
+        code: Code,
+    ) -> Result<AT_RES_SuccessfulBody<SCOPE>, FlowHandleCallbackError>
+    where
+        SCOPE: Scope + Serialize + DeserializeOwned + Send + Sync,
+    {
+        let access_token_endpoint = AccessTokenEndpoint::new(provider, code);
 
         let access_token_ret = self
             .client_with_token

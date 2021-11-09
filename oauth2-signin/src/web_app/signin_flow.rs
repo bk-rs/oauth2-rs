@@ -100,7 +100,7 @@ where
     ) -> SigninFlowHandleCallbackRet {
         let access_token = match self
             .flow
-            .handle_callback(self.provider.as_ref(), query, state)
+            .handle_callback_with_query(self.provider.as_ref(), query, state)
             .await
         {
             Ok(x) => x,
