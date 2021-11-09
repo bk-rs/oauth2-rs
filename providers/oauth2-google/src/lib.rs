@@ -8,7 +8,8 @@ pub mod authorization_code_grant;
 pub mod device_authorization_grant;
 
 pub use authorization_code_grant::{
-    GoogleProviderForWebServerApps, GoogleProviderForWebServerAppsAccessType,
+    GoogleProviderForDesktopApps, GoogleProviderForWebServerApps,
+    GoogleProviderForWebServerAppsAccessType,
 };
 pub use device_authorization_grant::GoogleProviderForTvAndDeviceApps;
 

@@ -2,6 +2,8 @@
 
 Ref [Using OAuth 2.0 for Web Server Applications](https://developers.google.com/identity/protocols/oauth2/web-server)
 
+Ref [Using OAuth 2.0 for Mobile & Desktop Apps](https://developers.google.com/identity/protocols/oauth2/native-app)
+
 ## Prerequisites
 
 Project name: "oauth2-rs-demo"
@@ -34,4 +36,12 @@ e.g.
 Your Client ID: "x*72"
 
 Your Client Secret: "x*35"
+```
+
+### Create credentials for Desktop Apps
+
+```
+Application type: Desktop App
+
+Name: oauth2-rs-desktop-app
 ```

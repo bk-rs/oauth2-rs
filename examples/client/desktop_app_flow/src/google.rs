@@ -1,12 +1,12 @@
 /*
-RUST_BACKTRACE=1 RUST_LOG=debug cargo run -p oauth2_client_desktop_app_flow_example -- 'YOUR_CLIENT_ID' 'YOUR_CLIENT_SECRET'
+RUST_BACKTRACE=1 RUST_LOG=debug cargo run -p oauth2_client_desktop_app_flow_example --bin google -- 'YOUR_CLIENT_ID' 'YOUR_CLIENT_SECRET'
 */
 
 use std::{env, error, io, thread};
 
 use http_api_isahc_client::IsahcClient;
 use oauth2_client::{authorization_code_grant::Flow, oauth2_core::types::RedirectUri};
-use oauth2_mastodon::{MastodonProviderForEndUsers, MastodonScope, BASE_URL_MASTODON_SOCIAL};
+use oauth2_google::{GoogleProviderForDesktopApps, GoogleScope};
 use web_view::{Content, WebViewBuilder};
 
 #[tokio::main]
@@ -20,15 +20,10 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
 }
 
 async fn run(client_id: String, client_secret: String) -> Result<(), Box<dyn error::Error>> {
-    let scopes = vec![MastodonScope::Read, MastodonScope::Write];
+    let scopes = vec![GoogleScope::Email];
 
     let flow = Flow::new(IsahcClient::new()?);
-    let provider = MastodonProviderForEndUsers::new(
-        BASE_URL_MASTODON_SOCIAL,
-        client_id,
-        client_secret,
-        RedirectUri::Oob,
-    )?;
+    let provider = GoogleProviderForDesktopApps::new(client_id, client_secret, RedirectUri::Oob)?;
 
     let authorization_url = flow.build_authorization_url(&provider, scopes, None)?;
 
