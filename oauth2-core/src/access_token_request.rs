@@ -33,6 +33,8 @@ where
     /// https://datatracker.ietf.org/doc/html/rfc6749#section-4.4
     #[serde(rename = "client_credentials")]
     ClientCredentialsGrant(BodyWithClientCredentialsGrant<SCOPE>),
+    #[serde(rename = "password")]
+    ResourceOwnerPasswordCredentialsGrant(BodyWithResourceOwnerPasswordCredentialsGrant<SCOPE>),
 }
 
 //
@@ -143,6 +145,65 @@ where
         client_password: ClientPassword,
     ) -> Self {
         Self {
+            scope,
+            client_password: Some(client_password),
+            _extensions: None,
+        }
+    }
+
+    pub fn set_extensions(&mut self, extensions: Map<String, Value>) {
+        self._extensions = Some(extensions);
+    }
+    pub fn extensions(&self) -> Option<&Map<String, Value>> {
+        self._extensions.as_ref()
+    }
+}
+
+//
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct BodyWithResourceOwnerPasswordCredentialsGrant<SCOPE>
+where
+    SCOPE: Scope,
+{
+    pub username: String,
+    pub password: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub scope: Option<ScopeParameter<SCOPE>>,
+    #[serde(flatten, skip_serializing_if = "Option::is_none")]
+    pub client_password: Option<ClientPassword>,
+
+    #[serde(flatten, skip_serializing_if = "Option::is_none")]
+    _extensions: Option<Map<String, Value>>,
+}
+
+impl<SCOPE> BodyWithResourceOwnerPasswordCredentialsGrant<SCOPE>
+where
+    SCOPE: Scope,
+{
+    pub fn new(
+        username: impl AsRef<str>,
+        password: impl AsRef<str>,
+        scope: Option<ScopeParameter<SCOPE>>,
+    ) -> Self {
+        Self {
+            username: username.as_ref().to_owned(),
+            password: password.as_ref().to_owned(),
+            scope,
+            client_password: None,
+            _extensions: None,
+        }
+    }
+
+    pub fn with_client_password(
+        username: impl AsRef<str>,
+        password: impl AsRef<str>,
+        scope: Option<ScopeParameter<SCOPE>>,
+        client_password: ClientPassword,
+    ) -> Self {
+        Self {
+            username: username.as_ref().to_owned(),
+            password: password.as_ref().to_owned(),
             scope,
             client_password: Some(client_password),
             _extensions: None,
@@ -298,6 +359,52 @@ mod tests_with_client_credentials_grant {
                     body.extensions().unwrap().get("foo").unwrap().as_str(),
                     Some("bar")
                 )
+            }
+            #[allow(unreachable_patterns)]
+            Ok(body) => panic!("{:?}", body),
+            Err(err) => panic!("{}", err),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests_with_resource_owner_password_credentials_grant {
+    use super::*;
+
+    #[test]
+    fn test_ser_de() {
+        let body_str = "grant_type=password&username=USERNAME&password=PASSWORD";
+        match serde_urlencoded::from_str::<Body<String>>(body_str) {
+            Ok(Body::ResourceOwnerPasswordCredentialsGrant(body)) => {
+                assert_eq!(body.username, "USERNAME");
+                assert_eq!(body.password, "PASSWORD");
+                assert_eq!(body.client_password, None);
+            }
+            #[allow(unreachable_patterns)]
+            Ok(body) => panic!("{:?}", body),
+            Err(err) => panic!("{}", err),
+        }
+
+        let body_str =
+            "grant_type=password&username=USERNAME&password=PASSWORD&client_id=CLIENT_ID&client_secret=CLIENT_SECRET";
+        match serde_urlencoded::from_str::<Body<String>>(body_str) {
+            Ok(Body::ResourceOwnerPasswordCredentialsGrant(body)) => {
+                assert_eq!(body.username, "USERNAME");
+                assert_eq!(body.password, "PASSWORD");
+                assert_eq!(body.client_password.unwrap().client_id, "CLIENT_ID");
+            }
+            #[allow(unreachable_patterns)]
+            Ok(body) => panic!("{:?}", body),
+            Err(err) => panic!("{}", err),
+        }
+
+        let body_str =
+            "grant_type=password&username=USERNAME&password=PASSWORD&client_id=CLIENT_ID";
+        match serde_urlencoded::from_str::<Body<String>>(body_str) {
+            Ok(Body::ResourceOwnerPasswordCredentialsGrant(body)) => {
+                assert_eq!(body.username, "USERNAME");
+                assert_eq!(body.password, "PASSWORD");
+                assert_eq!(body.client_password, None);
             }
             #[allow(unreachable_patterns)]
             Ok(body) => panic!("{:?}", body),

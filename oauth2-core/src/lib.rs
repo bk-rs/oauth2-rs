@@ -19,3 +19,4 @@ pub mod access_token_response;
 pub mod authorization_code_grant;
 pub mod client_credentials_grant;
 pub mod device_authorization_grant;
+pub mod resource_owner_password_credentials_grant;

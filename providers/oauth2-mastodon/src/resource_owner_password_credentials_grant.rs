@@ -1,24 +1,24 @@
 use oauth2_client::{
     re_exports::{ClientId, ClientSecret, Map, Url, UrlParseError, Value},
-    Provider, ProviderExtClientCredentialsGrant,
+    Provider, ProviderExtResourceOwnerPasswordCredentialsGrant,
 };
-use oauth2_doorkeeper::DoorkeeperProviderWithClientCredentials;
+use oauth2_doorkeeper::DoorkeeperProviderWithResourceOwnerPasswordCredentials;
 
 use crate::{token_url, MastodonScope};
 
 #[derive(Debug, Clone)]
-pub struct MastodonProviderForApplications {
-    inner: DoorkeeperProviderWithClientCredentials<MastodonScope>,
+pub struct MastodonProviderForBots {
+    inner: DoorkeeperProviderWithResourceOwnerPasswordCredentials<MastodonScope>,
     base_url: Url,
 }
-impl MastodonProviderForApplications {
+impl MastodonProviderForBots {
     pub fn new(
         base_url: impl AsRef<str>,
         client_id: ClientId,
         client_secret: ClientSecret,
     ) -> Result<Self, UrlParseError> {
         Ok(Self {
-            inner: DoorkeeperProviderWithClientCredentials::<MastodonScope>::new(
+            inner: DoorkeeperProviderWithResourceOwnerPasswordCredentials::<MastodonScope>::new(
                 client_id,
                 client_secret,
                 token_url(base_url.as_ref())?.as_str(),
@@ -27,7 +27,7 @@ impl MastodonProviderForApplications {
         })
     }
 }
-impl Provider for MastodonProviderForApplications {
+impl Provider for MastodonProviderForBots {
     type Scope = MastodonScope;
 
     fn client_id(&self) -> Option<&ClientId> {
@@ -51,7 +51,7 @@ impl Provider for MastodonProviderForApplications {
         Some(map)
     }
 }
-impl ProviderExtClientCredentialsGrant for MastodonProviderForApplications {
+impl ProviderExtResourceOwnerPasswordCredentialsGrant for MastodonProviderForBots {
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
         Some(vec![MastodonScope::Read])
     }

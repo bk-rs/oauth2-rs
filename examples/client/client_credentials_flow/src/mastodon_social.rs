@@ -6,9 +6,7 @@ use std::{env, error};
 
 use http_api_isahc_client::IsahcClient;
 use oauth2_client::client_credentials_grant::Flow;
-use oauth2_mastodon::{
-    MastodonProviderForEndApplications, MastodonScope, BASE_URL_MASTODON_SOCIAL,
-};
+use oauth2_mastodon::{MastodonProviderForApplications, MastodonScope, BASE_URL_MASTODON_SOCIAL};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn error::Error>> {
@@ -24,11 +22,8 @@ async fn run(client_id: String, client_secret: String) -> Result<(), Box<dyn err
     let scopes = vec![MastodonScope::Read, MastodonScope::Write];
 
     let flow = Flow::new(IsahcClient::new()?);
-    let provider = MastodonProviderForEndApplications::new(
-        BASE_URL_MASTODON_SOCIAL,
-        client_id,
-        client_secret,
-    )?;
+    let provider =
+        MastodonProviderForApplications::new(BASE_URL_MASTODON_SOCIAL, client_id, client_secret)?;
 
     let access_token_body = flow.execute(&provider, scopes).await?;
 

@@ -60,7 +60,7 @@ impl ProviderExtAuthorizationCodeGrant for MastodonProviderForEndUsers {
     }
 
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
-        Some(vec![MastodonScope::Read, MastodonScope::Write])
+        Some(vec![MastodonScope::Read])
     }
 
     fn authorization_endpoint_url(&self) -> &Url {

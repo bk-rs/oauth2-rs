@@ -6,9 +6,11 @@ pub const BASE_URL_MASTODON_SOCIAL: &str = "https://mastodon.social/";
 
 pub mod authorization_code_grant;
 pub mod client_credentials_grant;
+pub mod resource_owner_password_credentials_grant;
 
 pub use authorization_code_grant::MastodonProviderForEndUsers;
-pub use client_credentials_grant::MastodonProviderForEndApplications;
+pub use client_credentials_grant::MastodonProviderForApplications;
+pub use resource_owner_password_credentials_grant::MastodonProviderForBots;
 
 pub mod additional_endpoints;
 pub use additional_endpoints::MastodonEndpointBuilder;
