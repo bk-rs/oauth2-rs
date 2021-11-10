@@ -7,17 +7,7 @@ members = [
     "oauth2-server",
     "oauth2-signin",
     # 
-    "providers/oauth2-amazon",
-    "providers/oauth2-doorkeeper",
-    "providers/oauth2-facebook",
-    "providers/oauth2-github",
-    "providers/oauth2-gitlab",
-    "providers/oauth2-google",
-    "providers/oauth2-instagram",
-    "providers/oauth2-mastodon",
-    "providers/oauth2-microsoft",
-    "providers/oauth2-twitch",
-    "providers/oauth2-wechat",
+    "providers/*",
     # 
     "examples/client/*",
 ]
