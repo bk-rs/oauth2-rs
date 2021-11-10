@@ -7,3 +7,71 @@ Ref [Generate and Validate Tokens](https://developer.apple.com/documentation/sig
 ## Prerequisites
 
 Ref [What the Heck is Sign In with Apple?](https://developer.okta.com/blog/2019/06/04/what-the-heck-is-sign-in-with-apple)
+
+Require Apple Developer Program
+
+1. Register an App ID
+
+```
+Bundle ID: com.xxx.oauth2-app
+
+Enable "Sign In with Apple"
+```
+
+2. Register a Services ID
+
+```
+Identifier: com.xxx.oauth2-services
+```
+
+3. Edit your Services ID Configuration
+
+Enable "Sign In with Apple", then Configure, select "Primary App ID" to "******.com.xxx.oauth2-app"
+
+```
+Domains and Subdomains:
+    oauth2-rs.lvh.me
+
+Return URLs
+    http://oauth2-rs.lvh.me/auth/apple/callback
+```
+
+4. Register a New Key
+
+```
+Key Name: xxx oauth2
+
+Enable "Sign In with Apple", then Configure, select "Primary App ID" to "******.com.xxx.oauth2-app"
+```
+
+Download filename is "AuthKey_{Key ID}.p8"
+
+5. Creating the Client Secret
+
+"Team ID" in https://developer.apple.com/account/#!/membership
+
+"client_id" in Key Details page (https://developer.apple.com/account/resources/authkeys/review/{Key ID}), e.g. "{Team ID}.com.xxx.oauth2-app"
+
+
+JWT HEADER
+
+```
+{
+    "alg": "ES256",
+    "kid": "{Key ID}"
+}
+```
+
+JWT PAYLOAD
+
+```
+{
+    "iss": "{Team ID}",
+    "iat": {Current Unix Timestamp},
+    "exp": {Current Unix Timestamp + 15777000},
+    "aud": "https://appleid.apple.com",
+    "sub": "{client_id}"
+}
+```
+
+Note: exp max 6 months
