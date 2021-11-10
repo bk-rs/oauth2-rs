@@ -139,7 +139,7 @@ where
         }
     }
 
-    pub fn with_client_password(
+    pub fn new_with_client_password(
         scope: Option<ScopeParameter<SCOPE>>,
         client_password: ClientPassword,
     ) -> Self {
@@ -194,7 +194,7 @@ where
         }
     }
 
-    pub fn with_client_password(
+    pub fn new_with_client_password(
         username: impl AsRef<str>,
         password: impl AsRef<str>,
         scope: Option<ScopeParameter<SCOPE>>,

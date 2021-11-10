@@ -28,6 +28,10 @@ where
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scope: Option<ScopeParameter<SCOPE>>,
 
+    // OIDC
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id_token: Option<String>,
+
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     pub _extensions: Option<Map<String, Value>>,
 }
@@ -48,6 +52,27 @@ where
             expires_in,
             refresh_token,
             scope,
+            id_token: None,
+            _extensions: None,
+        }
+    }
+
+    // OIDC
+    pub fn new_with_oidc(
+        access_token: String,
+        token_type: AccessTokenType,
+        expires_in: Option<usize>,
+        refresh_token: Option<String>,
+        scope: Option<ScopeParameter<SCOPE>>,
+        id_token: Option<String>,
+    ) -> Self {
+        Self {
+            access_token,
+            token_type,
+            expires_in,
+            refresh_token,
+            scope,
+            id_token,
             _extensions: None,
         }
     }

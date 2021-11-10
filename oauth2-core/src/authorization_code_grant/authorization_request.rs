@@ -26,6 +26,10 @@ where
     #[serde(skip_serializing_if = "Option::is_none")]
     pub state: Option<State>,
 
+    // OIDC
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub nonce: Option<String>,
+
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     _extensions: Option<Map<String, Value>>,
 }
@@ -44,6 +48,26 @@ where
             client_id,
             redirect_uri,
             scope,
+            nonce: None,
+            state,
+            _extensions: None,
+        }
+    }
+
+    // OIDC
+    pub fn new_with_oidc(
+        client_id: ClientId,
+        redirect_uri: Option<String>,
+        scope: Option<ScopeParameter<SCOPE>>,
+        state: Option<State>,
+        nonce: Option<String>,
+    ) -> Self {
+        Self {
+            response_type: RESPONSE_TYPE.to_owned(),
+            client_id,
+            redirect_uri,
+            scope,
+            nonce,
             state,
             _extensions: None,
         }

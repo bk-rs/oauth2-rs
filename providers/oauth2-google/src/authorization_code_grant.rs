@@ -274,8 +274,7 @@ mod tests {
 
         match body_ret {
             Ok(body) => {
-                let map = body.extensions().unwrap();
-                assert!(map.get("id_token").is_some());
+                assert!(body.id_token.is_some());
             }
             Err(body) => panic!("{:?}", body),
         }

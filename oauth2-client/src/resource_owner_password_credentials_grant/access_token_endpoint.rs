@@ -77,7 +77,7 @@ where
         );
 
         let mut body = if self.provider.client_password_in_request_body() {
-            BodyWithResourceOwnerPasswordCredentialsGrant::with_client_password(
+            BodyWithResourceOwnerPasswordCredentialsGrant::new_with_client_password(
                 self.username.to_owned(),
                 self.password.to_owned(),
                 self.scopes.to_owned().map(Into::into),
