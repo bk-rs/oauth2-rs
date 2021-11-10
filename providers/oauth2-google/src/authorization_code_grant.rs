@@ -206,7 +206,7 @@ mod tests {
 
     use oauth2_client::{
         authorization_code_grant::{AccessTokenEndpoint, AuthorizationEndpoint},
-        re_exports::Endpoint as _,
+        re_exports::{Endpoint as _, Response},
     };
 
     #[test]
@@ -254,6 +254,31 @@ mod tests {
         let request = AccessTokenEndpoint::new(&provider, "CODE".to_owned()).render_request()?;
 
         assert_eq!(request.body(), b"grant_type=authorization_code&code=CODE&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&client_id=CLIENT_ID&client_secret=CLIENT_SECRET");
+
+        Ok(())
+    }
+
+    #[test]
+    fn access_token_response() -> Result<(), Box<dyn error::Error>> {
+        let provider = GoogleProviderForWebServerApps::new(
+            "CLIENT_ID".to_owned(),
+            "CLIENT_SECRET".to_owned(),
+            RedirectUri::new("https://client.example.com/cb")?,
+        )?;
+
+        let response_body = include_str!(
+            "../tests/response_body_json_files/access_token_with_authorization_code_grant.json"
+        );
+        let body_ret = AccessTokenEndpoint::new(&provider, "CODE".to_owned())
+            .parse_response(Response::builder().body(response_body.as_bytes().to_vec())?)?;
+
+        match body_ret {
+            Ok(body) => {
+                let map = body.extensions().unwrap();
+                assert!(map.get("id_token").is_some());
+            }
+            Err(body) => panic!("{:?}", body),
+        }
 
         Ok(())
     }
