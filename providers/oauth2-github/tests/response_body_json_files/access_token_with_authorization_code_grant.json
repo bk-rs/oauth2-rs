@@ -1,0 +1,5 @@
+{
+    "access_token": "x*40",
+    "token_type": "bearer",
+    "scope": "public_repo,user:email"
+}

@@ -194,7 +194,7 @@ mod tests {
         )
         .render_request()?;
 
-        assert_eq!(request.uri(), "https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=CLIENT_ID&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&scope=email&state=STATE&force_verify=true");
+        assert_eq!(request.uri(), "https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=CLIENT_ID&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&scope=user%3Aread%3Aemail&state=STATE&force_verify=true");
 
         Ok(())
     }
@@ -222,6 +222,7 @@ mod tests {
             RedirectUri::new("https://client.example.com/cb")?,
         )?;
 
+        //
         let response_body = r#"{"status":400, "message":"Invalid authorization code"}"#;
         let body_ret = AccessTokenEndpoint::new(&provider, "CODE".to_owned()).parse_response(
             Response::builder()
@@ -241,6 +242,21 @@ mod tests {
                     .unwrap()
                     .contains("Invalid authorization code"));
             }
+        }
+
+        //
+        let response_body = include_str!(
+            "../tests/response_body_json_files/access_token_with_authorization_code_grant.json"
+        );
+        let body_ret = AccessTokenEndpoint::new(&provider, "CODE".to_owned())
+            .parse_response(Response::builder().body(response_body.as_bytes().to_vec())?)?;
+
+        match body_ret {
+            Ok(body) => {
+                let map = body.extensions().unwrap();
+                assert!(map.is_empty());
+            }
+            Err(body) => panic!("{:?}", body),
         }
 
         Ok(())
