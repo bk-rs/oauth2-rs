@@ -10,6 +10,7 @@ pub struct AppleProviderWithAppleJs {
     client_id: ClientId,
     client_secret: ClientSecret,
     redirect_uri: RedirectUri,
+    pub nonce: Option<String>,
     //
     token_endpoint_url: Url,
     authorization_endpoint_url: Url,
@@ -24,9 +25,18 @@ impl AppleProviderWithAppleJs {
             client_id,
             client_secret,
             redirect_uri,
+            nonce: None,
             token_endpoint_url: TOKEN_URL.parse()?,
             authorization_endpoint_url: AUTHORIZATION_URL.parse()?,
         })
+    }
+
+    pub fn configure<F>(mut self, mut f: F) -> Self
+    where
+        F: FnMut(&mut Self),
+    {
+        f(&mut self);
+        self
     }
 }
 impl Provider for AppleProviderWithAppleJs {
@@ -59,11 +69,90 @@ impl ProviderExtAuthorizationCodeGrant for AppleProviderWithAppleJs {
 
     fn authorization_request_query_extensions(&self) -> Option<Map<String, Value>> {
         let mut map = Map::new();
-        map.insert(
-            "response_mode".to_owned(),
-            Value::String("query".to_owned()),
-        );
 
-        Some(map)
+        if let Some(nonce) = &self.nonce {
+            map.insert("nonce".to_owned(), Value::String(nonce.to_string()));
+        }
+
+        if map.is_empty() {
+            None
+        } else {
+            Some(map)
+        }
+    }
+
+    fn authorization_request_url_modifying(&self, url: &mut Url) {
+        let query_pairs: Vec<_> = url
+            .query_pairs()
+            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .collect::<Vec<_>>();
+        let mut query_pairs_mut = url.query_pairs_mut();
+        query_pairs_mut.clear();
+        for (k, v) in query_pairs {
+            match k.as_str() {
+                "response_type" => {
+                    query_pairs_mut.append_pair(k.as_str(), "code id_token");
+                }
+                "scope" => {}
+                _ => {
+                    query_pairs_mut.append_pair(k.as_str(), v.as_str());
+                }
+            }
+        }
+        query_pairs_mut.finish();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use std::error;
+
+    use oauth2_client::{
+        authorization_code_grant::{AccessTokenEndpoint, AuthorizationEndpoint},
+        re_exports::{Endpoint as _, Response},
+    };
+
+    #[test]
+    fn authorization_request() -> Result<(), Box<dyn error::Error>> {
+        let provider = AppleProviderWithAppleJs::new(
+            "CLIENT_ID".to_owned(),
+            "CLIENT_SECRET".to_owned(),
+            RedirectUri::new("https://client.example.com/cb")?,
+        )?;
+
+        let request =
+            AuthorizationEndpoint::new(&provider, vec![AppleScope::Email], "STATE".to_owned())
+                .render_request()?;
+
+        assert_eq!(request.uri(), "https://appleid.apple.com/auth/authorize?response_type=code+id_token&client_id=CLIENT_ID&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&state=STATE");
+
+        Ok(())
+    }
+
+    #[test]
+    fn access_token_response() -> Result<(), Box<dyn error::Error>> {
+        let provider = AppleProviderWithAppleJs::new(
+            "CLIENT_ID".to_owned(),
+            "CLIENT_SECRET".to_owned(),
+            RedirectUri::new("https://client.example.com/cb")?,
+        )?;
+
+        let response_body = include_str!(
+            "../tests/response_body_json_files/access_token_with_authorization_code_grant.json"
+        );
+        let body_ret = AccessTokenEndpoint::new(&provider, "CODE".to_owned())
+            .parse_response(Response::builder().body(response_body.as_bytes().to_vec())?)?;
+
+        match body_ret {
+            Ok(body) => {
+                let map = body.extensions().unwrap();
+                assert!(map.get("id_token").is_some());
+            }
+            Err(body) => panic!("{:?}", body),
+        }
+
+        Ok(())
     }
 }

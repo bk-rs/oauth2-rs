@@ -92,7 +92,8 @@ impl Context {
                     clients_config.apple.client_id.to_owned(),
                     clients_config.apple.client_secret.to_owned(),
                     clients_config.apple.redirect_uri.to_owned(),
-                )?,
+                )?
+                .configure(|x| x.nonce = Some("NXGF63FddmZZMlB8a9wlt0KzyC4MUAqz".to_owned())),
                 vec![],
                 DefaultEndpointBuilder,
             ),
