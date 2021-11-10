@@ -24,6 +24,8 @@ Enable "Sign In with Apple"
 Identifier: com.xxx.oauth2-services
 ```
 
+
+
 3. Edit your Services ID Configuration
 
 Enable "Sign In with Apple", then Configure, select "Primary App ID" to "******.com.xxx.oauth2-app"
@@ -33,7 +35,7 @@ Domains and Subdomains:
     oauth2-rs.lvh.me
 
 Return URLs
-    http://oauth2-rs.lvh.me/auth/apple/callback
+    https://oauth2-rs.lvh.me/auth/apple/callback
 ```
 
 4. Register a New Key
@@ -50,7 +52,7 @@ Download filename is "AuthKey_{Key ID}.p8"
 
 "Team ID" in https://developer.apple.com/account/#!/membership
 
-"client_id" in Key Details page (https://developer.apple.com/account/resources/authkeys/review/{Key ID}), e.g. "{Team ID}.com.xxx.oauth2-app"
+"client_id" is The Bundle ID for App ID or Identifier for Services ID, e.g. "com.xxx.oauth2-app"
 
 
 JWT HEADER

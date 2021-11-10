@@ -17,3 +17,8 @@ redirect_uri = "https://oauth2-rs.lvh.me/auth/twitch/callback"
 client_id = "xxx"
 client_secret = "xxx"
 redirect_uri = "http://oauth2-rs.lvh.me/auth/mastodon-social/callback"
+
+[apple]
+client_id = "xxx"
+client_secret = "xxx"
+redirect_uri = "https://oauth2-rs.lvh.me/auth/apple/callback"

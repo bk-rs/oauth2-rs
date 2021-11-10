@@ -17,4 +17,4 @@ pub use user_info::{UserInfo, UserInfoObtainOutput};
 //
 pub mod endpoint_builder;
 
-pub use endpoint_builder::EndpointBuilder;
+pub use endpoint_builder::{DefaultEndpointBuilder, EndpointBuilder};

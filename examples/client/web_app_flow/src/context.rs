@@ -1,6 +1,7 @@
 use std::{collections::HashMap, error};
 
 use http_api_isahc_client::IsahcClient;
+use oauth2_apple::AppleProviderWithAppleJs;
 use oauth2_github::{GithubEndpointBuilder, GithubProviderWithWebApplication, GithubScope};
 use oauth2_google::{
     GoogleEndpointBuilder, GoogleProviderForWebServerApps,
@@ -9,7 +10,9 @@ use oauth2_google::{
 use oauth2_mastodon::{
     MastodonEndpointBuilder, MastodonProviderForEndUsers, MastodonScope, BASE_URL_MASTODON_SOCIAL,
 };
-use oauth2_signin::web_app::SigninFlow;
+use oauth2_signin::{
+    oauth2_client::additional_endpoints::DefaultEndpointBuilder, web_app::SigninFlow,
+};
 use oauth2_twitch::{TwitchEndpointBuilder, TwitchProviderForWebServerApps, TwitchScope};
 
 use crate::config::Config;
@@ -79,6 +82,19 @@ impl Context {
                 )?,
                 vec![MastodonScope::Read, MastodonScope::Write],
                 MastodonEndpointBuilder,
+            ),
+        );
+        signin_flow_map.insert(
+            "apple",
+            SigninFlow::new(
+                IsahcClient::new()?,
+                AppleProviderWithAppleJs::new(
+                    clients_config.apple.client_id.to_owned(),
+                    clients_config.apple.client_secret.to_owned(),
+                    clients_config.apple.redirect_uri.to_owned(),
+                )?,
+                vec![],
+                DefaultEndpointBuilder,
             ),
         );
 

@@ -30,3 +30,21 @@ where
         f.debug_struct("EndpointBuilder").finish()
     }
 }
+
+//
+//
+//
+#[derive(Debug, Clone)]
+pub struct DefaultEndpointBuilder;
+impl<SCOPE> EndpointBuilder<SCOPE> for DefaultEndpointBuilder
+where
+    SCOPE: Scope,
+{
+    fn user_info_obtain(
+        &self,
+        _access_token_provider: AccessTokenProvider<SCOPE>,
+        _access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
+    ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>> {
+        Ok(UserInfoObtainOutput::None)
+    }
+}

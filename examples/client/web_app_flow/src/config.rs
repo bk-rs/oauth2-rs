@@ -39,6 +39,7 @@ pub struct ClientsConfig {
     pub google: ClientConfig,
     pub twitch: ClientConfig,
     pub mastodon_social: ClientConfig,
+    pub apple: ClientConfig,
 }
 
 #[derive(Deserialize, Debug, Clone)]
