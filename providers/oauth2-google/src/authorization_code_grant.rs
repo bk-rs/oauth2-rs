@@ -98,6 +98,11 @@ impl ProviderExtAuthorizationCodeGrant for GoogleProviderForWebServerApps {
         ])
     }
 
+    // OIDC
+    fn oidc_support(&self) -> Option<bool> {
+        Some(false)
+    }
+
     fn authorization_endpoint_url(&self) -> &Url {
         &self.authorization_endpoint_url
     }

@@ -29,6 +29,7 @@ where
     provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
     scopes: Option<Vec<SCOPE>>,
     state: Option<State>,
+    nonce: Option<String>,
 }
 impl<'a, SCOPE> AuthorizationEndpoint<'a, SCOPE>
 where
@@ -43,6 +44,22 @@ where
             provider,
             scopes: scopes.into(),
             state: state.into(),
+            nonce: None,
+        }
+    }
+
+    // OIDC
+    pub fn new_with_oidc(
+        provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
+        scopes: impl Into<Option<Vec<SCOPE>>>,
+        state: impl Into<Option<State>>,
+        nonce: impl Into<Option<String>>,
+    ) -> Self {
+        Self {
+            provider,
+            scopes: scopes.into(),
+            state: state.into(),
+            nonce: nonce.into(),
         }
     }
 }
@@ -57,15 +74,28 @@ where
     type ParseResponseError = Infallible;
 
     fn render_request(&self) -> Result<Request<Body>, Self::RenderRequestError> {
-        let mut query = REQ_Query::new(
-            self.provider
-                .client_id()
-                .cloned()
-                .ok_or_else(|| AuthorizationEndpointError::ClientIdMissing)?,
-            self.provider.redirect_uri().map(|x| x.to_string()),
-            self.scopes.to_owned().map(Into::into),
-            self.state.to_owned(),
-        );
+        let mut query = if let Some(nonce) = &self.nonce {
+            REQ_Query::new_with_oidc(
+                self.provider
+                    .client_id()
+                    .cloned()
+                    .ok_or_else(|| AuthorizationEndpointError::ClientIdMissing)?,
+                self.provider.redirect_uri().map(|x| x.to_string()),
+                self.scopes.to_owned().map(Into::into),
+                self.state.to_owned(),
+                Some(nonce.to_owned()),
+            )
+        } else {
+            REQ_Query::new(
+                self.provider
+                    .client_id()
+                    .cloned()
+                    .ok_or_else(|| AuthorizationEndpointError::ClientIdMissing)?,
+                self.provider.redirect_uri().map(|x| x.to_string()),
+                self.scopes.to_owned().map(Into::into),
+                self.state.to_owned(),
+            )
+        };
         if let Some(extensions) = self.provider.authorization_request_query_extensions() {
             query.set_extensions(extensions);
         }

@@ -68,12 +68,19 @@ async fn auth_handler(
         .get(provider.as_str())
         .ok_or_else(|| "provider not found")?;
 
-    let state = gen_state();
-
+    let state = gen_state(10);
     session.set(state_session_key(&provider).as_str(), state.to_owned());
-    let url = flow.build_authorization_url(state)?;
 
-    info!("{} {:?}", provider, url.as_str());
+    let url = if flow.provider.oidc_support().is_some() {
+        let nonce = gen_state(32);
+        session.set(nonce_session_key(&provider).as_str(), nonce.to_owned());
+
+        flow.build_authorization_url_with_oidc(state, nonce)?
+    } else {
+        flow.build_authorization_url(state)?
+    };
+
+    info!("{} authorization_url {}", provider, url.as_str());
 
     Ok(Redirect::temporary(url.as_str().parse::<Uri>()?))
 }
@@ -103,9 +110,17 @@ async fn auth_callback_handler(
 
     let state = session.get::<String>(state_session_key(&provider).as_str());
     session.remove(state_session_key(&provider).as_str());
-    info!("{} {:?}", provider, state);
+    info!("{} state {:?}", provider, state);
 
-    let ret = flow.handle_callback(query_raw, state).await;
+    let ret = if flow.provider.oidc_support().is_some() {
+        let nonce = session.get::<String>(nonce_session_key(&provider).as_str());
+        session.remove(nonce_session_key(&provider).as_str());
+        info!("{} nonce {:?}", provider, nonce);
+
+        flow.handle_callback(query_raw, state).await
+    } else {
+        flow.handle_callback(query_raw, state).await
+    };
 
     info!("{} {:?}", provider, ret);
 
@@ -114,4 +129,8 @@ async fn auth_callback_handler(
 
 fn state_session_key(provider: &str) -> String {
     format!("state_{}", provider)
+}
+
+fn nonce_session_key(provider: &str) -> String {
+    format!("nonce_{}", provider)
 }

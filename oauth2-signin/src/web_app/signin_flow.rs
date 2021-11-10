@@ -84,13 +84,42 @@ where
             .build_authorization_url(self.provider.as_ref(), self.scopes.to_owned(), state)
     }
 
-    pub fn build_authorization_url_with_custom_scopes(
+    // OIDC
+    pub fn build_authorization_url_with_oidc(
+        &self,
+        state: impl Into<Option<State>>,
+        nonce: impl Into<Option<String>>,
+    ) -> Result<Url, SigninFlowBuildAuthorizationUrlError> {
+        self.flow.build_authorization_url_with_oidc(
+            self.provider.as_ref(),
+            self.scopes.to_owned(),
+            state,
+            nonce,
+        )
+    }
+
+    pub fn build_authorization_url_by_custom_scopes(
         &self,
         custom_scopes: Vec<String>,
         state: impl Into<Option<State>>,
     ) -> Result<Url, SigninFlowBuildAuthorizationUrlError> {
         self.flow
             .build_authorization_url(self.provider.as_ref(), Some(custom_scopes), state)
+    }
+
+    // OIDC
+    pub fn build_authorization_url_by_custom_scopes_with_oidc(
+        &self,
+        custom_scopes: Vec<String>,
+        state: impl Into<Option<State>>,
+        nonce: impl Into<Option<String>>,
+    ) -> Result<Url, SigninFlowBuildAuthorizationUrlError> {
+        self.flow.build_authorization_url_with_oidc(
+            self.provider.as_ref(),
+            Some(custom_scopes),
+            state,
+            nonce,
+        )
     }
 
     pub async fn handle_callback(
@@ -100,7 +129,7 @@ where
     ) -> SigninFlowHandleCallbackRet {
         let access_token = match self
             .flow
-            .handle_callback_with_query(self.provider.as_ref(), query, state)
+            .handle_callback_by_query(self.provider.as_ref(), query, state)
             .await
         {
             Ok(x) => x,
@@ -199,7 +228,7 @@ mod tests {
         let github_auth_url = map
             .get("github")
             .unwrap()
-            .build_authorization_url_with_custom_scopes(
+            .build_authorization_url_by_custom_scopes(
                 vec![GithubScope::User.to_string(), "custom".to_owned()],
                 "STATE".to_owned(),
             )?;

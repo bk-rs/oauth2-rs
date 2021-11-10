@@ -70,15 +70,27 @@ async fn auth_handler(
 ) -> Result<(impl warp::Reply, SessionWithStore<MemoryStore>), warp::Rejection> {
     let flow = ctx.signin_flow_map.get(provider.as_str()).unwrap();
 
-    let state = gen_state();
+    let state = gen_state(10);
 
     session_with_store
         .session
         .insert(state_session_key(&provider).as_str(), state.to_owned())
         .unwrap();
-    let url = flow.build_authorization_url(state).unwrap();
 
-    info!("{} {:?}", provider, url.as_str());
+    let url = if flow.provider.oidc_support().is_some() {
+        let nonce = gen_state(32);
+        session_with_store
+            .session
+            .insert(nonce_session_key(&provider).as_str(), nonce.to_owned())
+            .unwrap();
+
+        flow.build_authorization_url_with_oidc(state, nonce)
+            .unwrap()
+    } else {
+        flow.build_authorization_url(state).unwrap()
+    };
+
+    info!("{} authorization_url {}", provider, url.as_str());
 
     Ok((
         warp::redirect::temporary(url.as_str().parse::<Uri>().unwrap()),
@@ -102,9 +114,21 @@ async fn auth_callback_handler(
     session_with_store
         .session
         .remove(state_session_key(&provider).as_str());
-    info!("{} {:?}", provider, state);
+    info!("{} state {:?}", provider, state);
 
-    let ret = flow.handle_callback(query_raw, state).await;
+    let ret = if flow.provider.oidc_support().is_some() {
+        let nonce = session_with_store
+            .session
+            .get::<String>(nonce_session_key(&provider).as_str());
+        session_with_store
+            .session
+            .remove(nonce_session_key(&provider).as_str());
+        info!("{} nonce {:?}", provider, nonce);
+
+        flow.handle_callback(query_raw, state).await
+    } else {
+        flow.handle_callback(query_raw, state).await
+    };
 
     info!("{} {:?}", provider, ret);
 
@@ -113,4 +137,8 @@ async fn auth_callback_handler(
 
 fn state_session_key(provider: &str) -> String {
     format!("state_{}", provider)
+}
+
+fn nonce_session_key(provider: &str) -> String {
+    format!("nonce_{}", provider)
 }

@@ -55,7 +55,22 @@ where
         SCOPE: Scope + Serialize,
     {
         // Step 1
-        build_authorization_url(provider, scopes, state)
+        build_authorization_url(provider, scopes, state, None)
+    }
+
+    // OIDC
+    pub fn build_authorization_url_with_oidc<SCOPE>(
+        &self,
+        provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
+        scopes: impl Into<Option<Vec<SCOPE>>>,
+        state: impl Into<Option<State>>,
+        nonce: impl Into<Option<String>>,
+    ) -> Result<Url, FlowBuildAuthorizationUrlError>
+    where
+        SCOPE: Scope + Serialize,
+    {
+        // Step 1
+        build_authorization_url(provider, scopes, state, nonce)
     }
 }
 
@@ -63,7 +78,7 @@ impl<C> Flow<C>
 where
     C: Client + Send + Sync,
 {
-    pub async fn handle_callback_with_query<SCOPE>(
+    pub async fn handle_callback_by_query<SCOPE>(
         &self,
         provider: &(dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE> + Send + Sync),
         query: impl AsRef<str>,
@@ -151,13 +166,18 @@ pub fn build_authorization_url<'a, SCOPE>(
     provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
     scopes: impl Into<Option<Vec<SCOPE>>>,
     state: impl Into<Option<State>>,
+    nonce: impl Into<Option<String>>,
 ) -> Result<Url, FlowBuildAuthorizationUrlError>
 where
     SCOPE: Scope + Serialize,
 {
     let scopes = scopes.into().or(provider.scopes_default());
 
-    let authorization_endpoint = AuthorizationEndpoint::new(provider, scopes, state);
+    let authorization_endpoint = if provider.oidc_support().is_some() {
+        AuthorizationEndpoint::new_with_oidc(provider, scopes, state, nonce)
+    } else {
+        AuthorizationEndpoint::new(provider, scopes, state)
+    };
 
     let authorization_endpoint_request = authorization_endpoint
         .render_request()

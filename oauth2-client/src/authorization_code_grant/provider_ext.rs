@@ -23,6 +23,14 @@ pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone {
         None
     }
 
+    // OIDC
+    fn oidc_support(&self) -> Option<bool> {
+        // None -> Not Support
+        // Some(false) -> Support
+        // Some(true) -> Force
+        None
+    }
+
     fn authorization_endpoint_url(&self) -> &Url;
 
     fn authorization_request_query_extensions(&self) -> Option<Map<String, Value>> {
@@ -142,6 +150,11 @@ where
         self.inner
             .scopes_default()
             .map(|x| x.iter().map(|y| y.to_string()).collect())
+    }
+
+    // OIDC
+    fn oidc_support(&self) -> Option<bool> {
+        self.inner.oidc_support()
     }
 
     fn authorization_endpoint_url(&self) -> &Url {
