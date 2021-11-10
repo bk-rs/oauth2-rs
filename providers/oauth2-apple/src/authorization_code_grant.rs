@@ -1,5 +1,5 @@
 use oauth2_client::{
-    re_exports::{ClientId, ClientSecret, Map, RedirectUri, Url, UrlParseError, Value},
+    re_exports::{ClientId, ClientSecret, RedirectUri, Url, UrlParseError},
     Provider, ProviderExtAuthorizationCodeGrant,
 };
 
@@ -10,7 +10,6 @@ pub struct AppleProviderWithAppleJs {
     client_id: ClientId,
     client_secret: ClientSecret,
     redirect_uri: RedirectUri,
-    pub nonce: Option<String>,
     //
     token_endpoint_url: Url,
     authorization_endpoint_url: Url,
@@ -25,18 +24,9 @@ impl AppleProviderWithAppleJs {
             client_id,
             client_secret,
             redirect_uri,
-            nonce: None,
             token_endpoint_url: TOKEN_URL.parse()?,
             authorization_endpoint_url: AUTHORIZATION_URL.parse()?,
         })
-    }
-
-    pub fn configure<F>(mut self, mut f: F) -> Self
-    where
-        F: FnMut(&mut Self),
-    {
-        f(&mut self);
-        self
     }
 }
 impl Provider for AppleProviderWithAppleJs {
@@ -65,20 +55,6 @@ impl ProviderExtAuthorizationCodeGrant for AppleProviderWithAppleJs {
 
     fn authorization_endpoint_url(&self) -> &Url {
         &self.authorization_endpoint_url
-    }
-
-    fn authorization_request_query_extensions(&self) -> Option<Map<String, Value>> {
-        let mut map = Map::new();
-
-        if let Some(nonce) = &self.nonce {
-            map.insert("nonce".to_owned(), Value::String(nonce.to_string()));
-        }
-
-        if map.is_empty() {
-            None
-        } else {
-            Some(map)
-        }
     }
 
     fn authorization_request_url_modifying(&self, url: &mut Url) {
