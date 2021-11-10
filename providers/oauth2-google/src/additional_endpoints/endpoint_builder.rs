@@ -5,8 +5,11 @@ use oauth2_client::{
         AccessTokenProvider, AccessTokenResponseSuccessfulBody, EndpointBuilder,
         UserInfoObtainOutput,
     },
+    oauth2_core::types::ScopeParameter,
     re_exports::Scope,
 };
+
+use crate::GoogleScope;
 
 use super::GoogleUserInfoEndpoint;
 
@@ -24,7 +27,14 @@ where
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
     ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>> {
         Ok(UserInfoObtainOutput::Respond(Box::new(
-            GoogleUserInfoEndpoint::new(&access_token.access_token),
+            GoogleUserInfoEndpoint::new(
+                &access_token.access_token,
+                access_token.scope.to_owned().map(|x| {
+                    ScopeParameter::<String>::from(&x)
+                        .0
+                        .contains(&GoogleScope::Openid.to_string())
+                }) == Some(true),
+            ),
         )))
     }
 }
