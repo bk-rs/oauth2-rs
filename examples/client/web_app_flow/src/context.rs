@@ -53,7 +53,11 @@ impl Context {
                     x.access_type = Some(GoogleProviderForWebServerAppsAccessType::Offline);
                     x.include_granted_scopes = Some(true);
                 }),
-                vec![GoogleScope::Email, GoogleScope::DriveFile],
+                vec![
+                    GoogleScope::Email,
+                    GoogleScope::Profile,
+                    GoogleScope::Openid,
+                ],
                 GoogleEndpointBuilder,
             ),
         );

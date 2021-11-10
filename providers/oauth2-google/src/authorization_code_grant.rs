@@ -187,8 +187,8 @@ impl ProviderExtAuthorizationCodeGrant for GoogleProviderForDesktopApps {
 
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
         Some(vec![
-            GoogleScope::Profile,
             GoogleScope::Email,
+            GoogleScope::Profile,
             GoogleScope::Openid,
         ])
     }

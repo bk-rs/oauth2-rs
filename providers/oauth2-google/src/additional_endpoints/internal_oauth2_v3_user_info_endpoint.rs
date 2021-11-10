@@ -50,9 +50,9 @@ impl Endpoint for Oauth2V3UserInfoEndpoint {
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Oauth2V3UserInfo {
     pub sub: String,
-    pub picture: String,
-    pub email: String,
-    pub email_verified: bool,
+    pub picture: Option<String>,
+    pub email: Option<String>,
+    pub email_verified: Option<bool>,
 }
 
 #[derive(thiserror::Error, Debug)]

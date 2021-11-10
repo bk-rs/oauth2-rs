@@ -69,7 +69,7 @@ impl TryFrom<Oauth2V3UserInfo> for UserInfo {
         Ok(Self {
             uid: user_info.sub.to_owned(),
             name: None,
-            email: Some(user_info.email.to_string()),
+            email: user_info.email.to_owned(),
             raw: serde_json::to_value(user_info)
                 .map(|x| x.as_object().cloned())?
                 .ok_or_else(|| "unreachable".to_owned())?,
