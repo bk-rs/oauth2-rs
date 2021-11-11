@@ -12,6 +12,6 @@ oauth2-client = { version = "^0.0", path = "../oauth2-client", default-features 
 oauth2-github = { version = "^0.0", path = "../providers/oauth2-github" }
 oauth2-google = { version = "^0.0", path = "../providers/oauth2-google" }
 
-http-api-isahc-client = { version = "0.2", path = "../../http-api-endpoint/http-api-isahc-client", default-features = false }
+http-api-isahc-client = { version = "0.2", default-features = false }
 
 tokio = { version = "1.12", default-features = false, features = ["macros", "rt"] }

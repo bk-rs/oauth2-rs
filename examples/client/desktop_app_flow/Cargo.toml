@@ -18,7 +18,7 @@ oauth2-mastodon = { version = "^0.0", path = "../../../providers/oauth2-mastodon
 oauth2-google = { version = "^0.0", path = "../../../providers/oauth2-google" }
 
 tokio = { version = "1.12", default-features = false, features = ["macros", "rt-multi-thread"] }
-http-api-isahc-client = { version = "0.2", path = "../../../../http-api-endpoint/http-api-isahc-client", features = ["with-sleep-via-tokio"] }
+http-api-isahc-client = { version = "0.2", features = ["with-sleep-via-tokio"] }
 
 web-view = { version = "0.7" }
 
