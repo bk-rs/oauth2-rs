@@ -29,7 +29,7 @@ pub struct Flow<C>
 where
     C: Client,
 {
-    client_with_token: C,
+    pub client_with_token: C,
 }
 impl<C> Flow<C>
 where

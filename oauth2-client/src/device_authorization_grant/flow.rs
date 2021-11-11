@@ -33,8 +33,8 @@ where
     C1: Client,
     C2: RetryableClient,
 {
-    client_with_auth: C1,
-    client_with_token: C2,
+    pub client_with_auth: C1,
+    pub client_with_token: C2,
 }
 impl<C1, C2> Flow<C1, C2>
 where
