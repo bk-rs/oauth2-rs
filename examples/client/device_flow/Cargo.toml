@@ -4,11 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-name = "github"
+name = "oauth2_client_device_flow_example_github"
 path = "src/github.rs"
 
 [[bin]]
-name = "google"
+name = "oauth2_client_device_flow_example_google"
 path = "src/google.rs"
 
 [dependencies]

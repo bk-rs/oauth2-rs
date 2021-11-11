@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-name = "mastodon_social"
+name = "oauth2_client_client_credentials_flow_example_mastodon_social"
 path = "src/mastodon_social.rs"
 
 [dependencies]
