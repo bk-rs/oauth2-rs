@@ -7,7 +7,9 @@ use oauth2_google::{
     GoogleEndpointBuilder, GoogleProviderForWebServerApps,
     GoogleProviderForWebServerAppsAccessType, GoogleScope,
 };
-use oauth2_instagram::{InstagramProviderForBasicDisplayApi, InstagramScope};
+use oauth2_instagram::{
+    InstagramEndpointBuilder, InstagramProviderForBasicDisplayApi, InstagramScope,
+};
 use oauth2_mastodon::{
     MastodonEndpointBuilder, MastodonProviderForEndUsers, MastodonScope, BASE_URL_MASTODON_SOCIAL,
 };
@@ -112,7 +114,7 @@ impl Context {
                     clients_config.instagram.redirect_uri.to_owned(),
                 )?,
                 vec![InstagramScope::UserMedia, InstagramScope::UserProfile],
-                DefaultEndpointBuilder,
+                InstagramEndpointBuilder,
             ),
         );
 

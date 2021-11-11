@@ -33,7 +33,7 @@ where
             .ok_or_else(|| "Missing base_url")?
             .ok_or_else(|| "Missing base_url")?
             .as_str()
-            .ok_or_else(|| "Missing base_url")?
+            .ok_or_else(|| "Mismatch base_url")?
             .to_owned();
 
         Ok(UserInfoObtainOutput::Respond(Box::new(
