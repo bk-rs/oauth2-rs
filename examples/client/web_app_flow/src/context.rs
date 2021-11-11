@@ -7,6 +7,7 @@ use oauth2_google::{
     GoogleEndpointBuilder, GoogleProviderForWebServerApps,
     GoogleProviderForWebServerAppsAccessType, GoogleScope,
 };
+use oauth2_instagram::{InstagramProviderForBasicDisplayApi, InstagramScope};
 use oauth2_mastodon::{
     MastodonEndpointBuilder, MastodonProviderForEndUsers, MastodonScope, BASE_URL_MASTODON_SOCIAL,
 };
@@ -98,6 +99,19 @@ impl Context {
                     clients_config.apple.redirect_uri.to_owned(),
                 )?,
                 None,
+                DefaultEndpointBuilder,
+            ),
+        );
+        signin_flow_map.insert(
+            "instagram",
+            SigninFlow::new(
+                IsahcClient::new()?,
+                InstagramProviderForBasicDisplayApi::new(
+                    clients_config.instagram.client_id.to_owned(),
+                    clients_config.instagram.client_secret.to_owned(),
+                    clients_config.instagram.redirect_uri.to_owned(),
+                )?,
+                vec![InstagramScope::UserMedia, InstagramScope::UserProfile],
                 DefaultEndpointBuilder,
             ),
         );

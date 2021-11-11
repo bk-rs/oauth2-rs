@@ -18,4 +18,5 @@ xdg-open https://oauth2-rs.lvh.me/auth/google
 xdg-open https://oauth2-rs.lvh.me/auth/twitch
 xdg-open http://oauth2-rs.lvh.me/auth/mastodon-social
 xdg-open https://oauth2-rs.lvh.me/auth/apple
+xdg-open https://oauth2-rs.lvh.me/auth/instagram
 ```

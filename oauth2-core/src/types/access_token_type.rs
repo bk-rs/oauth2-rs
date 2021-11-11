@@ -13,3 +13,8 @@ pub enum AccessTokenType {
     #[serde(other)]
     Other(String),
 }
+impl Default for AccessTokenType {
+    fn default() -> Self {
+        Self::Bearer
+    }
+}

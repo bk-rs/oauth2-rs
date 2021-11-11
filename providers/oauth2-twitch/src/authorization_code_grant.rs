@@ -217,8 +217,8 @@ mod tests {
     #[test]
     fn access_token_response() -> Result<(), Box<dyn error::Error>> {
         let provider = TwitchProviderForWebServerApps::new(
-            "APPID".to_owned(),
-            "SECRET".to_owned(),
+            "CLIENT_ID".to_owned(),
+            "CLIENT_SECRET".to_owned(),
             RedirectUri::new("https://client.example.com/cb")?,
         )?;
 

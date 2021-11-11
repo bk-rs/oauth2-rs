@@ -20,6 +20,7 @@ oauth2-google = { version = "^0.0", path = "../../../providers/oauth2-google" }
 oauth2-twitch = { version = "^0.0", path = "../../../providers/oauth2-twitch" }
 oauth2-mastodon = { version = "^0.0", path = "../../../providers/oauth2-mastodon" }
 oauth2-apple = { version = "^0.0", path = "../../../providers/oauth2-apple" }
+oauth2-instagram = { version = "^0.0", path = "../../../providers/oauth2-instagram" }
 
 tokio = { version = "1.12", default-features = false, features = ["macros", "rt-multi-thread"] }
 futures-util = { version = "0.3" }

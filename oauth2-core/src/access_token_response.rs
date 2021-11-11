@@ -20,6 +20,8 @@ where
     SCOPE: Scope,
 {
     pub access_token: String,
+    // e.g. instagram {"access_token":"xxx", "user_id":0}
+    #[serde(default)]
     pub token_type: AccessTokenType,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expires_in: Option<usize>,
