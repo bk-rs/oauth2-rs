@@ -1,6 +1,10 @@
 //! https://datatracker.ietf.org/doc/html/rfc6749#section-3.3
 
-use std::{cmp, error, fmt, marker::PhantomData, str};
+use std::{
+    cmp, error, fmt,
+    marker::PhantomData,
+    str::{self, FromStr as _},
+};
 
 use serde::{
     de::{self, SeqAccess, Visitor},
@@ -21,6 +25,30 @@ pub struct ScopeParameter<T>(pub Vec<T>);
 impl<T> From<Vec<T>> for ScopeParameter<T> {
     fn from(v: Vec<T>) -> Self {
         Self(v)
+    }
+}
+
+impl<T> str::FromStr for ScopeParameter<T>
+where
+    T: Scope,
+{
+    type Err = ScopeFromStrError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let split_char = if s.contains(SCOPE_PARAMETER_DELIMITATION) {
+            SCOPE_PARAMETER_DELIMITATION
+        } else if s.contains(",") {
+            // e.g. github access_token_response
+            ','
+        } else {
+            SCOPE_PARAMETER_DELIMITATION
+        };
+
+        let mut inner = vec![];
+        for s in s.split(split_char) {
+            inner.push(T::from_str(s).map_err(|_| ScopeFromStrError::Unknown(s.to_owned()))?);
+        }
+        Ok(inner.into())
     }
 }
 
@@ -70,27 +98,11 @@ where
         formatter.write_str("should be a str or seq")
     }
 
-    fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+    fn visit_str<E>(self, s: &str) -> Result<Self::Value, E>
     where
         E: de::Error,
     {
-        let split_char = if v.contains(SCOPE_PARAMETER_DELIMITATION) {
-            SCOPE_PARAMETER_DELIMITATION
-        } else if v.contains(",") {
-            // e.g. github access_token_response
-            ','
-        } else {
-            SCOPE_PARAMETER_DELIMITATION
-        };
-
-        let mut inner = vec![];
-        for s in v.split(split_char) {
-            inner.push(
-                T::from_str(s)
-                    .map_err(|_| de::Error::custom(ScopeFromStrError::Unknown(s.to_owned())))?,
-            );
-        }
-        Ok(inner.into())
+        ScopeParameter::<T>::from_str(s).map_err(de::Error::custom)
     }
 
     fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
