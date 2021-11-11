@@ -78,10 +78,10 @@ where
 
 #[derive(thiserror::Error, Debug)]
 pub enum FlowExecuteError {
-    #[error("DeviceAccessTokenEndpointRespondFailed {0}")]
+    #[error("AccessTokenEndpointRespondFailed {0}")]
     AccessTokenEndpointRespondFailed(Box<dyn error::Error + Send + Sync>),
-    #[error("DeviceAccessTokenEndpointError {0}")]
+    #[error("AccessTokenEndpointError {0}")]
     AccessTokenEndpointError(AccessTokenEndpointError),
-    #[error("DeviceAccessTokenFailed {0:?}")]
+    #[error("AccessTokenFailed {0:?}")]
     AccessTokenFailed(AT_RES_ErrorBody),
 }
