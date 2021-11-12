@@ -4,11 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-name = "oauth2_client_desktop_app_flow_example_mastodon_social"
+name = "desktop_app_flow_mastodon_social"
 path = "src/mastodon_social.rs"
 
 [[bin]]
-name = "oauth2_client_desktop_app_flow_example_google"
+name = "desktop_app_flow_google"
 path = "src/google.rs"
 
 [dependencies]

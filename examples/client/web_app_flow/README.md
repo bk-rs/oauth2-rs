@@ -5,9 +5,9 @@ cp config/clients.toml.example config/clients.toml
 CAROOT=$(pwd)/mkcert mkcert -install
 
 
-RUST_BACKTRACE=1 RUST_LOG=trace cargo run -p oauth2_client_web_app_flow_example --bin warp
+RUST_BACKTRACE=1 RUST_LOG=trace cargo run -p oauth2_client_web_app_flow_example --bin web_app_flow_warp
 # or
-RUST_BACKTRACE=1 RUST_LOG=trace cargo run -p oauth2_client_web_app_flow_example --bin poem
+RUST_BACKTRACE=1 RUST_LOG=trace cargo run -p oauth2_client_web_app_flow_example --bin web_app_flow_poem
 
 
 sudo socat tcp-listen:80,reuseaddr,fork tcp:127.0.0.1:8080

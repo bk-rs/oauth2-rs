@@ -1,5 +1,5 @@
 /*
-RUST_BACKTRACE=1 RUST_LOG=debug cargo run -p oauth2_client_password_credentials_flow_example --bin mastodon_social -- 'YOUR_CLIENT_ID' 'YOUR_CLIENT_SECRET' 'YOUR_EMAIL' 'YOUR_PASSWORD'
+RUST_BACKTRACE=1 RUST_LOG=debug cargo run -p oauth2_client_password_credentials_flow_example --bin password_credentials_flow_mastodon_social -- 'YOUR_CLIENT_ID' 'YOUR_CLIENT_SECRET' 'YOUR_EMAIL' 'YOUR_PASSWORD'
 */
 
 use std::{env, error};

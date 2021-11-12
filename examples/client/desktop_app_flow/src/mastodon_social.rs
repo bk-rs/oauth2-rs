@@ -1,5 +1,5 @@
 /*
-RUST_BACKTRACE=1 RUST_LOG=debug cargo run -p oauth2_client_desktop_app_flow_example --bin mastodon_social -- 'YOUR_CLIENT_ID' 'YOUR_CLIENT_SECRET'
+RUST_BACKTRACE=1 RUST_LOG=debug cargo run -p oauth2_client_desktop_app_flow_example --bin desktop_app_flow_mastodon_social -- 'YOUR_CLIENT_ID' 'YOUR_CLIENT_SECRET'
 */
 
 use std::{env, error, io, thread};

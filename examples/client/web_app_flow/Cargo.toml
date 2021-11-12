@@ -4,11 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-name = "warp"
+name = "web_app_flow_warp"
 path = "src/warp.rs"
 
 [[bin]]
-name = "poem"
+name = "web_app_flow_poem"
 path = "src/poem.rs"
 
 [dependencies]
