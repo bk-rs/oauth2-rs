@@ -23,18 +23,16 @@ use crate::{FacebookScope, DEVICE_AUTHORIZATION_URL, TOKEN_URL};
 
 #[derive(Debug, Clone)]
 pub struct FacebookProviderForDevices {
-    client_id: ClientId,
-    client_token: ClientSecret,
+    client_access_token: String,
     pub redirect_uri: Option<String>,
     //
     token_endpoint_url: Url,
     device_authorization_endpoint_url: Url,
 }
 impl FacebookProviderForDevices {
-    pub fn new(client_id: ClientId, client_token: ClientSecret) -> Result<Self, UrlParseError> {
+    pub fn new(app_id: String, client_token: String) -> Result<Self, UrlParseError> {
         Ok(Self {
-            client_id,
-            client_token,
+            client_access_token: format!("{}|{}", app_id, client_token),
             redirect_uri: None,
             token_endpoint_url: TOKEN_URL.parse()?,
             device_authorization_endpoint_url: DEVICE_AUTHORIZATION_URL.parse()?,
@@ -53,7 +51,7 @@ impl Provider for FacebookProviderForDevices {
     type Scope = FacebookScope;
 
     fn client_id(&self) -> Option<&ClientId> {
-        Some(&self.client_id)
+        None
     }
 
     fn client_secret(&self) -> Option<&ClientSecret> {
@@ -74,7 +72,7 @@ impl ProviderExtDeviceAuthorizationGrant for FacebookProviderForDevices {
 
         map.insert(
             "access_token".to_owned(),
-            Value::String(format!("{}|{}", self.client_id, self.client_token)),
+            Value::String(self.client_access_token.to_owned()),
         );
 
         if let Some(redirect_uri) = &self.redirect_uri {
@@ -143,7 +141,7 @@ impl ProviderExtDeviceAuthorizationGrant for FacebookProviderForDevices {
 
         map.insert(
             "access_token".to_owned(),
-            Value::String(format!("{}|{}", self.client_id, self.client_token)),
+            Value::String(self.client_access_token.to_owned()),
         );
 
         map.insert(
@@ -337,4 +335,142 @@ pub enum DeviceAccessTokenResponseParsingError {
     //
     #[error("DeResponseBodyFailed {0}")]
     DeResponseBodyFailed(SerdeJsonError),
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use std::{error, time::Duration};
+
+    use oauth2_client::{
+        device_authorization_grant::{DeviceAccessTokenEndpoint, DeviceAuthorizationEndpoint},
+        re_exports::{Endpoint as _, RetryableEndpoint as _},
+    };
+
+    #[test]
+    fn authorization_request() -> Result<(), Box<dyn error::Error>> {
+        let provider =
+            FacebookProviderForDevices::new("APP_ID".to_owned(), "CLIENT_TOKEN".to_owned())?;
+        let endpoint = DeviceAuthorizationEndpoint::new(
+            &provider,
+            vec![FacebookScope::Email, FacebookScope::PublicProfile],
+        );
+
+        //
+        let request = endpoint.render_request()?;
+
+        assert_eq!(
+            request.body(),
+            b"scope=email+public_profile&access_token=APP_ID%7CCLIENT_TOKEN"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn authorization_response() -> Result<(), Box<dyn error::Error>> {
+        let provider =
+            FacebookProviderForDevices::new("APP_ID".to_owned(), "CLIENT_TOKEN".to_owned())?;
+        let endpoint = DeviceAuthorizationEndpoint::new(
+            &provider,
+            vec![FacebookScope::Email, FacebookScope::PublicProfile],
+        );
+
+        //
+        let response_body =
+            include_str!("../tests/response_body_json_files/device_authorization.json");
+        let body_ret = endpoint
+            .parse_response(Response::builder().body(response_body.as_bytes().to_vec())?)?;
+        match body_ret {
+            Ok(body) => {
+                assert_eq!(body.device_code, "4c7c240847a4c10bf6850802c51dde1e")
+            }
+            Err(body) => panic!("{:?}", body),
+        }
+
+        //
+        let response_body = include_str!(
+            "../tests/response_body_json_files/device_authorization_err_when_no_access_token.json"
+        );
+        let body_ret = endpoint
+            .parse_response(Response::builder().body(response_body.as_bytes().to_vec())?)?;
+        match body_ret {
+            Ok(body) => panic!("{:?}", body),
+            Err(body) => assert_eq!(
+                body.error_description,
+                Some("(#190) This method must be called with a client access token".to_owned())
+            ),
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn access_token_request() -> Result<(), Box<dyn error::Error>> {
+        let provider =
+            FacebookProviderForDevices::new("APP_ID".to_owned(), "CLIENT_TOKEN".to_owned())?;
+        let endpoint = DeviceAccessTokenEndpoint::new(
+            &provider,
+            "DEVICE_CODE".to_owned(),
+            Duration::from_secs(5),
+        );
+
+        //
+        let request = endpoint.render_request(None)?;
+
+        assert_eq!(request.body(), b"grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Adevice_code&device_code=DEVICE_CODE&access_token=APP_ID%7CCLIENT_TOKEN&code=DEVICE_CODE");
+
+        Ok(())
+    }
+
+    #[test]
+    fn access_token_response() -> Result<(), Box<dyn error::Error>> {
+        let provider =
+            FacebookProviderForDevices::new("APP_ID".to_owned(), "CLIENT_TOKEN".to_owned())?;
+        let endpoint = DeviceAccessTokenEndpoint::new(
+            &provider,
+            "DEVICE_CODE".to_owned(),
+            Duration::from_secs(5),
+        );
+
+        //
+        let response_body = include_str!(
+            "../tests/response_body_json_files/access_token_with_device_authorization_grant.json"
+        );
+        let body_ret = endpoint.parse_response(
+            Response::builder().body(response_body.as_bytes().to_vec())?,
+            None,
+        )?;
+        match body_ret {
+            Ok(Ok(body)) => {
+                let map = body.extensions().unwrap();
+                assert_eq!(
+                    map.get("data_access_expiration_time").unwrap().as_u64(),
+                    Some(1644569029)
+                );
+            }
+            Ok(Err(body)) => panic!("{:?}", body),
+            Err(reason) => panic!("{:?}", reason),
+        }
+
+        //
+        let response_body = include_str!(
+            "../tests/response_body_json_files/device_access_token_err_when_1349174.json"
+        );
+        let body_ret = endpoint.parse_response(
+            Response::builder().body(response_body.as_bytes().to_vec())?,
+            None,
+        )?;
+        match body_ret {
+            Ok(Ok(body)) => panic!("{:?}", body),
+            Ok(Err(body)) => panic!("{:?}", body),
+            Err(reason) => assert_eq!(
+                reason,
+                DeviceAccessTokenEndpointRetryReason::AuthorizationPending
+            ),
+        }
+
+        Ok(())
+    }
 }

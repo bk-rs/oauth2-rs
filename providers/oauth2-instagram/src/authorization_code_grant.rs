@@ -16,13 +16,13 @@ pub struct InstagramProviderForBasicDisplayApi {
 }
 impl InstagramProviderForBasicDisplayApi {
     pub fn new(
-        client_id: ClientId,
-        client_secret: ClientSecret,
+        instagram_app_id: ClientId,
+        instagram_app_secret: ClientSecret,
         redirect_uri: RedirectUri,
     ) -> Result<Self, UrlParseError> {
         Ok(Self {
-            client_id,
-            client_secret,
+            client_id: instagram_app_id,
+            client_secret: instagram_app_secret,
             redirect_uri,
             token_endpoint_url: TOKEN_URL.parse()?,
             authorization_endpoint_url: AUTHORIZATION_URL.parse()?,
@@ -72,8 +72,8 @@ mod tests {
     #[test]
     fn access_token_response() -> Result<(), Box<dyn error::Error>> {
         let provider = InstagramProviderForBasicDisplayApi::new(
-            "CLIENT_ID".to_owned(),
-            "CLIENT_SECRET".to_owned(),
+            "APP_ID".to_owned(),
+            "APP_SECRET".to_owned(),
             RedirectUri::new("https://client.example.com/cb")?,
         )?;
 
