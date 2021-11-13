@@ -11,6 +11,9 @@ pub mod device_authorization_grant;
 pub use authorization_code_grant::FacebookProviderForWebApp;
 pub use device_authorization_grant::FacebookProviderForDevices;
 
+pub mod additional_endpoints;
+pub use additional_endpoints::FacebookEndpointBuilder;
+
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum FacebookScope {

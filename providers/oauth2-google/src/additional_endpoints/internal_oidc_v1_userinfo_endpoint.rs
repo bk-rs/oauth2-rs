@@ -4,7 +4,7 @@ use oauth2_client::re_exports::{
     SerdeJsonError, Serialize, MIME_APPLICATION_JSON,
 };
 
-pub const USER_INFO_URL: &str = "https://openidconnect.googleapis.com/v1/userinfo";
+pub const URL: &str = "https://openidconnect.googleapis.com/v1/userinfo";
 
 //
 #[derive(Debug, Clone)]
@@ -27,7 +27,7 @@ impl Endpoint for OidcV1UserInfoEndpoint {
 
     fn render_request(&self) -> Result<Request<Body>, Self::RenderRequestError> {
         let request = Request::builder()
-            .uri(USER_INFO_URL)
+            .uri(URL)
             .header(AUTHORIZATION, format!("Bearer {}", &self.access_token))
             .header(ACCEPT, MIME_APPLICATION_JSON)
             .body(vec![])

@@ -4,7 +4,7 @@ use oauth2_client::re_exports::{
     SerdeJsonError, Serialize, MIME_APPLICATION_JSON,
 };
 
-pub const USER_INFO_URL: &str = "https://api.github.com/user";
+pub const URL: &str = "https://api.github.com/user";
 
 //
 #[derive(Debug, Clone)]
@@ -27,7 +27,7 @@ impl Endpoint for UserEndpoint {
 
     fn render_request(&self) -> Result<Request<Body>, Self::RenderRequestError> {
         let request = Request::builder()
-            .uri(USER_INFO_URL)
+            .uri(URL)
             .header(AUTHORIZATION, format!("token {}", &self.access_token))
             .header(ACCEPT, MIME_APPLICATION_JSON)
             .body(vec![])

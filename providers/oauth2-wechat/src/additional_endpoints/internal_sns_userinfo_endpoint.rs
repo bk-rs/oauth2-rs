@@ -3,7 +3,7 @@ use oauth2_client::re_exports::{
     Response, SerdeJsonError, Serialize, Value, MIME_APPLICATION_JSON,
 };
 
-pub const USER_INFO_URL: &str = "https://api.weixin.qq.com/sns/userinfo";
+pub const URL: &str = "https://api.weixin.qq.com/sns/userinfo";
 
 //
 #[derive(Debug, Clone)]
@@ -29,7 +29,7 @@ impl Endpoint for SnsUserinfoEndpoint {
     fn render_request(&self) -> Result<Request<Body>, Self::RenderRequestError> {
         let url = format!(
             "{}?access_token={}&openid={}&lang=zh_CN",
-            USER_INFO_URL, self.access_token, self.openid
+            URL, self.access_token, self.openid
         );
 
         let request = Request::builder()

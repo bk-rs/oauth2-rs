@@ -2,7 +2,7 @@ use std::{collections::HashMap, error};
 
 use http_api_isahc_client::IsahcClient;
 use oauth2_apple::AppleProviderWithAppleJs;
-use oauth2_facebook::{FacebookProviderForWebApp, FacebookScope};
+use oauth2_facebook::{FacebookEndpointBuilder, FacebookProviderForWebApp, FacebookScope};
 use oauth2_github::{GithubEndpointBuilder, GithubProviderWithWebApplication, GithubScope};
 use oauth2_google::{
     GoogleEndpointBuilder, GoogleProviderForWebServerApps,
@@ -128,7 +128,7 @@ impl Context {
                     clients_config.facebook.redirect_uri.to_owned(),
                 )?,
                 vec![FacebookScope::Email, FacebookScope::PublicProfile],
-                DefaultEndpointBuilder,
+                FacebookEndpointBuilder,
             ),
         );
 
