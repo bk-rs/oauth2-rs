@@ -26,7 +26,7 @@ Details
 Display name: oauth2-rs-i-g-demo
 ```
 
-2. Settings > Basic
+2. Configure App, Settings > Basic
 
 Privacy Policy URL: YOUR_URL e.g. https://policies.google.com/privacy
 
@@ -40,7 +40,7 @@ Platform: Website
 Site URL: https://oauth2-rs.lvh.me
 ```
 
-3. Configure Instagram Basic Display
+3. Add and configure "Instagram Basic Display" Product
 
 Create New App
 

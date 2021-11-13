@@ -38,6 +38,25 @@ pub struct SuccessfulBody {
 }
 
 impl SuccessfulBody {
+    pub fn new(
+        device_code: DeviceCode,
+        user_code: UserCode,
+        verification_uri: VerificationUri,
+        verification_uri_complete: Option<VerificationUriComplete>,
+        expires_in: usize,
+        interval: Option<usize>,
+    ) -> Self {
+        Self {
+            device_code,
+            user_code,
+            verification_uri,
+            verification_uri_complete,
+            expires_in,
+            interval,
+            _extensions: None,
+        }
+    }
+
     pub fn interval(&self) -> Duration {
         Duration::from_secs(self.interval.unwrap_or_else(|| INTERVAL_DEFAULT) as u64)
     }

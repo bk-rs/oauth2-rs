@@ -5,7 +5,7 @@ use mime::Mime;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 
-use crate::types::{ClientId, Scope, ScopeParameter};
+use crate::types::{ClientId, Scope, ScopeFromStrError, ScopeParameter};
 
 pub const METHOD: Method = Method::POST;
 pub const CONTENT_TYPE: Mime = mime::APPLICATION_WWW_FORM_URLENCODED;
@@ -44,6 +44,20 @@ where
     }
     pub fn extensions(&self) -> Option<&Map<String, Value>> {
         self._extensions.as_ref()
+    }
+
+    pub fn try_from_t_with_string(body: &Body<String>) -> Result<Self, ScopeFromStrError> {
+        let scope = if let Some(x) = &body.scope {
+            Some(ScopeParameter::<SCOPE>::try_from_t_with_string(x)?)
+        } else {
+            None
+        };
+
+        let mut this = Self::new(body.client_id.to_owned(), scope);
+        if let Some(extensions) = body.extensions() {
+            this.set_extensions(extensions.to_owned());
+        }
+        Ok(this)
     }
 }
 

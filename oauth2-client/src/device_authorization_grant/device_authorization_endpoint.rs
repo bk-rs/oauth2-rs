@@ -1,3 +1,5 @@
+use std::error;
+
 use http_api_client_endpoint::{Body, Endpoint, Request, Response};
 use oauth2_core::{
     access_token_response::GENERAL_ERROR_BODY_KEY_ERROR,
@@ -64,6 +66,14 @@ where
             body.set_extensions(extensions);
         }
 
+        if let Some(request_ret) = self.provider.device_authorization_request_rendering(&body) {
+            let request = request_ret.map_err(|err| {
+                DeviceAuthorizationEndpointError::CustomRenderingRequestFailed(err)
+            })?;
+
+            return Ok(request);
+        }
+
         let body_str = serde_urlencoded::to_string(body)
             .map_err(DeviceAuthorizationEndpointError::SerRequestBodyFailed)?;
 
@@ -82,6 +92,19 @@ where
         &self,
         response: Response<Body>,
     ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
+        println!("111{:?}", String::from_utf8(response.body().to_vec()));
+
+        if let Some(body_ret_ret) = self
+            .provider
+            .device_authorization_response_parsing(&response)
+        {
+            let body_ret = body_ret_ret.map_err(|err| {
+                DeviceAuthorizationEndpointError::CustomParsingResponseFailed(err)
+            })?;
+
+            return Ok(body_ret);
+        }
+
         if response.status().is_success() {
             let map = serde_json::from_slice::<Map<String, Value>>(&response.body())
                 .map_err(DeviceAuthorizationEndpointError::DeResponseBodyFailed)?;
@@ -101,10 +124,17 @@ where
 
 #[derive(thiserror::Error, Debug)]
 pub enum DeviceAuthorizationEndpointError {
+    #[error("CustomRenderingRequestFailed {0}")]
+    CustomRenderingRequestFailed(Box<dyn error::Error + Send + Sync>),
+    //
     #[error("SerRequestBodyFailed {0}")]
     SerRequestBodyFailed(SerdeUrlencodedSerError),
     #[error("MakeRequestFailed {0}")]
     MakeRequestFailed(HttpError),
+    //
+    #[error("CustomParsingResponseFailed {0}")]
+    CustomParsingResponseFailed(Box<dyn error::Error + Send + Sync>),
+    //
     #[error("DeResponseBodyFailed {0}")]
     DeResponseBodyFailed(SerdeJsonError),
 }

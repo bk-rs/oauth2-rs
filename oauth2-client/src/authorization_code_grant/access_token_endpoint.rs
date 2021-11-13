@@ -95,7 +95,7 @@ where
     ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
         if let Some(body_ret_ret) = self.provider.access_token_response_parsing(&response) {
             let body_ret = body_ret_ret
-                .map_err(|err| AccessTokenEndpointError::CustomparsingResponseFailed(err))?;
+                .map_err(|err| AccessTokenEndpointError::CustomParsingResponseFailed(err))?;
 
             return Ok(body_ret);
         }
@@ -128,8 +128,8 @@ pub enum AccessTokenEndpointError {
     #[error("MakeRequestFailed {0}")]
     MakeRequestFailed(HttpError),
     //
-    #[error("CustomparsingResponseFailed {0}")]
-    CustomparsingResponseFailed(Box<dyn error::Error + Send + Sync>),
+    #[error("CustomParsingResponseFailed {0}")]
+    CustomParsingResponseFailed(Box<dyn error::Error + Send + Sync>),
     //
     #[error("DeResponseBodyFailed {0}")]
     DeResponseBodyFailed(SerdeJsonError),

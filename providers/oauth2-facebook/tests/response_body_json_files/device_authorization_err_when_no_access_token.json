@@ -1,0 +1,8 @@
+{
+    "error": {
+        "message": "(#190) This method must be called with a client access token",
+        "type": "OAuthException",
+        "code": 190,
+        "fbtrace_id": "A06dRADqP3d4du2uNEH_KMx"
+    }
+}

@@ -102,6 +102,7 @@ where
         _retry: Option<&RetryableEndpointRetry<Self::RetryReason>>,
     ) -> Result<Result<Self::ParseResponseOutput, Self::RetryReason>, Self::ParseResponseError>
     {
+        println!("222{:?}", String::from_utf8(response.body().to_vec()));
         if response.status().is_success() {
             let map = serde_json::from_slice::<Map<String, Value>>(&response.body())
                 .map_err(DeviceAccessTokenEndpointError::DeResponseBodyFailed)?;

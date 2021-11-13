@@ -1,9 +1,16 @@
-use std::fmt;
+use std::{error, fmt};
 
 use dyn_clone::{clone_trait_object, DynClone};
+pub use oauth2_core::device_authorization_grant::{
+    device_authorization_request::Body as DeviceAuthorizationRequestBody,
+    device_authorization_response::{
+        ErrorBody as DeviceAuthorizationResponseErrorBody,
+        SuccessfulBody as DeviceAuthorizationResponseSuccessfulBody,
+    },
+};
 
 use crate::{
-    re_exports::{ClientId, ClientSecret, Map, Scope, Url, Value},
+    re_exports::{Body, ClientId, ClientSecret, Map, Request, Response, Scope, Url, Value},
     Provider,
 };
 
@@ -16,6 +23,25 @@ pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone {
     fn device_authorization_endpoint_url(&self) -> &Url;
 
     fn device_authorization_request_body_extensions(&self) -> Option<Map<String, Value>> {
+        None
+    }
+
+    fn device_authorization_request_rendering(
+        &self,
+        _body: &DeviceAuthorizationRequestBody<<Self as Provider>::Scope>,
+    ) -> Option<Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>>> {
+        None
+    }
+
+    fn device_authorization_response_parsing(
+        &self,
+        _response: &Response<Body>,
+    ) -> Option<
+        Result<
+            Result<DeviceAuthorizationResponseSuccessfulBody, DeviceAuthorizationResponseErrorBody>,
+            Box<dyn error::Error + Send + Sync + 'static>,
+        >,
+    > {
         None
     }
 
@@ -99,6 +125,33 @@ where
 
     fn device_authorization_request_body_extensions(&self) -> Option<Map<String, Value>> {
         self.inner.device_authorization_request_body_extensions()
+    }
+
+    fn device_authorization_request_rendering(
+        &self,
+        body: &DeviceAuthorizationRequestBody<<Self as Provider>::Scope>,
+    ) -> Option<Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>>> {
+        let body =
+            match DeviceAuthorizationRequestBody::<<P as Provider>::Scope>::try_from_t_with_string(
+                body,
+            ) {
+                Ok(x) => x,
+                Err(err) => return Some(Err(Box::new(err))),
+            };
+
+        self.inner.device_authorization_request_rendering(&body)
+    }
+
+    fn device_authorization_response_parsing(
+        &self,
+        response: &Response<Body>,
+    ) -> Option<
+        Result<
+            Result<DeviceAuthorizationResponseSuccessfulBody, DeviceAuthorizationResponseErrorBody>,
+            Box<dyn error::Error + Send + Sync + 'static>,
+        >,
+    > {
+        self.inner.device_authorization_response_parsing(response)
     }
 
     fn device_access_token_request_body_extensions(&self) -> Option<Map<String, Value>> {
