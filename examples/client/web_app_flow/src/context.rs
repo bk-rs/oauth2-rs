@@ -5,6 +5,7 @@ use oauth2_amazon::{
     AmazonEndpointBuilder, AmazonProviderWithWebServices, AmazonScope, AmazonTokenUrlRegion,
 };
 use oauth2_apple::AppleProviderWithAppleJs;
+use oauth2_bitbucket::{BitbucketProviderWithWebApplication, BitbucketScope};
 use oauth2_facebook::{FacebookEndpointBuilder, FacebookProviderForWebApp, FacebookScope};
 use oauth2_github::{GithubEndpointBuilder, GithubProviderWithWebApplication, GithubScope};
 use oauth2_gitlab::{
@@ -168,6 +169,23 @@ impl Context {
                     GitlabScope::ReadUser,
                 ],
                 GitlabEndpointBuilder,
+            ),
+        );
+        signin_flow_map.insert(
+            "bitbucket",
+            SigninFlow::new(
+                IsahcClient::new()?,
+                BitbucketProviderWithWebApplication::new(
+                    clients_config.bitbucket.client_id.to_owned(),
+                    clients_config.bitbucket.client_secret.to_owned(),
+                    clients_config.bitbucket.redirect_uri.to_owned(),
+                )?,
+                vec![
+                    BitbucketScope::Account,
+                    BitbucketScope::Email,
+                    BitbucketScope::Repository,
+                ],
+                DefaultEndpointBuilder,
             ),
         );
 

@@ -28,6 +28,8 @@ where
     #[serde(skip_serializing_if = "Option::is_none")]
     pub refresh_token: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    // e.g. bitbucket {"scopes": "account repository"}
+    #[serde(alias = "scopes")]
     pub scope: Option<ScopeParameter<SCOPE>>,
 
     // OIDC

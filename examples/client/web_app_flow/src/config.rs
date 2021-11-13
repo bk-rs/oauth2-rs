@@ -44,6 +44,7 @@ pub struct ClientsConfig {
     pub facebook: ClientConfig,
     pub amazon: ClientConfig,
     pub gitlab: ClientConfig,
+    pub bitbucket: ClientConfig,
 }
 
 #[derive(Deserialize, Debug, Clone)]

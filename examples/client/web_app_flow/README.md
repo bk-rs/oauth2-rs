@@ -22,4 +22,5 @@ xdg-open https://oauth2-rs.lvh.me/auth/instagram
 xdg-open https://oauth2-rs.lvh.me/auth/facebook
 xdg-open https://oauth2-rs.lvh.me/auth/amazon
 xdg-open http://oauth2-rs.lvh.me/auth/gitlab
+xdg-open http://oauth2-rs.lvh.me/auth/bitbucket
 ```

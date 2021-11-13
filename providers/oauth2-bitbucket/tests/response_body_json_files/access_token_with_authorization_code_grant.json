@@ -1,0 +1,8 @@
+{
+    "scopes": "account repository",
+    "access_token": "x*148",
+    "expires_in": 7200,
+    "token_type": "bearer",
+    "state": "authorization_code",
+    "refresh_token": "x*18"
+}
