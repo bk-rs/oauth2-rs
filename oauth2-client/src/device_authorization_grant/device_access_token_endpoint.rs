@@ -1,4 +1,4 @@
-use std::{cmp::max, time::Duration};
+use std::{cmp::max, error, time::Duration};
 
 use http_api_client_endpoint::{
     Body, Request, Response, RetryableEndpoint, RetryableEndpointRetry,
@@ -76,7 +76,10 @@ where
             self.provider.client_id().cloned(),
             self.provider.client_secret().cloned(),
         );
-        if let Some(extensions) = self.provider.device_access_token_request_body_extensions() {
+        if let Some(extensions) = self
+            .provider
+            .device_access_token_request_body_extensions(&body)
+        {
             body.set_extensions(extensions);
         }
 
@@ -93,6 +96,8 @@ where
             .body(body_str.as_bytes().to_vec())
             .map_err(DeviceAccessTokenEndpointError::MakeRequestFailed)?;
 
+        println!("222{:?}", request);
+        println!("222{:?}", String::from_utf8(request.body().to_vec()));
         Ok(request)
     }
 
@@ -103,6 +108,17 @@ where
     ) -> Result<Result<Self::ParseResponseOutput, Self::RetryReason>, Self::ParseResponseError>
     {
         println!("222{:?}", String::from_utf8(response.body().to_vec()));
+
+        if let Some(body_ret_ret) = self
+            .provider
+            .device_access_token_response_parsing(&response)
+        {
+            let body_ret = body_ret_ret
+                .map_err(|err| DeviceAccessTokenEndpointError::CustomParsingResponseFailed(err))?;
+
+            return Ok(body_ret);
+        }
+
         if response.status().is_success() {
             let map = serde_json::from_slice::<Map<String, Value>>(&response.body())
                 .map_err(DeviceAccessTokenEndpointError::DeResponseBodyFailed)?;
@@ -155,6 +171,10 @@ pub enum DeviceAccessTokenEndpointError {
     SerRequestBodyFailed(SerdeUrlencodedSerError),
     #[error("MakeRequestFailed {0}")]
     MakeRequestFailed(HttpError),
+    //
+    #[error("CustomParsingResponseFailed {0}")]
+    CustomParsingResponseFailed(Box<dyn error::Error + Send + Sync>),
+    //
     #[error("DeResponseBodyFailed {0}")]
     DeResponseBodyFailed(SerdeJsonError),
 }

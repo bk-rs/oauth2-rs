@@ -1,12 +1,17 @@
 use std::{error, fmt};
 
+pub use crate::device_authorization_grant::device_access_token_endpoint::DeviceAccessTokenEndpointRetryReason;
 use dyn_clone::{clone_trait_object, DynClone};
-pub use oauth2_core::device_authorization_grant::{
-    device_authorization_request::Body as DeviceAuthorizationRequestBody,
-    device_authorization_response::{
-        ErrorBody as DeviceAuthorizationResponseErrorBody,
-        SuccessfulBody as DeviceAuthorizationResponseSuccessfulBody,
+pub use oauth2_core::{
+    access_token_request::BodyWithDeviceAuthorizationGrant,
+    device_authorization_grant::{
+        device_authorization_request::Body as DeviceAuthorizationRequestBody,
+        device_authorization_response::{
+            ErrorBody as DeviceAuthorizationResponseErrorBody,
+            SuccessfulBody as DeviceAuthorizationResponseSuccessfulBody,
+        },
     },
+    re_exports::{AccessTokenResponseErrorBody, AccessTokenResponseSuccessfulBody},
 };
 
 use crate::{
@@ -45,7 +50,28 @@ pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone {
         None
     }
 
-    fn device_access_token_request_body_extensions(&self) -> Option<Map<String, Value>> {
+    fn device_access_token_request_body_extensions(
+        &self,
+        _body: &BodyWithDeviceAuthorizationGrant,
+    ) -> Option<Map<String, Value>> {
+        None
+    }
+
+    fn device_access_token_response_parsing(
+        &self,
+        _response: &Response<Body>,
+    ) -> Option<
+        Result<
+            Result<
+                Result<
+                    AccessTokenResponseSuccessfulBody<<Self as Provider>::Scope>,
+                    AccessTokenResponseErrorBody,
+                >,
+                DeviceAccessTokenEndpointRetryReason,
+            >,
+            Box<dyn error::Error + Send + Sync + 'static>,
+        >,
+    > {
         None
     }
 }
@@ -154,8 +180,39 @@ where
         self.inner.device_authorization_response_parsing(response)
     }
 
-    fn device_access_token_request_body_extensions(&self) -> Option<Map<String, Value>> {
-        self.inner.device_access_token_request_body_extensions()
+    fn device_access_token_request_body_extensions(
+        &self,
+        body: &BodyWithDeviceAuthorizationGrant,
+    ) -> Option<Map<String, Value>> {
+        self.inner.device_access_token_request_body_extensions(body)
+    }
+
+    fn device_access_token_response_parsing(
+        &self,
+        response: &Response<Body>,
+    ) -> Option<
+        Result<
+            Result<
+                Result<
+                    AccessTokenResponseSuccessfulBody<<Self as Provider>::Scope>,
+                    AccessTokenResponseErrorBody,
+                >,
+                DeviceAccessTokenEndpointRetryReason,
+            >,
+            Box<dyn error::Error + Send + Sync + 'static>,
+        >,
+    > {
+        self.inner
+            .device_access_token_response_parsing(response)
+            .map(|x| {
+                x.map(|y| {
+                    y.map(|z| {
+                        z.map(|a| {
+                            AccessTokenResponseSuccessfulBody::<<Self as Provider>::Scope>::from(&a)
+                        })
+                    })
+                })
+            })
     }
 
     // Note

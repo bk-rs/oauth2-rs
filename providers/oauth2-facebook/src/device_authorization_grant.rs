@@ -2,7 +2,8 @@ use std::error;
 
 use oauth2_client::{
     device_authorization_grant::provider_ext::{
-        DeviceAuthorizationResponseErrorBody, DeviceAuthorizationResponseSuccessfulBody,
+        BodyWithDeviceAuthorizationGrant, DeviceAuthorizationResponseErrorBody,
+        DeviceAuthorizationResponseSuccessfulBody,
     },
     oauth2_core::{
         device_authorization_grant::device_authorization_response::{
@@ -131,6 +132,25 @@ impl ProviderExtDeviceAuthorizationGrant for FacebookProviderForDevices {
             },
             Err(err) => Some(Err(err)),
         }
+    }
+
+    fn device_access_token_request_body_extensions(
+        &self,
+        body: &BodyWithDeviceAuthorizationGrant,
+    ) -> Option<Map<String, Value>> {
+        let mut map = Map::new();
+
+        map.insert(
+            "access_token".to_owned(),
+            Value::String(format!("{}|{}", self.client_id, self.client_token)),
+        );
+
+        map.insert(
+            "code".to_owned(),
+            Value::String(body.device_code.to_owned()),
+        );
+
+        Some(map)
     }
 }
 
