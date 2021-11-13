@@ -1,0 +1,33 @@
+{
+    "username": "vkill",
+    "has_2fa_enabled": null,
+    "display_name": "何永鹏",
+    "account_id": "557058:6096354a-494e-458a-9c38-bc8ef021d382",
+    "links": {
+        "hooks": {
+            "href": "https://api.bitbucket.org/2.0/workspaces/%7B78f5191b-925d-4211-afa2-39064a4cd454%7D/hooks"
+        },
+        "self": {
+            "href": "https://api.bitbucket.org/2.0/users/%7B78f5191b-925d-4211-afa2-39064a4cd454%7D"
+        },
+        "repositories": {
+            "href": "https://api.bitbucket.org/2.0/repositories/%7B78f5191b-925d-4211-afa2-39064a4cd454%7D"
+        },
+        "html": {
+            "href": "https://bitbucket.org/%7B78f5191b-925d-4211-afa2-39064a4cd454%7D/"
+        },
+        "avatar": {
+            "href": "https://secure.gravatar.com/avatar/6a3b78e05f20472aafc29aad3c4a6b4d?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FV-2.png"
+        },
+        "snippets": {
+            "href": "https://api.bitbucket.org/2.0/snippets/%7B78f5191b-925d-4211-afa2-39064a4cd454%7D"
+        }
+    },
+    "nickname": "vkill",
+    "created_on": "2012-11-02T09:12:00.091816+00:00",
+    "is_staff": false,
+    "location": null,
+    "account_status": "active",
+    "type": "user",
+    "uuid": "{78f5191b-925d-4211-afa2-39064a4cd454}"
+}
