@@ -19,7 +19,7 @@ use oauth2_client::{
     Provider, ProviderExtDeviceAuthorizationGrant,
 };
 
-use crate::{FacebookScope, DEVICE_AUTHORIZATION_URL, TOKEN_URL};
+use crate::{FacebookScope, DEVICE_AUTHORIZATION_URL, DEVICE_TOKEN_URL};
 
 #[derive(Debug, Clone)]
 pub struct FacebookProviderForDevices {
@@ -34,7 +34,7 @@ impl FacebookProviderForDevices {
         Ok(Self {
             client_access_token: format!("{}|{}", app_id, client_token),
             redirect_uri: None,
-            token_endpoint_url: TOKEN_URL.parse()?,
+            token_endpoint_url: DEVICE_TOKEN_URL.parse()?,
             device_authorization_endpoint_url: DEVICE_AUTHORIZATION_URL.parse()?,
         })
     }

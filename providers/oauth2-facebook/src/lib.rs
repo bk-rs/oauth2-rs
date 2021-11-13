@@ -1,12 +1,14 @@
 use oauth2_client::re_exports::{Deserialize_enum_str, Scope, Serialize_enum_str};
 
-pub const TOKEN_URL: &str = "https://graph.facebook.com/v12.0/device/login_status";
-pub const AUTHORIZATION_URL: &str = "https://accounts.google.com/o/oauth2/v2/auth";
+pub const TOKEN_URL: &str = "https://graph.facebook.com/v12.0/oauth/access_token";
+pub const AUTHORIZATION_URL: &str = "https://www.facebook.com/v12.0/dialog/oauth";
+pub const DEVICE_TOKEN_URL: &str = "https://graph.facebook.com/v12.0/device/login_status";
 pub const DEVICE_AUTHORIZATION_URL: &str = "https://graph.facebook.com/v12.0/device/login";
 
 pub mod authorization_code_grant;
 pub mod device_authorization_grant;
 
+pub use authorization_code_grant::FacebookProviderForWebApp;
 pub use device_authorization_grant::FacebookProviderForDevices;
 
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]

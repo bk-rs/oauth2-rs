@@ -41,6 +41,7 @@ pub struct ClientsConfig {
     pub mastodon_social: ClientConfig,
     pub apple: ClientConfig,
     pub instagram: ClientConfig,
+    pub facebook: ClientConfig,
 }
 
 #[derive(Deserialize, Debug, Clone)]

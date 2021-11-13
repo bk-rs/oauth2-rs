@@ -2,6 +2,7 @@ use std::{collections::HashMap, error};
 
 use http_api_isahc_client::IsahcClient;
 use oauth2_apple::AppleProviderWithAppleJs;
+use oauth2_facebook::{FacebookProviderForWebApp, FacebookScope};
 use oauth2_github::{GithubEndpointBuilder, GithubProviderWithWebApplication, GithubScope};
 use oauth2_google::{
     GoogleEndpointBuilder, GoogleProviderForWebServerApps,
@@ -115,6 +116,19 @@ impl Context {
                 )?,
                 vec![InstagramScope::UserMedia, InstagramScope::UserProfile],
                 InstagramEndpointBuilder,
+            ),
+        );
+        signin_flow_map.insert(
+            "facebook",
+            SigninFlow::new(
+                IsahcClient::new()?,
+                FacebookProviderForWebApp::new(
+                    clients_config.facebook.client_id.to_owned(),
+                    clients_config.facebook.client_secret.to_owned(),
+                    clients_config.facebook.redirect_uri.to_owned(),
+                )?,
+                vec![FacebookScope::Email, FacebookScope::PublicProfile],
+                DefaultEndpointBuilder,
             ),
         );
 

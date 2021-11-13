@@ -2,7 +2,6 @@
 
 Ref [Facebook Login for Devices](https://developers.facebook.com/docs/facebook-login/for-devices)
 
-
 ## Prerequisites
 
 1. Create a Facebook App
@@ -18,7 +17,7 @@ Manage integrations for your business
 Type
 
 ```
-Consumer
+Business or Consumer
 ```
 
 Details
