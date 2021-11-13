@@ -4,7 +4,7 @@ use oauth2_client::re_exports::{
     SerdeJsonError, Serialize, Value, MIME_APPLICATION_JSON,
 };
 
-pub const URL: &str = "https://api.github.com/user";
+pub const URL: &str = "https://gitlab.com/api/v4/user";
 
 //
 #[derive(Debug, Clone)]
@@ -28,7 +28,7 @@ impl Endpoint for UserEndpoint {
     fn render_request(&self) -> Result<Request<Body>, Self::RenderRequestError> {
         let request = Request::builder()
             .uri(URL)
-            .header(AUTHORIZATION, format!("token {}", &self.access_token))
+            .header(AUTHORIZATION, format!("Bearer {}", &self.access_token))
             .header(ACCEPT, MIME_APPLICATION_JSON)
             .body(vec![])
             .map_err(UserEndpointError::MakeRequestFailed)?;
@@ -49,10 +49,10 @@ impl Endpoint for UserEndpoint {
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct User {
-    pub login: String,
     pub id: usize,
-    pub avatar_url: String,
     pub name: String,
+    pub username: String,
+    pub avatar_url: String,
     pub email: String,
     //
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
@@ -78,7 +78,7 @@ mod tests {
             "../../tests/response_body_json_files/user.json"
         )) {
             Ok(user) => {
-                assert_eq!(user.id, 610852);
+                assert_eq!(user.id, 446862);
             }
             Err(err) => panic!("{}", err),
         }

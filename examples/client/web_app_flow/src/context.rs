@@ -7,7 +7,9 @@ use oauth2_amazon::{
 use oauth2_apple::AppleProviderWithAppleJs;
 use oauth2_facebook::{FacebookEndpointBuilder, FacebookProviderForWebApp, FacebookScope};
 use oauth2_github::{GithubEndpointBuilder, GithubProviderWithWebApplication, GithubScope};
-use oauth2_gitlab::{GitlabProviderForEndUsers, GitlabScope, BASE_URL_GITLAB_COM};
+use oauth2_gitlab::{
+    GitlabEndpointBuilder, GitlabProviderForEndUsers, GitlabScope, BASE_URL_GITLAB_COM,
+};
 use oauth2_google::{
     GoogleEndpointBuilder, GoogleProviderForWebServerApps,
     GoogleProviderForWebServerAppsAccessType, GoogleScope,
@@ -163,8 +165,9 @@ impl Context {
                     GitlabScope::Openid,
                     GitlabScope::Profile,
                     GitlabScope::Email,
+                    GitlabScope::ReadUser,
                 ],
-                DefaultEndpointBuilder,
+                GitlabEndpointBuilder,
             ),
         );
 

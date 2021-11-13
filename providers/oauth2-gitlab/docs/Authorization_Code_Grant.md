@@ -9,7 +9,7 @@ Ref [Configure GitLab as an OAuth 2.0 authentication identity provider](https://
 ```
 Name: oauth2-rs-demo
 Redirect URI: http://oauth2-rs.lvh.me/auth/gitlab/callback
-Scopes: openid profile email
+Scopes: read_user openid profile email
 ```
 
 ```
