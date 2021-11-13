@@ -46,7 +46,10 @@ pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone {
 
     fn authorization_request_url_modifying(&self, _url: &mut Url) {}
 
-    fn access_token_request_body_extensions(&self) -> Option<Map<String, Value>> {
+    fn access_token_request_body_extensions(
+        &self,
+        _body: &AccessTokenRequestBody,
+    ) -> Option<Map<String, Value>> {
         None
     }
 
@@ -183,8 +186,11 @@ where
         self.inner.authorization_request_url_modifying(url)
     }
 
-    fn access_token_request_body_extensions(&self) -> Option<Map<String, Value>> {
-        self.inner.access_token_request_body_extensions()
+    fn access_token_request_body_extensions(
+        &self,
+        body: &AccessTokenRequestBody,
+    ) -> Option<Map<String, Value>> {
+        self.inner.access_token_request_body_extensions(body)
     }
 
     fn access_token_request_rendering(

@@ -295,7 +295,40 @@ impl TryFrom<FacebookDeviceAccessTokenResponseErrorBody>
     type Error = Box<dyn error::Error + Send + Sync>;
 
     fn try_from(body: FacebookDeviceAccessTokenResponseErrorBody) -> Result<Self, Self::Error> {
-        todo!()
+        match body.error.error_subcode {
+            Some(1349174) => Ok(Ok(
+                DeviceAccessTokenEndpointRetryReason::AuthorizationPending,
+            )),
+            Some(1349172) => Ok(Ok(DeviceAccessTokenEndpointRetryReason::SlowDown)),
+            Some(1349152) => {
+                let mut body_new = AccessTokenResponseErrorBody::new(
+                    AccessTokenResponseErrorBodyError::ExpiredToken,
+                    Some(body.error.message.to_owned()),
+                    None,
+                );
+                body_new.set_extensions(
+                    serde_json::to_value(body)
+                        .map(|x| x.as_object().cloned())?
+                        .ok_or_else(|| "unreachable".to_owned())?,
+                );
+
+                Ok(Err(body_new))
+            }
+            _ => {
+                let mut body_new = AccessTokenResponseErrorBody::new(
+                    AccessTokenResponseErrorBodyError::Other("".to_owned()),
+                    Some(body.error.message.to_owned()),
+                    None,
+                );
+                body_new.set_extensions(
+                    serde_json::to_value(body)
+                        .map(|x| x.as_object().cloned())?
+                        .ok_or_else(|| "unreachable".to_owned())?,
+                );
+
+                Ok(Err(body_new))
+            }
+        }
     }
 }
 

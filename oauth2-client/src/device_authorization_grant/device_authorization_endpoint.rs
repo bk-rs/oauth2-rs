@@ -70,8 +70,6 @@ where
             let request = request_ret.map_err(|err| {
                 DeviceAuthorizationEndpointError::CustomRenderingRequestFailed(err)
             })?;
-            println!("111{:?}", request);
-            println!("111{:?}", String::from_utf8(request.body().to_vec()));
             return Ok(request);
         }
 
@@ -86,8 +84,6 @@ where
             .body(body_str.as_bytes().to_vec())
             .map_err(DeviceAuthorizationEndpointError::MakeRequestFailed)?;
 
-        println!("111{:?}", request);
-        println!("111{:?}", String::from_utf8(request.body().to_vec()));
         Ok(request)
     }
 
@@ -95,8 +91,6 @@ where
         &self,
         response: Response<Body>,
     ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
-        println!("111{:?}", String::from_utf8(response.body().to_vec()));
-
         if let Some(body_ret_ret) = self
             .provider
             .device_authorization_response_parsing(&response)

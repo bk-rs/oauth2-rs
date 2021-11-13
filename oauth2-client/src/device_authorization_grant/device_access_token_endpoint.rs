@@ -83,6 +83,13 @@ where
             body.set_extensions(extensions);
         }
 
+        if let Some(request_ret) = self.provider.device_access_token_request_rendering(&body) {
+            let request = request_ret
+                .map_err(|err| DeviceAccessTokenEndpointError::CustomRenderingRequestFailed(err))?;
+
+            return Ok(request);
+        }
+
         let body = REQ_Body::<SCOPE>::DeviceAuthorizationGrant(body);
 
         let body_str = serde_urlencoded::to_string(body)
@@ -96,8 +103,6 @@ where
             .body(body_str.as_bytes().to_vec())
             .map_err(DeviceAccessTokenEndpointError::MakeRequestFailed)?;
 
-        println!("222{:?}", request);
-        println!("222{:?}", String::from_utf8(request.body().to_vec()));
         Ok(request)
     }
 
@@ -107,8 +112,6 @@ where
         _retry: Option<&RetryableEndpointRetry<Self::RetryReason>>,
     ) -> Result<Result<Self::ParseResponseOutput, Self::RetryReason>, Self::ParseResponseError>
     {
-        println!("222{:?}", String::from_utf8(response.body().to_vec()));
-
         if let Some(body_ret_ret) = self
             .provider
             .device_access_token_response_parsing(&response)
@@ -167,6 +170,9 @@ pub enum DeviceAccessTokenEndpointRetryReason {
 
 #[derive(thiserror::Error, Debug)]
 pub enum DeviceAccessTokenEndpointError {
+    #[error("CustomRenderingRequestFailed {0}")]
+    CustomRenderingRequestFailed(Box<dyn error::Error + Send + Sync>),
+    //
     #[error("SerRequestBodyFailed {0}")]
     SerRequestBodyFailed(SerdeUrlencodedSerError),
     #[error("MakeRequestFailed {0}")]

@@ -61,7 +61,7 @@ where
             self.provider.client_id().cloned(),
             self.provider.client_secret().cloned(),
         );
-        if let Some(extensions) = self.provider.access_token_request_body_extensions() {
+        if let Some(extensions) = self.provider.access_token_request_body_extensions(&body) {
             body.set_extensions(extensions);
         }
 
