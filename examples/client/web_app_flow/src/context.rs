@@ -7,6 +7,7 @@ use oauth2_amazon::{
 use oauth2_apple::AppleProviderWithAppleJs;
 use oauth2_facebook::{FacebookEndpointBuilder, FacebookProviderForWebApp, FacebookScope};
 use oauth2_github::{GithubEndpointBuilder, GithubProviderWithWebApplication, GithubScope};
+use oauth2_gitlab::{GitlabProviderForEndUsers, GitlabScope, BASE_URL_GITLAB_COM};
 use oauth2_google::{
     GoogleEndpointBuilder, GoogleProviderForWebServerApps,
     GoogleProviderForWebServerAppsAccessType, GoogleScope,
@@ -146,6 +147,24 @@ impl Context {
                 )?,
                 vec![AmazonScope::Profile, AmazonScope::PostalCode],
                 AmazonEndpointBuilder,
+            ),
+        );
+        signin_flow_map.insert(
+            "gitlab",
+            SigninFlow::new(
+                IsahcClient::new()?,
+                GitlabProviderForEndUsers::new(
+                    BASE_URL_GITLAB_COM,
+                    clients_config.gitlab.client_id.to_owned(),
+                    clients_config.gitlab.client_secret.to_owned(),
+                    clients_config.gitlab.redirect_uri.to_owned(),
+                )?,
+                vec![
+                    GitlabScope::Openid,
+                    GitlabScope::Profile,
+                    GitlabScope::Email,
+                ],
+                DefaultEndpointBuilder,
             ),
         );
 

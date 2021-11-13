@@ -23,6 +23,7 @@ oauth2-apple = { version = "^0.0", path = "../../../providers/oauth2-apple" }
 oauth2-instagram = { version = "^0.0", path = "../../../providers/oauth2-instagram" }
 oauth2-facebook = { version = "^0.0", path = "../../../providers/oauth2-facebook" }
 oauth2-amazon = { version = "^0.0", path = "../../../providers/oauth2-amazon" }
+oauth2-gitlab = { version = "^0.0", path = "../../../providers/oauth2-gitlab" }
 
 tokio = { version = "1.12", default-features = false, features = ["macros", "rt-multi-thread"] }
 futures-util = { version = "0.3" }
