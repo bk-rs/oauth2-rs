@@ -1,0 +1,12 @@
+{
+    "error": {
+        "message": "This request requires the user to take a pending action",
+        "type": "OAuthException",
+        "code": 31,
+        "error_subcode": 1349174,
+        "is_transient": false,
+        "error_user_title": "Device Login Authorization Pending",
+        "error_user_msg": "User has not yet authorized your application. Continue polling.",
+        "fbtrace_id": "AuNfh12gTyCQuqgHPn64x8F"
+    }
+}

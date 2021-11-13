@@ -2,8 +2,9 @@ use std::error;
 
 use oauth2_client::{
     device_authorization_grant::provider_ext::{
-        BodyWithDeviceAuthorizationGrant, DeviceAuthorizationResponseErrorBody,
-        DeviceAuthorizationResponseSuccessfulBody,
+        AccessTokenResponseErrorBody, AccessTokenResponseSuccessfulBody,
+        BodyWithDeviceAuthorizationGrant, DeviceAccessTokenEndpointRetryReason,
+        DeviceAuthorizationResponseErrorBody, DeviceAuthorizationResponseSuccessfulBody,
     },
     oauth2_core::{
         device_authorization_grant::device_authorization_response::{
@@ -152,6 +153,67 @@ impl ProviderExtDeviceAuthorizationGrant for FacebookProviderForDevices {
 
         Some(map)
     }
+
+    fn device_access_token_response_parsing(
+        &self,
+        response: &Response<Body>,
+    ) -> Option<
+        Result<
+            Result<
+                Result<
+                    AccessTokenResponseSuccessfulBody<<Self as Provider>::Scope>,
+                    AccessTokenResponseErrorBody,
+                >,
+                DeviceAccessTokenEndpointRetryReason,
+            >,
+            Box<dyn error::Error + Send + Sync + 'static>,
+        >,
+    > {
+        fn doing(
+            response: &Response<Body>,
+        ) -> Result<
+            Result<
+                AccessTokenResponseSuccessfulBody<<FacebookProviderForDevices as Provider>::Scope>,
+                FacebookDeviceAccessTokenResponseErrorBody,
+            >,
+            Box<dyn error::Error + Send + Sync + 'static>,
+        > {
+            if response.status().is_success() {
+                let map = serde_json::from_slice::<Map<String, Value>>(&response.body())
+                    .map_err(DeviceAccessTokenResponseParsingError::DeResponseBodyFailed)?;
+                if !map.contains_key("error") {
+                    let body = serde_json::from_slice::<
+                        AccessTokenResponseSuccessfulBody<
+                            <FacebookProviderForDevices as Provider>::Scope,
+                        >,
+                    >(&response.body())
+                    .map_err(DeviceAccessTokenResponseParsingError::DeResponseBodyFailed)?;
+
+                    return Ok(Ok(body));
+                }
+            }
+
+            let body = serde_json::from_slice::<FacebookDeviceAccessTokenResponseErrorBody>(
+                &response.body(),
+            )
+            .map_err(DeviceAuthorizationResponseParsingError::DeResponseBodyFailed)?;
+            Ok(Err(body))
+        }
+
+        match doing(response) {
+            Ok(Ok(ok_body)) => Some(Ok(Ok(Ok(ok_body)))),
+            Ok(Err(err_body)) => match Result::<
+                DeviceAccessTokenEndpointRetryReason,
+                AccessTokenResponseErrorBody,
+            >::try_from(err_body)
+            {
+                Ok(Ok(reason)) => Some(Ok(Err(reason))),
+                Ok(Err(err_body)) => Some(Ok(Ok(Err(err_body)))),
+                Err(err) => Some(Err(err)),
+            },
+            Err(err) => Some(Err(err)),
+        }
+    }
 }
 
 //
@@ -212,6 +274,33 @@ impl TryFrom<FacebookDeviceAuthorizationResponseErrorBody>
 
 #[derive(thiserror::Error, Debug)]
 pub enum DeviceAuthorizationResponseParsingError {
+    //
+    #[error("DeResponseBodyFailed {0}")]
+    DeResponseBodyFailed(SerdeJsonError),
+}
+
+//
+#[derive(Serialize, Deserialize)]
+pub struct FacebookDeviceAccessTokenResponseErrorBody {
+    pub error: FacebookDeviceAccessTokenResponseErrorBodyError,
+}
+#[derive(Serialize, Deserialize)]
+pub struct FacebookDeviceAccessTokenResponseErrorBodyError {
+    pub message: String,
+    pub error_subcode: Option<isize>,
+}
+impl TryFrom<FacebookDeviceAccessTokenResponseErrorBody>
+    for Result<DeviceAccessTokenEndpointRetryReason, AccessTokenResponseErrorBody>
+{
+    type Error = Box<dyn error::Error + Send + Sync>;
+
+    fn try_from(body: FacebookDeviceAccessTokenResponseErrorBody) -> Result<Self, Self::Error> {
+        todo!()
+    }
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum DeviceAccessTokenResponseParsingError {
     //
     #[error("DeResponseBodyFailed {0}")]
     DeResponseBodyFailed(SerdeJsonError),
