@@ -8,7 +8,9 @@ use mime::Mime;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 
-use crate::types::{ClientId, ClientPassword, ClientSecret, Code, Scope, ScopeParameter};
+use crate::types::{
+    ClientId, ClientPassword, ClientSecret, Code, Scope, ScopeFromStrError, ScopeParameter,
+};
 
 pub const METHOD: Method = Method::POST;
 pub const CONTENT_TYPE: Mime = mime::APPLICATION_WWW_FORM_URLENCODED;
@@ -156,6 +158,23 @@ where
     pub fn extensions(&self) -> Option<&Map<String, Value>> {
         self._extensions.as_ref()
     }
+
+    pub fn try_from_t_with_string(
+        body: &BodyWithClientCredentialsGrant<String>,
+    ) -> Result<Self, ScopeFromStrError> {
+        let scope = if let Some(x) = &body.scope {
+            Some(ScopeParameter::<SCOPE>::try_from_t_with_string(x)?)
+        } else {
+            None
+        };
+
+        let mut this = Self::new(scope);
+        this.client_password = body.client_password.to_owned();
+        if let Some(extensions) = body.extensions() {
+            this.set_extensions(extensions.to_owned());
+        }
+        Ok(this)
+    }
 }
 
 //
@@ -214,6 +233,23 @@ where
     }
     pub fn extensions(&self) -> Option<&Map<String, Value>> {
         self._extensions.as_ref()
+    }
+
+    pub fn try_from_t_with_string(
+        body: &BodyWithResourceOwnerPasswordCredentialsGrant<String>,
+    ) -> Result<Self, ScopeFromStrError> {
+        let scope = if let Some(x) = &body.scope {
+            Some(ScopeParameter::<SCOPE>::try_from_t_with_string(x)?)
+        } else {
+            None
+        };
+
+        let mut this = Self::new(body.username.to_owned(), body.password.to_owned(), scope);
+        this.client_password = body.client_password.to_owned();
+        if let Some(extensions) = body.extensions() {
+            this.set_extensions(extensions.to_owned());
+        }
+        Ok(this)
     }
 }
 

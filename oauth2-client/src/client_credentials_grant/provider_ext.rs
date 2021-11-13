@@ -1,6 +1,7 @@
-use std::fmt;
+use std::{error, fmt};
 
 use dyn_clone::{clone_trait_object, DynClone};
+pub use oauth2_core::access_token_request::BodyWithClientCredentialsGrant;
 
 use crate::{
     re_exports::{ClientId, ClientSecret, Map, Scope, Url, Value},
@@ -17,7 +18,10 @@ pub trait ProviderExtClientCredentialsGrant: Provider + DynClone {
         None
     }
 
-    fn access_token_request_body_extensions(&self) -> Option<Map<String, Value>> {
+    fn access_token_request_body_extensions(
+        &self,
+        _body: &BodyWithClientCredentialsGrant<<Self as Provider>::Scope>,
+    ) -> Option<Result<Map<String, Value>, Box<dyn error::Error + Send + Sync + 'static>>> {
         None
     }
 }
@@ -90,8 +94,19 @@ where
             .map(|x| x.iter().map(|y| y.to_string()).collect())
     }
 
-    fn access_token_request_body_extensions(&self) -> Option<Map<String, Value>> {
-        self.inner.access_token_request_body_extensions()
+    fn access_token_request_body_extensions(
+        &self,
+        body: &BodyWithClientCredentialsGrant<<Self as Provider>::Scope>,
+    ) -> Option<Result<Map<String, Value>, Box<dyn error::Error + Send + Sync + 'static>>> {
+        let body =
+            match BodyWithClientCredentialsGrant::<<P as Provider>::Scope>::try_from_t_with_string(
+                body,
+            ) {
+                Ok(x) => x,
+                Err(err) => return Some(Err(Box::new(err))),
+            };
+
+        self.inner.access_token_request_body_extensions(&body)
     }
 
     // Note

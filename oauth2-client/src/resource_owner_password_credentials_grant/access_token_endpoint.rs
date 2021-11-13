@@ -1,3 +1,5 @@
+use std::error;
+
 use http_api_client_endpoint::{Body, Endpoint, Request, Response};
 use oauth2_core::{
     access_token_request::{
@@ -90,8 +92,17 @@ where
                 self.scopes.to_owned().map(Into::into),
             )
         };
-        if let Some(extensions) = self.provider.access_token_request_body_extensions() {
-            body.set_extensions(extensions);
+        if let Some(extensions_ret) = self.provider.access_token_request_body_extensions(&body) {
+            match extensions_ret {
+                Ok(extensions) => {
+                    body.set_extensions(extensions);
+                }
+                Err(err) => {
+                    return Err(AccessTokenEndpointError::MakeRequestBodyExtensionsFailed(
+                        err,
+                    ));
+                }
+            }
         }
 
         //
@@ -143,6 +154,9 @@ pub enum AccessTokenEndpointError {
     ClientIdMissing,
     #[error("ClientSecretMissing")]
     ClientSecretMissing,
+    //
+    #[error("MakeRequestBodyExtensionsFailed {0}")]
+    MakeRequestBodyExtensionsFailed(Box<dyn error::Error + Send + Sync>),
     //
     #[error("SerRequestBodyFailed {0}")]
     SerRequestBodyFailed(SerdeUrlencodedSerError),
