@@ -1,6 +1,7 @@
 use std::{collections::HashMap, error};
 
 use http_api_isahc_client::IsahcClient;
+use oauth2_amazon::{AmazonProviderWithWebServices, AmazonScope, AmazonTokenUrlRegion};
 use oauth2_apple::AppleProviderWithAppleJs;
 use oauth2_facebook::{FacebookEndpointBuilder, FacebookProviderForWebApp, FacebookScope};
 use oauth2_github::{GithubEndpointBuilder, GithubProviderWithWebApplication, GithubScope};
@@ -129,6 +130,20 @@ impl Context {
                 )?,
                 vec![FacebookScope::Email, FacebookScope::PublicProfile],
                 FacebookEndpointBuilder,
+            ),
+        );
+        signin_flow_map.insert(
+            "amazon",
+            SigninFlow::new(
+                IsahcClient::new()?,
+                AmazonProviderWithWebServices::new(
+                    clients_config.amazon.client_id.to_owned(),
+                    clients_config.amazon.client_secret.to_owned(),
+                    clients_config.amazon.redirect_uri.to_owned(),
+                    AmazonTokenUrlRegion::NA,
+                )?,
+                vec![AmazonScope::Profile, AmazonScope::PostalCode],
+                DefaultEndpointBuilder,
             ),
         );
 

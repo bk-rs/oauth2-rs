@@ -32,3 +32,8 @@ redirect_uri = "https://oauth2-rs.lvh.me/auth/instagram/callback"
 client_id = "xxx"
 client_secret = "xxx"
 redirect_uri = "https://oauth2-rs.lvh.me/auth/facebook/callback"
+
+[amazon]
+client_id = "xxx"
+client_secret = "xxx"
+redirect_uri = "https://oauth2-rs.lvh.me/auth/amazon/callback"
