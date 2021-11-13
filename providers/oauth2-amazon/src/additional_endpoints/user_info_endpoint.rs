@@ -9,10 +9,10 @@ use super::internal_user_endpoint::{User, UserEndpoint, UserEndpointError};
 
 //
 #[derive(Debug, Clone)]
-pub struct GithubUserInfoEndpoint {
+pub struct AmazonUserInfoEndpoint {
     inner: UserEndpoint,
 }
-impl GithubUserInfoEndpoint {
+impl AmazonUserInfoEndpoint {
     pub fn new(access_token: impl AsRef<str>) -> Self {
         Self {
             inner: UserEndpoint::new(access_token),
@@ -20,7 +20,7 @@ impl GithubUserInfoEndpoint {
     }
 }
 
-impl Endpoint for GithubUserInfoEndpoint {
+impl Endpoint for AmazonUserInfoEndpoint {
     type RenderRequestError = EndpointRenderRequestError;
 
     type ParseResponseOutput = UserInfo;
@@ -63,7 +63,7 @@ impl TryFrom<User> for UserInfo {
 
     fn try_from(user: User) -> Result<Self, Self::Error> {
         Ok(Self {
-            uid: user.id.to_string(),
+            uid: user.user_id.to_owned(),
             name: Some(user.name.to_owned()),
             email: Some(user.email.to_owned()),
             raw: serde_json::to_value(user)

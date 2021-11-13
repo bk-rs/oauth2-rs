@@ -1,7 +1,9 @@
 use std::{collections::HashMap, error};
 
 use http_api_isahc_client::IsahcClient;
-use oauth2_amazon::{AmazonProviderWithWebServices, AmazonScope, AmazonTokenUrlRegion};
+use oauth2_amazon::{
+    AmazonEndpointBuilder, AmazonProviderWithWebServices, AmazonScope, AmazonTokenUrlRegion,
+};
 use oauth2_apple::AppleProviderWithAppleJs;
 use oauth2_facebook::{FacebookEndpointBuilder, FacebookProviderForWebApp, FacebookScope};
 use oauth2_github::{GithubEndpointBuilder, GithubProviderWithWebApplication, GithubScope};
@@ -143,7 +145,7 @@ impl Context {
                     AmazonTokenUrlRegion::NA,
                 )?,
                 vec![AmazonScope::Profile, AmazonScope::PostalCode],
-                DefaultEndpointBuilder,
+                AmazonEndpointBuilder,
             ),
         );
 

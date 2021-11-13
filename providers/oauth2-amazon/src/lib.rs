@@ -9,6 +9,9 @@ pub mod authorization_code_grant;
 
 pub use authorization_code_grant::AmazonProviderWithWebServices;
 
+pub mod additional_endpoints;
+pub use additional_endpoints::AmazonEndpointBuilder;
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum AmazonTokenUrlRegion {
     NA,

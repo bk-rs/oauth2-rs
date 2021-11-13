@@ -72,7 +72,7 @@ impl TryFrom<(IgUserId, User)> for UserInfoWrapper {
     fn try_from((ig_user_id, user): (IgUserId, User)) -> Result<Self, Self::Error> {
         Ok(Self(UserInfo {
             uid: ig_user_id.to_string(),
-            name: Some(user.username.to_string()),
+            name: Some(user.username.to_owned()),
             email: None,
             raw: serde_json::to_value(user)
                 .map(|x| x.as_object().cloned())?

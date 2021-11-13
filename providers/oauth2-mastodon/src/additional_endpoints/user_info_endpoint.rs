@@ -77,7 +77,7 @@ impl TryFrom<Account> for UserInfo {
     fn try_from(account: Account) -> Result<Self, Self::Error> {
         Ok(Self {
             uid: account.id.to_string(),
-            name: Some(account.username.to_string()),
+            name: Some(account.username.to_owned()),
             email: None,
             raw: serde_json::to_value(account)
                 .map(|x| x.as_object().cloned())?
