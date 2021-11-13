@@ -1,0 +1,4 @@
+{
+    "error_description": "The authorization grant type is not supported by the authorization server",
+    "error": "unsupported_grant_type"
+}

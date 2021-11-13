@@ -15,7 +15,9 @@ use oauth2_core::{
         device_access_token_response::{
             ErrorBody as RES_ErrorBody, SuccessfulBody as RES_SuccessfulBody,
         },
-        device_authorization_response::{DeviceCode, INTERVAL_DEFAULT},
+        device_authorization_response::{
+            SuccessfulBody as DA_RES_SuccessfulBody, INTERVAL_DEFAULT,
+        },
     },
     http::{
         header::{ACCEPT, CONTENT_TYPE},
@@ -36,7 +38,7 @@ where
     SCOPE: Scope,
 {
     provider: &'a (dyn ProviderExtDeviceAuthorizationGrant<Scope = SCOPE> + Send + Sync),
-    device_code: DeviceCode,
+    device_authorization_response_successful_body: DA_RES_SuccessfulBody,
     interval: Duration,
 }
 impl<'a, SCOPE> DeviceAccessTokenEndpoint<'a, SCOPE>
@@ -45,13 +47,16 @@ where
 {
     pub fn new(
         provider: &'a (dyn ProviderExtDeviceAuthorizationGrant<Scope = SCOPE> + Send + Sync),
-        device_code: DeviceCode,
-        interval: Duration,
+        device_authorization_response_successful_body: DA_RES_SuccessfulBody,
     ) -> Self {
+        let interval = max(
+            device_authorization_response_successful_body.interval(),
+            Duration::from_secs(INTERVAL_DEFAULT as u64),
+        );
         Self {
             provider,
-            device_code,
-            interval: max(interval, Duration::from_secs(INTERVAL_DEFAULT as u64)),
+            device_authorization_response_successful_body,
+            interval,
         }
     }
 }
@@ -72,18 +77,23 @@ where
         _retry: Option<&RetryableEndpointRetry<Self::RetryReason>>,
     ) -> Result<Request<Body>, Self::RenderRequestError> {
         let mut body = BodyWithDeviceAuthorizationGrant::new(
-            self.device_code.to_owned(),
+            self.device_authorization_response_successful_body
+                .device_code
+                .to_owned(),
             self.provider.client_id().cloned(),
             self.provider.client_secret().cloned(),
         );
-        if let Some(extensions) = self
-            .provider
-            .device_access_token_request_body_extensions(&body)
-        {
+        if let Some(extensions) = self.provider.device_access_token_request_body_extensions(
+            &body,
+            &self.device_authorization_response_successful_body,
+        ) {
             body.set_extensions(extensions);
         }
 
-        if let Some(request_ret) = self.provider.device_access_token_request_rendering(&body) {
+        if let Some(request_ret) = self.provider.device_access_token_request_rendering(
+            &body,
+            &self.device_authorization_response_successful_body,
+        ) {
             let request = request_ret
                 .map_err(|err| DeviceAccessTokenEndpointError::CustomRenderingRequestFailed(err))?;
 

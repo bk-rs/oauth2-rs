@@ -136,6 +136,7 @@ impl ProviderExtDeviceAuthorizationGrant for FacebookProviderForDevices {
     fn device_access_token_request_body_extensions(
         &self,
         body: &BodyWithDeviceAuthorizationGrant,
+        _device_authorization_response_body: &DeviceAuthorizationResponseSuccessfulBody,
     ) -> Option<Map<String, Value>> {
         let mut map = Map::new();
 
@@ -341,7 +342,7 @@ pub enum DeviceAccessTokenResponseParsingError {
 mod tests {
     use super::*;
 
-    use std::{error, time::Duration};
+    use std::error;
 
     use oauth2_client::{
         device_authorization_grant::{DeviceAccessTokenEndpoint, DeviceAuthorizationEndpoint},
@@ -412,8 +413,14 @@ mod tests {
             FacebookProviderForDevices::new("APP_ID".to_owned(), "CLIENT_TOKEN".to_owned())?;
         let endpoint = DeviceAccessTokenEndpoint::new(
             &provider,
-            "DEVICE_CODE".to_owned(),
-            Duration::from_secs(5),
+            DeviceAuthorizationResponseSuccessfulBody::new(
+                "DEVICE_CODE".to_owned(),
+                "".to_owned(),
+                "https://example.com".parse()?,
+                None,
+                0,
+                Some(5),
+            ),
         );
 
         //
@@ -430,8 +437,14 @@ mod tests {
             FacebookProviderForDevices::new("APP_ID".to_owned(), "CLIENT_TOKEN".to_owned())?;
         let endpoint = DeviceAccessTokenEndpoint::new(
             &provider,
-            "DEVICE_CODE".to_owned(),
-            Duration::from_secs(5),
+            DeviceAuthorizationResponseSuccessfulBody::new(
+                "DEVICE_CODE".to_owned(),
+                "".to_owned(),
+                "https://example.com".parse()?,
+                None,
+                0,
+                Some(5),
+            ),
         );
 
         //

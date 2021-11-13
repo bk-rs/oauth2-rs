@@ -14,7 +14,15 @@ Security Profile Description: oauth2-rs-web-demo
 Consent Privacy Notice URL: YOUR_URL e.g. https://policies.google.com/privacy
 ```
 
+```
+Client ID: amzn1.application-oa2-client.x*32
+
+Client Secret: x*64
+```
+
 2. Add your Website to your Security Profile
+
+Tab "Web Settings"
 
 ```
 Allowed Origins: https://oauth2-rs.lvh.me

@@ -100,11 +100,8 @@ where
         );
 
         // Step 3
-        let device_access_token_endpoint = DeviceAccessTokenEndpoint::new(
-            provider,
-            device_authorization_successful_body.device_code.to_owned(),
-            device_authorization_successful_body.interval(),
-        );
+        let device_access_token_endpoint =
+            DeviceAccessTokenEndpoint::new(provider, device_authorization_successful_body);
 
         let device_access_token_ret = self
             .client_with_token

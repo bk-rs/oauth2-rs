@@ -4,10 +4,13 @@ pub const TOKEN_URL_NA: &str = "https://api.amazon.com/auth/o2/token";
 pub const TOKEN_URL_EU: &str = "https://api.amazon.co.uk/auth/o2/token";
 pub const TOKEN_URL_FE: &str = "https://api.amazon.co.jp/auth/o2/token";
 pub const AUTHORIZATION_URL: &str = "https://www.amazon.com/ap/oa";
+pub const DEVICE_AUTHORIZATION_URL: &str = "https://api.amazon.com/auth/o2/create/codepair";
 
 pub mod authorization_code_grant;
+pub mod device_authorization_grant;
 
 pub use authorization_code_grant::AmazonProviderWithWebServices;
+pub use device_authorization_grant::AmazonProviderWithDevices;
 
 pub mod additional_endpoints;
 pub use additional_endpoints::AmazonEndpointBuilder;

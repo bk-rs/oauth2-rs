@@ -53,6 +53,7 @@ pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone {
     fn device_access_token_request_body_extensions(
         &self,
         _body: &BodyWithDeviceAuthorizationGrant,
+        _device_authorization_response_body: &DeviceAuthorizationResponseSuccessfulBody,
     ) -> Option<Map<String, Value>> {
         None
     }
@@ -60,6 +61,7 @@ pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone {
     fn device_access_token_request_rendering(
         &self,
         _body: &BodyWithDeviceAuthorizationGrant,
+        _device_authorization_response_body: &DeviceAuthorizationResponseSuccessfulBody,
     ) -> Option<Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>>> {
         None
     }
@@ -190,15 +192,19 @@ where
     fn device_access_token_request_body_extensions(
         &self,
         body: &BodyWithDeviceAuthorizationGrant,
+        device_authorization_response_body: &DeviceAuthorizationResponseSuccessfulBody,
     ) -> Option<Map<String, Value>> {
-        self.inner.device_access_token_request_body_extensions(body)
+        self.inner
+            .device_access_token_request_body_extensions(body, device_authorization_response_body)
     }
 
     fn device_access_token_request_rendering(
         &self,
         body: &BodyWithDeviceAuthorizationGrant,
+        device_authorization_response_body: &DeviceAuthorizationResponseSuccessfulBody,
     ) -> Option<Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>>> {
-        self.inner.device_access_token_request_rendering(body)
+        self.inner
+            .device_access_token_request_rendering(body, device_authorization_response_body)
     }
 
     fn device_access_token_response_parsing(

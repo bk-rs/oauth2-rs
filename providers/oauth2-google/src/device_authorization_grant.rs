@@ -48,10 +48,13 @@ impl ProviderExtDeviceAuthorizationGrant for GoogleProviderForTvAndDeviceApps {
 mod tests {
     use super::*;
 
-    use std::{error, time::Duration};
+    use std::error;
 
     use oauth2_client::{
-        device_authorization_grant::DeviceAccessTokenEndpoint, re_exports::RetryableEndpoint as _,
+        device_authorization_grant::{
+            provider_ext::DeviceAuthorizationResponseSuccessfulBody, DeviceAccessTokenEndpoint,
+        },
+        re_exports::RetryableEndpoint as _,
     };
 
     #[test]
@@ -63,8 +66,14 @@ mod tests {
 
         let endpoint = DeviceAccessTokenEndpoint::new(
             &provider,
-            "DEVICE_CODE".to_owned(),
-            Duration::from_secs(5),
+            DeviceAuthorizationResponseSuccessfulBody::new(
+                "DEVICE_CODE".to_owned(),
+                "".to_owned(),
+                "https://example.com".parse()?,
+                None,
+                0,
+                Some(5),
+            ),
         );
 
         let request = endpoint.render_request(None)?;
