@@ -2,8 +2,7 @@ use std::error;
 
 use oauth2_client::{
     device_authorization_grant::provider_ext::{
-        DeviceAuthorizationRequestBody, DeviceAuthorizationResponseErrorBody,
-        DeviceAuthorizationResponseSuccessfulBody,
+        DeviceAuthorizationResponseErrorBody, DeviceAuthorizationResponseSuccessfulBody,
     },
     oauth2_core::{
         device_authorization_grant::device_authorization_response::{
@@ -12,8 +11,8 @@ use oauth2_client::{
         re_exports::AccessTokenResponseErrorBodyError,
     },
     re_exports::{
-        serde_json, serde_qs, thiserror, Body, ClientId, ClientSecret, Deserialize, HttpError,
-        Request, Response, SerdeJsonError, SerdeQsError, Serialize, Url, UrlParseError,
+        serde_json, thiserror, Body, ClientId, ClientSecret, Deserialize, Map, Response,
+        SerdeJsonError, Serialize, Url, UrlParseError, Value,
     },
     Provider, ProviderExtDeviceAuthorizationGrant,
 };
@@ -23,17 +22,17 @@ use crate::{FacebookScope, DEVICE_AUTHORIZATION_URL, TOKEN_URL};
 #[derive(Debug, Clone)]
 pub struct FacebookProviderForDevices {
     client_id: ClientId,
-    client_secret: ClientSecret,
+    client_token: ClientSecret,
     pub redirect_uri: Option<String>,
     //
     token_endpoint_url: Url,
     device_authorization_endpoint_url: Url,
 }
 impl FacebookProviderForDevices {
-    pub fn new(client_id: ClientId, client_secret: ClientSecret) -> Result<Self, UrlParseError> {
+    pub fn new(client_id: ClientId, client_token: ClientSecret) -> Result<Self, UrlParseError> {
         Ok(Self {
             client_id,
-            client_secret,
+            client_token,
             redirect_uri: None,
             token_endpoint_url: TOKEN_URL.parse()?,
             device_authorization_endpoint_url: DEVICE_AUTHORIZATION_URL.parse()?,
@@ -56,7 +55,7 @@ impl Provider for FacebookProviderForDevices {
     }
 
     fn client_secret(&self) -> Option<&ClientSecret> {
-        Some(&self.client_secret)
+        None
     }
 
     fn token_endpoint_url(&self) -> &Url {
@@ -68,79 +67,71 @@ impl ProviderExtDeviceAuthorizationGrant for FacebookProviderForDevices {
         &self.device_authorization_endpoint_url
     }
 
-    fn device_authorization_request_rendering(
-        &self,
-        body: &DeviceAuthorizationRequestBody<<Self as Provider>::Scope>,
-    ) -> Option<Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>>> {
-        fn doing(
-            this: &FacebookProviderForDevices,
-            body: &DeviceAuthorizationRequestBody<<FacebookProviderForDevices as Provider>::Scope>,
-        ) -> Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>> {
-            let client_id = body
-                .client_id
-                .to_owned()
-                .ok_or_else(|| DeviceAuthorizationRequestRenderingError::ClientIdMissing)?;
+    fn device_authorization_request_body_extensions(&self) -> Option<Map<String, Value>> {
+        let mut map = Map::new();
 
-            let client_secret = this.client_secret.to_owned();
+        map.insert(
+            "access_token".to_owned(),
+            Value::String(format!("{}|{}", self.client_id, self.client_token)),
+        );
 
-            let query = FacebookDeviceAuthorizationRequestQuery {
-                access_token: format!("{}|{}", client_id, client_secret),
-                scope: body.scope.to_owned().map(|x| {
-                    x.0.iter()
-                        .map(|y| y.to_string())
-                        .collect::<Vec<_>>()
-                        .join(",")
-                }),
-                redirect_uri: this.redirect_uri.to_owned(),
-            };
-            let query_str = serde_qs::to_string(&query)
-                .map_err(DeviceAuthorizationRequestRenderingError::SerRequestQueryFailed)?;
-
-            let mut url = this.token_endpoint_url().to_owned();
-            url.set_query(Some(query_str.as_str()));
-
-            let request = Request::builder()
-                .uri(url.as_str())
-                .body(vec![])
-                .map_err(DeviceAuthorizationRequestRenderingError::MakeRequestFailed)?;
-
-            Ok(request)
+        if let Some(redirect_uri) = &self.redirect_uri {
+            map.insert(
+                "redirect_uri".to_owned(),
+                Value::String(redirect_uri.to_owned()),
+            );
         }
 
-        Some(doing(self, body))
+        Some(map)
     }
 
     fn device_authorization_response_parsing(
         &self,
-        _response: &Response<Body>,
+        response: &Response<Body>,
     ) -> Option<
         Result<
             Result<DeviceAuthorizationResponseSuccessfulBody, DeviceAuthorizationResponseErrorBody>,
             Box<dyn error::Error + Send + Sync + 'static>,
         >,
     > {
-        None
+        fn doing(
+            response: &Response<Body>,
+        ) -> Result<
+            Result<
+                FacebookDeviceAuthorizationResponseSuccessfulBody,
+                FacebookDeviceAuthorizationResponseErrorBody,
+            >,
+            Box<dyn error::Error + Send + Sync + 'static>,
+        > {
+            if response.status().is_success() {
+                let map = serde_json::from_slice::<Map<String, Value>>(&response.body())
+                    .map_err(DeviceAuthorizationResponseParsingError::DeResponseBodyFailed)?;
+                if !map.contains_key("error") {
+                    let body = serde_json::from_slice::<
+                        FacebookDeviceAuthorizationResponseSuccessfulBody,
+                    >(&response.body())
+                    .map_err(DeviceAuthorizationResponseParsingError::DeResponseBodyFailed)?;
+
+                    return Ok(Ok(body));
+                }
+            }
+
+            let body = serde_json::from_slice::<FacebookDeviceAuthorizationResponseErrorBody>(
+                &response.body(),
+            )
+            .map_err(DeviceAuthorizationResponseParsingError::DeResponseBodyFailed)?;
+            Ok(Err(body))
+        }
+
+        match doing(response) {
+            Ok(Ok(ok_body)) => Some(Ok(Ok(ok_body.into()))),
+            Ok(Err(err_body)) => match DeviceAuthorizationResponseErrorBody::try_from(err_body) {
+                Ok(err_body) => Some(Ok(Err(err_body))),
+                Err(err) => Some(Err(err)),
+            },
+            Err(err) => Some(Err(err)),
+        }
     }
-}
-
-//
-#[derive(Serialize, Deserialize)]
-pub struct FacebookDeviceAuthorizationRequestQuery {
-    pub access_token: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub scope: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub redirect_uri: Option<String>,
-}
-
-#[derive(thiserror::Error, Debug)]
-pub enum DeviceAuthorizationRequestRenderingError {
-    #[error("ClientIdMissing")]
-    ClientIdMissing,
-    #[error("SerRequestQueryFailed {0}")]
-    SerRequestQueryFailed(SerdeQsError),
-    #[error("MakeRequestFailed {0}")]
-    MakeRequestFailed(HttpError),
 }
 
 //

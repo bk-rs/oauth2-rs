@@ -70,7 +70,8 @@ where
             let request = request_ret.map_err(|err| {
                 DeviceAuthorizationEndpointError::CustomRenderingRequestFailed(err)
             })?;
-
+            println!("111{:?}", request);
+            println!("111{:?}", String::from_utf8(request.body().to_vec()));
             return Ok(request);
         }
 
@@ -85,6 +86,8 @@ where
             .body(body_str.as_bytes().to_vec())
             .map_err(DeviceAuthorizationEndpointError::MakeRequestFailed)?;
 
+        println!("111{:?}", request);
+        println!("111{:?}", String::from_utf8(request.body().to_vec()));
         Ok(request)
     }
 

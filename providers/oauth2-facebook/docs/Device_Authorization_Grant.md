@@ -27,17 +27,17 @@ Details
 Display name: oauth2-rs-f-b-device-demo
 ```
 
-2. Configure App, Settings > Basic
-
-```
-Your Client ID: (App ID)
-
-Your Client Secret: (App Secret)
-```
-
-3. Add and configure "Facebook Login" Product
+2. Add and configure "Facebook Login" Product
 
 Enable "Login from Devices"
 
-4. Add an Test User, Roles > Testers
+3. Add an Test User, Roles > Testers
 
+
+Ref https://developers.facebook.com/docs/facebook-login/access-tokens/#clienttokens
+
+```
+Your Client ID: (App ID in Settings > Basic)
+
+Your Client Secret: (Client Token in Settings > Advanced > Security)
+```
