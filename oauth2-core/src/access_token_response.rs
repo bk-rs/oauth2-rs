@@ -59,26 +59,6 @@ where
         }
     }
 
-    // OIDC
-    pub fn new_with_oidc(
-        access_token: String,
-        token_type: AccessTokenType,
-        expires_in: Option<usize>,
-        refresh_token: Option<String>,
-        scope: Option<ScopeParameter<SCOPE>>,
-        id_token: Option<String>,
-    ) -> Self {
-        Self {
-            access_token,
-            token_type,
-            expires_in,
-            refresh_token,
-            scope,
-            id_token,
-            _extensions: None,
-        }
-    }
-
     pub fn set_extensions(&mut self, extensions: Map<String, Value>) {
         self._extensions = Some(extensions);
     }

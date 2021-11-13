@@ -54,25 +54,6 @@ where
         }
     }
 
-    // OIDC
-    pub fn new_with_oidc(
-        client_id: ClientId,
-        redirect_uri: Option<String>,
-        scope: Option<ScopeParameter<SCOPE>>,
-        state: Option<State>,
-        nonce: Option<String>,
-    ) -> Self {
-        Self {
-            response_type: RESPONSE_TYPE.to_owned(),
-            client_id,
-            redirect_uri,
-            scope,
-            nonce,
-            state,
-            _extensions: None,
-        }
-    }
-
     pub fn set_extensions(&mut self, extensions: Map<String, Value>) {
         self._extensions = Some(extensions);
     }

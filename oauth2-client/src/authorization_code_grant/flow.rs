@@ -173,11 +173,8 @@ where
 {
     let scopes = scopes.into().or(provider.scopes_default());
 
-    let authorization_endpoint = if provider.oidc_support().is_some() {
-        AuthorizationEndpoint::new_with_oidc(provider, scopes, state, nonce)
-    } else {
-        AuthorizationEndpoint::new(provider, scopes, state)
-    };
+    let mut authorization_endpoint = AuthorizationEndpoint::new(provider, scopes, state);
+    authorization_endpoint.nonce = nonce.into();
 
     let authorization_endpoint_request = authorization_endpoint
         .render_request()
