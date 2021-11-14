@@ -246,7 +246,7 @@ impl Context {
                     "common".to_owned(),
                     clients_config.microsoft.client_id.to_owned(),
                     clients_config.microsoft.client_secret.to_owned(),
-                    clients_config.microsoft.redirect_uri.to_owned(),
+                    clients_config.microsoft.redirect_uri,
                 )?,
                 vec![
                     MicrosoftScope::Openid,

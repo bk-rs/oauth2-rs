@@ -34,8 +34,8 @@ impl Endpoint for BitbucketUserInfoEndpoint {
         &self,
         response: Response<Body>,
     ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
-        Ok(UserInfo::try_from(self.inner.parse_response(response)?)
-            .map_err(EndpointParseResponseError::ToOutputFailed)?)
+        UserInfo::try_from(self.inner.parse_response(response)?)
+            .map_err(EndpointParseResponseError::ToOutputFailed)
     }
 }
 

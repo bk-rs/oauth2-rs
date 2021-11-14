@@ -23,38 +23,38 @@ where
     ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>> {
         let info = access_token
             .extensions()
-            .ok_or_else(|| "extensions missing")?
+            .ok_or("extensions missing")?
             .get("info")
-            .ok_or_else(|| "info missing")?
+            .ok_or("info missing")?
             .as_object()
-            .ok_or_else(|| "openid mismatch")?;
+            .ok_or("openid mismatch")?;
 
         let uid = info
             .get("uuid")
-            .ok_or_else(|| "uuid missing")?
+            .ok_or("uuid missing")?
             .as_str()
-            .ok_or_else(|| "uuid mismatch")?
+            .ok_or("uuid mismatch")?
             .to_owned();
 
         let name = info
             .get("name")
-            .ok_or_else(|| "name missing")?
+            .ok_or("name missing")?
             .as_str()
-            .ok_or_else(|| "name mismatch")?
+            .ok_or("name mismatch")?
             .to_owned();
 
         let email = info
             .get("email")
-            .ok_or_else(|| "email missing")?
+            .ok_or("email missing")?
             .as_str()
-            .ok_or_else(|| "email mismatch")?
+            .ok_or("email mismatch")?
             .to_owned();
 
-        return Ok(UserInfoObtainOutput::Static(UserInfo {
+        Ok(UserInfoObtainOutput::Static(UserInfo {
             uid,
             name: Some(name),
             email: Some(email),
             raw: info.to_owned(),
-        }));
+        }))
     }
 }

@@ -60,6 +60,7 @@ pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone {
         None
     }
 
+    #[allow(clippy::type_complexity)]
     fn access_token_response_parsing(
         &self,
         _response: &Response<Body>,
@@ -200,6 +201,7 @@ where
         self.inner.access_token_request_rendering(body)
     }
 
+    #[allow(clippy::type_complexity)]
     fn access_token_response_parsing(
         &self,
         response: &Response<Body>,

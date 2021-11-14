@@ -38,11 +38,9 @@ impl Endpoint for InstagramUserInfoEndpoint {
         &self,
         response: Response<Body>,
     ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
-        Ok(
-            UserInfoWrapper::try_from((self.ig_user_id, self.inner.parse_response(response)?))
-                .map(|x| x.0)
-                .map_err(EndpointParseResponseError::ToOutputFailed)?,
-        )
+        UserInfoWrapper::try_from((self.ig_user_id, self.inner.parse_response(response)?))
+            .map(|x| x.0)
+            .map_err(EndpointParseResponseError::ToOutputFailed)
     }
 }
 

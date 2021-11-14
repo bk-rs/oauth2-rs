@@ -40,7 +40,7 @@ impl Endpoint for OidcV1UserInfoEndpoint {
         &self,
         response: Response<Body>,
     ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
-        let body = serde_json::from_slice::<OidcV1UserInfo>(&response.body())
+        let body = serde_json::from_slice::<OidcV1UserInfo>(response.body())
             .map_err(OidcV1UserInfoEndpointError::DeResponseBodyFailed)?;
 
         Ok(body)

@@ -31,11 +31,11 @@ where
             if scope.contains(&WechatScope::SnsapiLogin.to_string()) {
                 let openid = access_token
                     .extensions()
-                    .ok_or_else(|| "extensions missing")?
+                    .ok_or("extensions missing")?
                     .get(KEY_OPENID)
-                    .ok_or_else(|| "openid missing")?
+                    .ok_or("openid missing")?
                     .as_str()
-                    .ok_or_else(|| "openid mismatch")?
+                    .ok_or("openid mismatch")?
                     .to_owned();
 
                 return Ok(UserInfoObtainOutput::Respond(Box::new(
@@ -48,11 +48,11 @@ where
             AccessTokenProvider::AuthorizationCodeGrant(_) => {
                 let uid = access_token
                     .extensions()
-                    .ok_or_else(|| "extensions missing")?
+                    .ok_or("extensions missing")?
                     .get(KEY_OPENID)
-                    .ok_or_else(|| "openid missing")?
+                    .ok_or("openid missing")?
                     .as_str()
-                    .ok_or_else(|| "openid mismatch")?
+                    .ok_or("openid mismatch")?
                     .to_owned();
 
                 return Ok(UserInfoObtainOutput::Static(UserInfo {

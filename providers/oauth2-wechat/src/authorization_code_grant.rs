@@ -95,14 +95,12 @@ impl ProviderExtAuthorizationCodeGrant for WechatProviderWithWebApplication {
             let redirect_uri = query
                 .redirect_uri
                 .to_owned()
-                .ok_or_else(|| AuthorizationRequestQuerySerializingError::RedirectUriMissing)?;
-
-            let redirect_uri = redirect_uri.to_string();
+                .ok_or(AuthorizationRequestQuerySerializingError::RedirectUriMissing)?;
 
             let scope = query
                 .scope
                 .to_owned()
-                .ok_or_else(|| AuthorizationRequestQuerySerializingError::ScopeMissing)?;
+                .ok_or(AuthorizationRequestQuerySerializingError::ScopeMissing)?;
 
             let scope = scope
                 .0
@@ -145,7 +143,7 @@ impl ProviderExtAuthorizationCodeGrant for WechatProviderWithWebApplication {
             let appid = body
                 .client_id
                 .to_owned()
-                .ok_or_else(|| AccessTokenRequestRenderingError::ClientIdMissing)?;
+                .ok_or(AccessTokenRequestRenderingError::ClientIdMissing)?;
 
             let query = WechatAccessTokenRequestQuery {
                 appid,
@@ -170,6 +168,7 @@ impl ProviderExtAuthorizationCodeGrant for WechatProviderWithWebApplication {
         Some(doing(self, body))
     }
 
+    #[allow(clippy::type_complexity)]
     fn access_token_response_parsing(
         &self,
         response: &Response<Body>,
@@ -189,11 +188,11 @@ impl ProviderExtAuthorizationCodeGrant for WechatProviderWithWebApplication {
             Box<dyn error::Error + Send + Sync + 'static>,
         > {
             if response.status().is_success() {
-                let map = serde_json::from_slice::<Map<String, Value>>(&response.body())
+                let map = serde_json::from_slice::<Map<String, Value>>(response.body())
                     .map_err(AccessTokenResponseParsingError::DeResponseBodyFailed)?;
                 if !map.contains_key("errcode") {
                     let body = serde_json::from_slice::<WechatAccessTokenResponseSuccessfulBody>(
-                        &response.body(),
+                        response.body(),
                     )
                     .map_err(AccessTokenResponseParsingError::DeResponseBodyFailed)?;
 
@@ -202,7 +201,7 @@ impl ProviderExtAuthorizationCodeGrant for WechatProviderWithWebApplication {
             }
 
             let body =
-                serde_json::from_slice::<WechatAccessTokenResponseErrorBody>(&response.body())
+                serde_json::from_slice::<WechatAccessTokenResponseErrorBody>(response.body())
                     .map_err(AccessTokenResponseParsingError::DeResponseBodyFailed)?;
             Ok(Err(body))
         }
@@ -269,7 +268,7 @@ impl From<WechatAccessTokenResponseSuccessfulBody>
             .split(',')
             .map(|x| {
                 x.parse::<WechatScope>()
-                    .unwrap_or(WechatScope::Other(x.to_owned()))
+                    .unwrap_or_else(|_| WechatScope::Other(x.to_owned()))
             })
             .collect();
 
@@ -280,7 +279,7 @@ impl From<WechatAccessTokenResponseSuccessfulBody>
             body.access_token.to_owned(),
             AccessTokenType::Bearer,
             Some(body.expires_in),
-            Some(body.refresh_token.to_owned()),
+            Some(body.refresh_token),
             if scope.is_empty() {
                 None
             } else {

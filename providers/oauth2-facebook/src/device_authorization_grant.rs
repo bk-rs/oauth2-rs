@@ -104,12 +104,12 @@ impl ProviderExtDeviceAuthorizationGrant for FacebookProviderForDevices {
             Box<dyn error::Error + Send + Sync + 'static>,
         > {
             if response.status().is_success() {
-                let map = serde_json::from_slice::<Map<String, Value>>(&response.body())
+                let map = serde_json::from_slice::<Map<String, Value>>(response.body())
                     .map_err(DeviceAuthorizationResponseParsingError::DeResponseBodyFailed)?;
                 if !map.contains_key("error") {
                     let body = serde_json::from_slice::<
                         FacebookDeviceAuthorizationResponseSuccessfulBody,
-                    >(&response.body())
+                    >(response.body())
                     .map_err(DeviceAuthorizationResponseParsingError::DeResponseBodyFailed)?;
 
                     return Ok(Ok(body));
@@ -117,7 +117,7 @@ impl ProviderExtDeviceAuthorizationGrant for FacebookProviderForDevices {
             }
 
             let body = serde_json::from_slice::<FacebookDeviceAuthorizationResponseErrorBody>(
-                &response.body(),
+                response.body(),
             )
             .map_err(DeviceAuthorizationResponseParsingError::DeResponseBodyFailed)?;
             Ok(Err(body))
@@ -153,6 +153,7 @@ impl ProviderExtDeviceAuthorizationGrant for FacebookProviderForDevices {
         Some(map)
     }
 
+    #[allow(clippy::type_complexity)]
     fn device_access_token_response_parsing(
         &self,
         response: &Response<Body>,
@@ -178,14 +179,14 @@ impl ProviderExtDeviceAuthorizationGrant for FacebookProviderForDevices {
             Box<dyn error::Error + Send + Sync + 'static>,
         > {
             if response.status().is_success() {
-                let map = serde_json::from_slice::<Map<String, Value>>(&response.body())
+                let map = serde_json::from_slice::<Map<String, Value>>(response.body())
                     .map_err(DeviceAccessTokenResponseParsingError::DeResponseBodyFailed)?;
                 if !map.contains_key("error") {
                     let body = serde_json::from_slice::<
                         AccessTokenResponseSuccessfulBody<
                             <FacebookProviderForDevices as Provider>::Scope,
                         >,
-                    >(&response.body())
+                    >(response.body())
                     .map_err(DeviceAccessTokenResponseParsingError::DeResponseBodyFailed)?;
 
                     return Ok(Ok(body));
@@ -193,7 +194,7 @@ impl ProviderExtDeviceAuthorizationGrant for FacebookProviderForDevices {
             }
 
             let body = serde_json::from_slice::<FacebookDeviceAccessTokenResponseErrorBody>(
-                &response.body(),
+                response.body(),
             )
             .map_err(DeviceAuthorizationResponseParsingError::DeResponseBodyFailed)?;
             Ok(Err(body))

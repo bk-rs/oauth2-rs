@@ -23,8 +23,8 @@ where
         _access_token_provider: AccessTokenProvider<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
     ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>> {
-        return Ok(UserInfoObtainOutput::Respond(Box::new(
+        Ok(UserInfoObtainOutput::Respond(Box::new(
             BitbucketUserInfoEndpoint::new(&access_token.access_token),
-        )));
+        )))
     }
 }

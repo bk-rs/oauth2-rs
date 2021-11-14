@@ -37,7 +37,7 @@ where
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let split_char = if s.contains(SCOPE_PARAMETER_DELIMITATION) {
             SCOPE_PARAMETER_DELIMITATION
-        } else if s.contains(",") {
+        } else if s.contains(',') {
             // e.g. github access_token_response
             ','
         } else {

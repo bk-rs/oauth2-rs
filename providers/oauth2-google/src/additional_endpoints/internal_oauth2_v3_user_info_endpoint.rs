@@ -40,7 +40,7 @@ impl Endpoint for Oauth2V3UserInfoEndpoint {
         &self,
         response: Response<Body>,
     ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
-        let body = serde_json::from_slice::<Oauth2V3UserInfo>(&response.body())
+        let body = serde_json::from_slice::<Oauth2V3UserInfo>(response.body())
             .map_err(Oauth2V3UserInfoEndpointError::DeResponseBodyFailed)?;
 
         Ok(body)

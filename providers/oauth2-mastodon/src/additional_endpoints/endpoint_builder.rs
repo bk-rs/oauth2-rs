@@ -24,16 +24,16 @@ where
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
     ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>> {
         let extensions = match access_token_provider {
-            AccessTokenProvider::AuthorizationCodeGrant(p) => p.extensions().to_owned(),
-            AccessTokenProvider::DeviceAuthorizationGrant(p) => p.extensions().to_owned(),
+            AccessTokenProvider::AuthorizationCodeGrant(p) => p.extensions(),
+            AccessTokenProvider::DeviceAuthorizationGrant(p) => p.extensions(),
         };
 
         let base_url = extensions
             .map(|x| x.get("base_url").cloned())
-            .ok_or_else(|| "Missing base_url")?
-            .ok_or_else(|| "Missing base_url")?
+            .ok_or("Missing base_url")?
+            .ok_or("Missing base_url")?
             .as_str()
-            .ok_or_else(|| "Mismatch base_url")?
+            .ok_or("Mismatch base_url")?
             .to_owned();
 
         Ok(UserInfoObtainOutput::Respond(Box::new(

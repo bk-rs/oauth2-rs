@@ -43,7 +43,7 @@ impl Endpoint for UsersEndpoint {
         &self,
         response: Response<Body>,
     ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
-        let body = serde_json::from_slice::<Users>(&response.body())
+        let body = serde_json::from_slice::<Users>(response.body())
             .map_err(UsersEndpointError::DeResponseBodyFailed)?;
 
         Ok(body)

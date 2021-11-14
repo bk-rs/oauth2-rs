@@ -54,14 +54,10 @@ impl Endpoint for GoogleUserInfoEndpoint {
         response: Response<Body>,
     ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
         match &self.inner {
-            Inner::Oauth2V3UserInfoEndpoint(ep) => {
-                Ok(UserInfo::try_from(ep.parse_response(response)?)
-                    .map_err(EndpointParseResponseError::ToOutputFailed)?)
-            }
-            Inner::OidcV1UserInfoEndpoint(ep) => {
-                Ok(UserInfo::try_from(ep.parse_response(response)?)
-                    .map_err(EndpointParseResponseError::ToOutputFailed)?)
-            }
+            Inner::Oauth2V3UserInfoEndpoint(ep) => UserInfo::try_from(ep.parse_response(response)?)
+                .map_err(EndpointParseResponseError::ToOutputFailed),
+            Inner::OidcV1UserInfoEndpoint(ep) => UserInfo::try_from(ep.parse_response(response)?)
+                .map_err(EndpointParseResponseError::ToOutputFailed),
         }
     }
 }

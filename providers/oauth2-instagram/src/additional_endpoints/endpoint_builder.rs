@@ -26,10 +26,10 @@ where
         let ig_user_id = access_token
             .extensions()
             .map(|x| x.get("user_id").cloned())
-            .ok_or_else(|| "Missing user_id")?
-            .ok_or_else(|| "Missing user_id")?
+            .ok_or("Missing user_id")?
+            .ok_or("Missing user_id")?
             .as_u64()
-            .ok_or_else(|| "Mismatch user_id")?
+            .ok_or("Mismatch user_id")?
             .to_owned();
 
         Ok(UserInfoObtainOutput::Respond(Box::new(

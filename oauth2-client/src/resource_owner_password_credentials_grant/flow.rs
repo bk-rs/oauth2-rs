@@ -49,7 +49,7 @@ where
         SCOPE: Scope + Serialize + DeserializeOwned + Send + Sync,
     {
         // Step 1
-        let scopes = scopes.into().or(provider.scopes_default());
+        let scopes = scopes.into().or_else(|| provider.scopes_default());
 
         let access_token_endpoint = AccessTokenEndpoint::new(provider, scopes, username, password);
 

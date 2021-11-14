@@ -66,6 +66,7 @@ pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone {
         None
     }
 
+    #[allow(clippy::type_complexity)]
     fn device_access_token_response_parsing(
         &self,
         _response: &Response<Body>,
@@ -207,6 +208,7 @@ where
             .device_access_token_request_rendering(body, device_authorization_response_body)
     }
 
+    #[allow(clippy::type_complexity)]
     fn device_access_token_response_parsing(
         &self,
         response: &Response<Body>,

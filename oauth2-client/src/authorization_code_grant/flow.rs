@@ -162,8 +162,8 @@ pub enum FlowHandleCallbackError {
 //
 //
 //
-pub fn build_authorization_url<'a, SCOPE>(
-    provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
+pub fn build_authorization_url<SCOPE>(
+    provider: &dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
     scopes: impl Into<Option<Vec<SCOPE>>>,
     state: impl Into<Option<State>>,
     nonce: impl Into<Option<String>>,
@@ -171,7 +171,7 @@ pub fn build_authorization_url<'a, SCOPE>(
 where
     SCOPE: Scope + Serialize,
 {
-    let scopes = scopes.into().or(provider.scopes_default());
+    let scopes = scopes.into().or_else(|| provider.scopes_default());
 
     let mut authorization_endpoint = AuthorizationEndpoint::new(provider, scopes, state);
     authorization_endpoint.nonce = nonce.into();

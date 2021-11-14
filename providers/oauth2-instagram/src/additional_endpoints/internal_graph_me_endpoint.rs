@@ -44,7 +44,7 @@ impl Endpoint for GraphMeEndpoint {
         &self,
         response: Response<Body>,
     ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
-        let body = serde_json::from_slice::<User>(&response.body())
+        let body = serde_json::from_slice::<User>(response.body())
             .map_err(GraphMeEndpointError::DeResponseBodyFailed)?;
 
         Ok(body)

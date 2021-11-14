@@ -16,10 +16,10 @@ pub mod additional_endpoints;
 pub use additional_endpoints::MastodonEndpointBuilder;
 
 pub fn token_url(base_url: impl AsRef<str>) -> Result<Url, UrlParseError> {
-    Ok(Url::parse(base_url.as_ref())?.join("/oauth/token")?)
+    Url::parse(base_url.as_ref())?.join("/oauth/token")
 }
 pub fn authorization_url(base_url: impl AsRef<str>) -> Result<Url, UrlParseError> {
-    Ok(Url::parse(base_url.as_ref())?.join("/oauth/authorize")?)
+    Url::parse(base_url.as_ref())?.join("/oauth/authorize")
 }
 
 // Ref https://docs.joinmastodon.org/api/oauth-scopes/

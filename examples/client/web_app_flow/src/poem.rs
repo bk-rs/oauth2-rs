@@ -66,7 +66,7 @@ async fn auth_handler(
     let flow = ctx
         .signin_flow_map
         .get(provider.as_str())
-        .ok_or_else(|| "provider not found")?;
+        .ok_or("provider not found")?;
 
     let state = gen_state(10);
     session.set(state_session_key(&provider).as_str(), state.to_owned());
@@ -106,7 +106,7 @@ async fn auth_callback_handler(
     let flow = ctx
         .signin_flow_map
         .get(provider.as_str())
-        .ok_or_else(|| "provider not found")?;
+        .ok_or("provider not found")?;
 
     let state = session.get::<String>(state_session_key(&provider).as_str());
     session.remove(state_session_key(&provider).as_str());

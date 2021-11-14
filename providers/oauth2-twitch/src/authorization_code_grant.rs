@@ -93,6 +93,7 @@ impl ProviderExtAuthorizationCodeGrant for TwitchProviderForWebServerApps {
         }
     }
 
+    #[allow(clippy::type_complexity)]
     fn access_token_response_parsing(
         &self,
         response: &Response<Body>,
@@ -117,14 +118,14 @@ impl ProviderExtAuthorizationCodeGrant for TwitchProviderForWebServerApps {
             Box<dyn error::Error + Send + Sync + 'static>,
         > {
             if response.status().is_success() {
-                let map = serde_json::from_slice::<Map<String, Value>>(&response.body())
+                let map = serde_json::from_slice::<Map<String, Value>>(response.body())
                     .map_err(AccessTokenResponseParsingError::DeResponseBodyFailed)?;
                 if !map.contains_key("errcode") {
                     let body = serde_json::from_slice::<
                         AccessTokenResponseSuccessfulBody<
                             <TwitchProviderForWebServerApps as Provider>::Scope,
                         >,
-                    >(&response.body())
+                    >(response.body())
                     .map_err(AccessTokenResponseParsingError::DeResponseBodyFailed)?;
 
                     return Ok(Ok(body));
@@ -132,7 +133,7 @@ impl ProviderExtAuthorizationCodeGrant for TwitchProviderForWebServerApps {
             }
 
             let body =
-                serde_json::from_slice::<TwitchAccessTokenResponseErrorBody>(&response.body())
+                serde_json::from_slice::<TwitchAccessTokenResponseErrorBody>(response.body())
                     .map_err(AccessTokenResponseParsingError::DeResponseBodyFailed)?;
             Ok(Err(body))
         }

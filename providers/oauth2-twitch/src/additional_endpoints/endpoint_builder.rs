@@ -27,7 +27,7 @@ where
             AccessTokenProvider::AuthorizationCodeGrant(p) => p.client_id(),
             AccessTokenProvider::DeviceAuthorizationGrant(p) => p.client_id(),
         };
-        let client_id = client_id.ok_or_else(|| "missing client_id")?;
+        let client_id = client_id.ok_or("missing client_id")?;
 
         Ok(UserInfoObtainOutput::Respond(Box::new(
             TwitchUserInfoEndpoint::new(&access_token.access_token, client_id),

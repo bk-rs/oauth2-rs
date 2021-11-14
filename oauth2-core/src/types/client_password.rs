@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::types::{ClientId, ClientSecret};
 
-pub const HEADER_AUTHORIZATION_PREFIX: &'static str = "Basic ";
+pub const HEADER_AUTHORIZATION_PREFIX: &str = "Basic ";
 
 //
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
@@ -43,8 +43,8 @@ impl ClientPassword {
         let s = str::from_utf8(&bytes).map_err(|_| "Invalid")?;
 
         let mut s = s.split(':');
-        let client_id = s.next().ok_or_else(|| "Missing client_id")?.to_owned();
-        let client_secret = s.next().ok_or_else(|| "Missing client_secret")?.to_owned();
+        let client_id = s.next().ok_or("Missing client_id")?.to_owned();
+        let client_secret = s.next().ok_or("Missing client_secret")?.to_owned();
         if s.next().is_some() {
             return Err("Invalid");
         }

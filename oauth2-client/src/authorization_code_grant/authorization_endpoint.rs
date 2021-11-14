@@ -63,7 +63,7 @@ where
             self.provider
                 .client_id()
                 .cloned()
-                .ok_or_else(|| AuthorizationEndpointError::ClientIdMissing)?,
+                .ok_or(AuthorizationEndpointError::ClientIdMissing)?,
             self.provider.redirect_uri().map(|x| x.to_string()),
             self.scopes.to_owned().map(Into::into),
             self.state.to_owned(),
@@ -138,7 +138,7 @@ pub fn parse_redirect_uri_query(
 
     let query = serde_qs::from_str::<RES_ErrorQuery>(query_str.as_ref())?;
 
-    return Ok(Err(query));
+    Ok(Err(query))
 }
 
 pub type ParseRedirectUriQueryError = SerdeQsError;

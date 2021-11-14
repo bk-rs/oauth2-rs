@@ -58,7 +58,7 @@ impl SuccessfulBody {
     }
 
     pub fn interval(&self) -> Duration {
-        Duration::from_secs(self.interval.unwrap_or_else(|| INTERVAL_DEFAULT) as u64)
+        Duration::from_secs(self.interval.unwrap_or(INTERVAL_DEFAULT) as u64)
     }
 
     pub fn set_extensions(&mut self, extensions: Map<String, Value>) {

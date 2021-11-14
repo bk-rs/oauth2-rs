@@ -34,8 +34,8 @@ impl Endpoint for TwitchUserInfoEndpoint {
         &self,
         response: Response<Body>,
     ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
-        Ok(UserInfo::try_from(self.inner.parse_response(response)?)
-            .map_err(EndpointParseResponseError::ToOutputFailed)?)
+        UserInfo::try_from(self.inner.parse_response(response)?)
+            .map_err(EndpointParseResponseError::ToOutputFailed)
     }
 }
 
@@ -62,11 +62,7 @@ impl TryFrom<Users> for UserInfo {
     type Error = Box<dyn error::Error + Send + Sync>;
 
     fn try_from(users: Users) -> Result<Self, Self::Error> {
-        let user = users
-            .data
-            .first()
-            .cloned()
-            .ok_or_else(|| "not found user")?;
+        let user = users.data.first().cloned().ok_or("not found user")?;
 
         Ok(Self {
             uid: user.id.to_owned(),

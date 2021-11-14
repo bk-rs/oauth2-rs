@@ -45,7 +45,7 @@ impl Endpoint for SnsUserinfoEndpoint {
         &self,
         response: Response<Body>,
     ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
-        let body = serde_json::from_slice::<SnsUserinfo>(&response.body())
+        let body = serde_json::from_slice::<SnsUserinfo>(response.body())
             .map_err(SnsUserinfoEndpointError::DeResponseBodyFailed)?;
 
         Ok(body)

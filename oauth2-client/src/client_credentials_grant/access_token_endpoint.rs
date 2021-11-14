@@ -62,11 +62,11 @@ where
             self.provider
                 .client_id()
                 .cloned()
-                .ok_or_else(|| AccessTokenEndpointError::ClientIdMissing)?,
+                .ok_or(AccessTokenEndpointError::ClientIdMissing)?,
             self.provider
                 .client_secret()
                 .cloned()
-                .ok_or_else(|| AccessTokenEndpointError::ClientSecretMissing)?,
+                .ok_or(AccessTokenEndpointError::ClientSecretMissing)?,
         );
 
         let mut body = if self.provider.client_password_in_request_body() {
@@ -117,17 +117,17 @@ where
     ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
         //
         if response.status().is_success() {
-            let map = serde_json::from_slice::<Map<String, Value>>(&response.body())
+            let map = serde_json::from_slice::<Map<String, Value>>(response.body())
                 .map_err(AccessTokenEndpointError::DeResponseBodyFailed)?;
             if !map.contains_key(GENERAL_ERROR_BODY_KEY_ERROR) {
-                let body = serde_json::from_slice::<RES_SuccessfulBody<SCOPE>>(&response.body())
+                let body = serde_json::from_slice::<RES_SuccessfulBody<SCOPE>>(response.body())
                     .map_err(AccessTokenEndpointError::DeResponseBodyFailed)?;
 
                 return Ok(Ok(body));
             }
         }
 
-        let body = serde_json::from_slice::<RES_ErrorBody>(&response.body())
+        let body = serde_json::from_slice::<RES_ErrorBody>(response.body())
             .map_err(AccessTokenEndpointError::DeResponseBodyFailed)?;
         Ok(Err(body))
     }

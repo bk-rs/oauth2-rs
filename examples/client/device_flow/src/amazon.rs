@@ -5,8 +5,8 @@ RUST_BACKTRACE=1 RUST_LOG=debug cargo run -p oauth2_client_device_flow_example -
 use std::{env, error};
 
 use http_api_isahc_client::IsahcClient;
-use oauth2_client::device_authorization_grant::Flow;
 use oauth2_amazon::{AmazonProviderWithDevices, AmazonScope};
+use oauth2_client::device_authorization_grant::Flow;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn error::Error>> {

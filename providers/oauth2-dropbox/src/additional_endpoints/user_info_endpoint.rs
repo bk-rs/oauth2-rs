@@ -7,13 +7,13 @@ use oauth2_client::{
 
 use super::internal_get_account_endpoint::{Account, GetAccountEndpoint, GetAccountEndpointError};
 
-type UID = String;
+type Uid = String;
 
 //
 #[derive(Debug, Clone)]
 pub struct DropboxUserInfoEndpoint {
     inner: GetAccountEndpoint,
-    uid: UID,
+    uid: Uid,
 }
 impl DropboxUserInfoEndpoint {
     pub fn new(
@@ -42,11 +42,9 @@ impl Endpoint for DropboxUserInfoEndpoint {
         &self,
         response: Response<Body>,
     ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
-        Ok(
-            UserInfoWrapper::try_from((self.uid.to_owned(), self.inner.parse_response(response)?))
-                .map(|x| x.0)
-                .map_err(EndpointParseResponseError::ToOutputFailed)?,
-        )
+        UserInfoWrapper::try_from((self.uid.to_owned(), self.inner.parse_response(response)?))
+            .map(|x| x.0)
+            .map_err(EndpointParseResponseError::ToOutputFailed)
     }
 }
 
@@ -72,10 +70,10 @@ impl From<GetAccountEndpointError> for EndpointParseResponseError {
 
 //
 struct UserInfoWrapper(UserInfo);
-impl TryFrom<(UID, Account)> for UserInfoWrapper {
+impl TryFrom<(Uid, Account)> for UserInfoWrapper {
     type Error = Box<dyn error::Error + Send + Sync>;
 
-    fn try_from((uid, account): (UID, Account)) -> Result<Self, Self::Error> {
+    fn try_from((uid, account): (Uid, Account)) -> Result<Self, Self::Error> {
         Ok(Self(UserInfo {
             uid,
             name: None,

@@ -54,7 +54,7 @@ impl Endpoint for GetAccountEndpoint {
         &self,
         response: Response<Body>,
     ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
-        let body = serde_json::from_slice::<Account>(&response.body())
+        let body = serde_json::from_slice::<Account>(response.body())
             .map_err(GetAccountEndpointError::DeResponseBodyFailed)?;
 
         Ok(body)

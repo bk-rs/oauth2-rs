@@ -43,7 +43,7 @@ impl Endpoint for AccountsVerifyCredentialsEndpoint {
         &self,
         response: Response<Body>,
     ) -> Result<Self::ParseResponseOutput, Self::ParseResponseError> {
-        let body = serde_json::from_slice::<Account>(&response.body())
+        let body = serde_json::from_slice::<Account>(response.body())
             .map_err(AccountsVerifyCredentialsEndpointError::DeResponseBodyFailed)?;
 
         Ok(body)
