@@ -1,0 +1,8 @@
+{
+    "access_token": "x*138",
+    "token_type": "bearer",
+    "expires_in": 14400,
+    "scope": "account_info.read sharing.read",
+    "uid": "24843181",
+    "account_id": "dbid:AADMB_j_i3y-F9qhVBv68H3eRnzSJ3bZ9Nw"
+}

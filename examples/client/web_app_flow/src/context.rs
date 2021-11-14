@@ -11,6 +11,7 @@ use oauth2_bitbucket::{
 use oauth2_digitalocean::{
     DigitaloceanEndpointBuilder, DigitaloceanProviderWithWebApplication, DigitaloceanScope,
 };
+use oauth2_dropbox::{DropboxEndpointBuilder, DropboxProviderWithWebApplication, DropboxScope};
 use oauth2_facebook::{FacebookEndpointBuilder, FacebookProviderForWebApp, FacebookScope};
 use oauth2_github::{GithubEndpointBuilder, GithubProviderWithWebApplication, GithubScope};
 use oauth2_gitlab::{
@@ -204,6 +205,19 @@ impl Context {
                 )?,
                 vec![DigitaloceanScope::Read, DigitaloceanScope::Write],
                 DigitaloceanEndpointBuilder,
+            ),
+        );
+        signin_flow_map.insert(
+            "dropbox",
+            SigninFlow::new(
+                IsahcClient::new()?,
+                DropboxProviderWithWebApplication::new(
+                    clients_config.dropbox.client_id.to_owned(),
+                    clients_config.dropbox.client_secret.to_owned(),
+                    clients_config.dropbox.redirect_uri.to_owned(),
+                )?,
+                vec![DropboxScope::AccountInfoRead, DropboxScope::SharingRead],
+                DropboxEndpointBuilder,
             ),
         );
 

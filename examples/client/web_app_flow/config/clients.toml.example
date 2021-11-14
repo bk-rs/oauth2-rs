@@ -52,3 +52,8 @@ redirect_uri = "http://oauth2-rs.lvh.me/auth/bitbucket/callback"
 client_id = "xxx"
 client_secret = "xxx"
 redirect_uri = "http://oauth2-rs.lvh.me/auth/digitalocean/callback"
+
+[dropbox]
+client_id = "xxx"
+client_secret = "xxx"
+redirect_uri = "https://oauth2-rs.lvh.me/auth/dropbox/callback"
