@@ -2,7 +2,7 @@ use std::error;
 
 use oauth2_client::{
     additional_endpoints::{
-        AccessTokenResponseSuccessfulBody, EndpointBuilder, GrantInfo, UserInfoObtainOutput,
+        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoOutput, EndpointBuilder, GrantInfo,
     },
     re_exports::Scope,
 };
@@ -21,16 +21,10 @@ where
         &self,
         grant_info: GrantInfo<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>> {
+    ) -> Result<BuilderObtainUserInfoOutput, Box<dyn error::Error + Send + Sync>> {
         let extensions = match grant_info {
-            GrantInfo::AuthorizationCodeGrant {
-                provider,
-                authorization_request_scopes: _,
-            } => provider.extensions(),
-            GrantInfo::DeviceAuthorizationGrant {
-                provider,
-                authorization_request_scopes: _,
-            } => provider.extensions(),
+            GrantInfo::AuthorizationCodeGrant(info) => info.provider.extensions(),
+            GrantInfo::DeviceAuthorizationGrant(info) => info.provider.extensions(),
         };
 
         let base_url = extensions
@@ -41,7 +35,7 @@ where
             .ok_or("Mismatch base_url")?
             .to_owned();
 
-        Ok(UserInfoObtainOutput::Respond(Box::new(
+        Ok(BuilderObtainUserInfoOutput::Respond(Box::new(
             MastodonUserInfoEndpoint::new(base_url, &access_token.access_token)?,
         )))
     }

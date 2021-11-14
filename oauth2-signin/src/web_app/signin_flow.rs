@@ -2,7 +2,8 @@ use std::fmt;
 
 use oauth2_client::{
     additional_endpoints::{
-        EndpointBuilder, EndpointExecuteError, GrantInfo, UserInfoObtainOutput,
+        AuthorizationCodeGrantInfo, BuilderObtainUserInfoOutput, EndpointBuilder,
+        EndpointExecuteError, GrantInfo,
     },
     authorization_code_grant::{
         provider_ext::ProviderExtAuthorizationCodeGrantStringScopeWrapper, Flow,
@@ -112,22 +113,22 @@ where
             Err(err) => return SigninFlowHandleCallbackRet::FlowHandleCallbackError(err),
         };
 
-        let grant_info = GrantInfo::AuthorizationCodeGrant {
+        let grant_info = GrantInfo::AuthorizationCodeGrant(AuthorizationCodeGrantInfo {
             provider: self.provider.as_ref(),
             authorization_request_scopes: self.scopes.as_ref(),
-        };
+        });
 
         match self
             .endpoint_builder
             .user_info_obtain(grant_info, &access_token)
         {
-            Ok(UserInfoObtainOutput::None) => {
+            Ok(BuilderObtainUserInfoOutput::None) => {
                 SigninFlowHandleCallbackRet::OkButUserInfoNone(access_token)
             }
-            Ok(UserInfoObtainOutput::Static(user_info)) => {
+            Ok(BuilderObtainUserInfoOutput::Static(user_info)) => {
                 SigninFlowHandleCallbackRet::Ok((access_token, user_info))
             }
-            Ok(UserInfoObtainOutput::Respond(user_info_endpoint)) => {
+            Ok(BuilderObtainUserInfoOutput::Respond(user_info_endpoint)) => {
                 match self
                     .client_with_user_info
                     .respond_dyn_endpoint(user_info_endpoint.as_ref())

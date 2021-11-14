@@ -2,8 +2,8 @@ use std::error;
 
 use oauth2_client::{
     additional_endpoints::{
-        AccessTokenResponseSuccessfulBody, EndpointBuilder, GrantInfo, UserInfo,
-        UserInfoObtainOutput,
+        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoOutput, EndpointBuilder, GrantInfo,
+        UserInfo,
     },
     oauth2_core::types::ScopeParameter,
     re_exports::Scope,
@@ -25,7 +25,7 @@ where
         &self,
         grant_info: GrantInfo<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>> {
+    ) -> Result<BuilderObtainUserInfoOutput, Box<dyn error::Error + Send + Sync>> {
         let has_snsapi_login_scope = access_token.scope.as_ref().map(|x| {
             ScopeParameter::<String>::from(x)
                 .0
@@ -42,16 +42,13 @@ where
                 .ok_or("openid mismatch")?
                 .to_owned();
 
-            return Ok(UserInfoObtainOutput::Respond(Box::new(
+            return Ok(BuilderObtainUserInfoOutput::Respond(Box::new(
                 WechatUserInfoEndpoint::new(&access_token.access_token, openid),
             )));
         }
 
         match grant_info {
-            GrantInfo::AuthorizationCodeGrant {
-                provider: _,
-                authorization_request_scopes: _,
-            } => {
+            GrantInfo::AuthorizationCodeGrant(_) => {
                 let uid = access_token
                     .extensions()
                     .ok_or("extensions missing")?
@@ -61,21 +58,18 @@ where
                     .ok_or("openid mismatch")?
                     .to_owned();
 
-                return Ok(UserInfoObtainOutput::Static(UserInfo {
+                return Ok(BuilderObtainUserInfoOutput::Static(UserInfo {
                     uid,
                     name: None,
                     email: None,
                     raw: Default::default(),
                 }));
             }
-            GrantInfo::DeviceAuthorizationGrant {
-                provider: _,
-                authorization_request_scopes: _,
-            } => {
+            GrantInfo::DeviceAuthorizationGrant(_) => {
                 // unknown
             }
         }
 
-        Ok(UserInfoObtainOutput::None)
+        Ok(BuilderObtainUserInfoOutput::None)
     }
 }

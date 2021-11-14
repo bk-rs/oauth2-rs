@@ -2,7 +2,7 @@ use std::error;
 
 use oauth2_client::{
     additional_endpoints::{
-        AccessTokenResponseSuccessfulBody, EndpointBuilder, GrantInfo, UserInfoObtainOutput,
+        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoOutput, EndpointBuilder, GrantInfo,
     },
     oauth2_core::types::ScopeParameter,
     re_exports::Scope,
@@ -24,7 +24,7 @@ where
         &self,
         _grant_info: GrantInfo<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>> {
+    ) -> Result<BuilderObtainUserInfoOutput, Box<dyn error::Error + Send + Sync>> {
         let scopes = access_token
             .scope
             .to_owned()
@@ -32,11 +32,11 @@ where
             .unwrap_or_default();
 
         if scopes.contains(&GitlabScope::ReadUser.to_string()) {
-            return Ok(UserInfoObtainOutput::Respond(Box::new(
+            return Ok(BuilderObtainUserInfoOutput::Respond(Box::new(
                 GitlabUserInfoEndpoint::new(&access_token.access_token),
             )));
         }
 
-        Ok(UserInfoObtainOutput::None)
+        Ok(BuilderObtainUserInfoOutput::None)
     }
 }

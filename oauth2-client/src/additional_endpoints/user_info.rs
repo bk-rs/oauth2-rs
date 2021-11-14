@@ -1,9 +1,5 @@
 use serde_json::{Map, Value};
 
-use crate::re_exports::Endpoint;
-
-use super::{EndpointParseResponseError, EndpointRenderRequestError};
-
 //
 #[derive(Debug, Clone)]
 pub struct UserInfo {
@@ -12,21 +8,4 @@ pub struct UserInfo {
     pub email: Option<String>,
     //
     pub raw: Map<String, Value>,
-}
-
-//
-#[derive(Debug)]
-pub enum UserInfoObtainOutput {
-    None,
-    Static(UserInfo),
-    Respond(
-        Box<
-            dyn Endpoint<
-                    RenderRequestError = EndpointRenderRequestError,
-                    ParseResponseOutput = UserInfo,
-                    ParseResponseError = EndpointParseResponseError,
-                > + Send
-                + Sync,
-        >,
-    ),
 }

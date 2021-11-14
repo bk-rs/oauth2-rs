@@ -2,8 +2,8 @@ use std::error;
 
 use oauth2_client::{
     additional_endpoints::{
-        AccessTokenResponseSuccessfulBody, EndpointBuilder, GrantInfo, UserInfo,
-        UserInfoObtainOutput,
+        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoOutput, EndpointBuilder, GrantInfo,
+        UserInfo,
     },
     re_exports::Scope,
 };
@@ -20,7 +20,7 @@ where
         &self,
         _grant_info: GrantInfo<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>> {
+    ) -> Result<BuilderObtainUserInfoOutput, Box<dyn error::Error + Send + Sync>> {
         let info = access_token
             .extensions()
             .ok_or("extensions missing")?
@@ -50,7 +50,7 @@ where
             .ok_or("email mismatch")?
             .to_owned();
 
-        Ok(UserInfoObtainOutput::Static(UserInfo {
+        Ok(BuilderObtainUserInfoOutput::Static(UserInfo {
             uid,
             name: Some(name),
             email: Some(email),

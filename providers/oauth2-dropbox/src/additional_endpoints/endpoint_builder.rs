@@ -2,8 +2,8 @@ use std::error;
 
 use oauth2_client::{
     additional_endpoints::{
-        AccessTokenResponseSuccessfulBody, EndpointBuilder, GrantInfo, UserInfo,
-        UserInfoObtainOutput,
+        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoOutput, EndpointBuilder, GrantInfo,
+        UserInfo,
     },
     oauth2_core::types::ScopeParameter,
     re_exports::Scope,
@@ -25,7 +25,7 @@ where
         &self,
         _grant_info: GrantInfo<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>> {
+    ) -> Result<BuilderObtainUserInfoOutput, Box<dyn error::Error + Send + Sync>> {
         let extensions = access_token.extensions().ok_or("extensions missing")?;
 
         let uid = extensions
@@ -49,12 +49,12 @@ where
                 .ok_or("account_id mismatch")?
                 .to_owned();
 
-            return Ok(UserInfoObtainOutput::Respond(Box::new(
+            return Ok(BuilderObtainUserInfoOutput::Respond(Box::new(
                 DropboxUserInfoEndpoint::new(&access_token.access_token, account_id, uid),
             )));
         }
 
-        Ok(UserInfoObtainOutput::Static(UserInfo {
+        Ok(BuilderObtainUserInfoOutput::Static(UserInfo {
             uid,
             name: None,
             email: None,
