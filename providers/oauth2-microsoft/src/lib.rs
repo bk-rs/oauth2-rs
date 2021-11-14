@@ -6,6 +6,8 @@ pub mod device_authorization_grant;
 pub use authorization_code_grant::MicrosoftProviderForWebApps;
 pub use device_authorization_grant::MicrosoftProviderForDevices;
 
+pub const TENANT_COMMON: &str = "common";
+
 pub fn token_url(tenant: impl AsRef<str>) -> String {
     format!(
         "https://login.microsoftonline.com/{}/oauth2/v2.0/token",
