@@ -5,7 +5,9 @@ use oauth2_amazon::{
     AmazonEndpointBuilder, AmazonProviderWithWebServices, AmazonScope, AmazonTokenUrlRegion,
 };
 use oauth2_apple::AppleProviderWithAppleJs;
-use oauth2_bitbucket::{BitbucketProviderWithWebApplication, BitbucketScope};
+use oauth2_bitbucket::{
+    BitbucketEndpointBuilder, BitbucketProviderWithWebApplication, BitbucketScope,
+};
 use oauth2_facebook::{FacebookEndpointBuilder, FacebookProviderForWebApp, FacebookScope};
 use oauth2_github::{GithubEndpointBuilder, GithubProviderWithWebApplication, GithubScope};
 use oauth2_gitlab::{
@@ -185,7 +187,7 @@ impl Context {
                     BitbucketScope::Email,
                     BitbucketScope::Repository,
                 ],
-                DefaultEndpointBuilder,
+                BitbucketEndpointBuilder,
             ),
         );
 
