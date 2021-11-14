@@ -1,0 +1,14 @@
+{
+    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users/$entity",
+    "displayName": "yongpeng he",
+    "surname": "yongpeng",
+    "givenName": "he",
+    "id": "f26b4f162cf4fb1f",
+    "userPrincipalName": "vkill.net@outlook.com",
+    "businessPhones": [],
+    "jobTitle": null,
+    "mail": null,
+    "mobilePhone": null,
+    "officeLocation": null,
+    "preferredLanguage": null
+}
