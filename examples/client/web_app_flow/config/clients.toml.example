@@ -47,3 +47,8 @@ redirect_uri = "http://oauth2-rs.lvh.me/auth/gitlab/callback"
 client_id = "xxx"
 client_secret = "xxx"
 redirect_uri = "http://oauth2-rs.lvh.me/auth/bitbucket/callback"
+
+[digitalocean]
+client_id = "xxx"
+client_secret = "xxx"
+redirect_uri = "http://oauth2-rs.lvh.me/auth/digitalocean/callback"

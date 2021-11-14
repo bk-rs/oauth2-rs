@@ -1,0 +1,12 @@
+{
+    "account": {
+        "droplet_limit": 5,
+        "floating_ip_limit": 3,
+        "volume_limit": 5,
+        "email": "vkill.net@gmail.com",
+        "uuid": "9e323321e52ae626628c6db045a9f27a69474f40",
+        "email_verified": true,
+        "status": "active",
+        "status_message": ""
+    }
+}

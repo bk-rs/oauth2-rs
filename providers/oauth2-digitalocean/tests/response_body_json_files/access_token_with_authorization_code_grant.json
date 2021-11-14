@@ -1,0 +1,12 @@
+{
+    "access_token": "x*64",
+    "bearer": "bearer",
+    "expires_in": 2592000,
+    "refresh_token": "x*64",
+    "scope": "read write",
+    "info": {
+        "name": "vkill.net",
+        "email": "vkill.net@gmail.com",
+        "uuid": "9e323321e52ae626628c6db045a9f27a69474f40"
+    }
+}

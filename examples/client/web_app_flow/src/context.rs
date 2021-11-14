@@ -8,6 +8,9 @@ use oauth2_apple::AppleProviderWithAppleJs;
 use oauth2_bitbucket::{
     BitbucketEndpointBuilder, BitbucketProviderWithWebApplication, BitbucketScope,
 };
+use oauth2_digitalocean::{
+    DigitaloceanEndpointBuilder, DigitaloceanProviderWithWebApplication, DigitaloceanScope,
+};
 use oauth2_facebook::{FacebookEndpointBuilder, FacebookProviderForWebApp, FacebookScope};
 use oauth2_github::{GithubEndpointBuilder, GithubProviderWithWebApplication, GithubScope};
 use oauth2_gitlab::{
@@ -188,6 +191,19 @@ impl Context {
                     BitbucketScope::Repository,
                 ],
                 BitbucketEndpointBuilder,
+            ),
+        );
+        signin_flow_map.insert(
+            "digitalocean",
+            SigninFlow::new(
+                IsahcClient::new()?,
+                DigitaloceanProviderWithWebApplication::new(
+                    clients_config.digitalocean.client_id.to_owned(),
+                    clients_config.digitalocean.client_secret.to_owned(),
+                    clients_config.digitalocean.redirect_uri.to_owned(),
+                )?,
+                vec![DigitaloceanScope::Read, DigitaloceanScope::Write],
+                DigitaloceanEndpointBuilder,
             ),
         );
 
