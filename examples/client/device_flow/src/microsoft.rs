@@ -18,7 +18,7 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
 }
 
 async fn run(client_id: String) -> Result<(), Box<dyn error::Error>> {
-    let scopes = vec![MicrosoftScope::Openid, MicrosoftScope::Profile, MicrosoftScope::Email];
+    let scopes = vec![MicrosoftScope::OfflineAccess, MicrosoftScope::Openid, MicrosoftScope::Profile, MicrosoftScope::Email];
 
     let flow = Flow::new(IsahcClient::new()?, IsahcClient::new()?);
     let provider = MicrosoftProviderForDevices::new("common".to_owned(), client_id)?;
