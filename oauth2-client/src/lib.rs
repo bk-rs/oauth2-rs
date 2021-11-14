@@ -12,7 +12,7 @@ pub mod client_credentials_grant;
 pub mod device_authorization_grant;
 pub mod resource_owner_password_credentials_grant;
 
-pub mod additional_endpoints;
+pub mod extensions;
 
 //
 pub use provider::Provider;

@@ -2,37 +2,37 @@ use std::{collections::HashMap, error};
 
 use http_api_isahc_client::IsahcClient;
 use oauth2_amazon::{
-    AmazonEndpointBuilder, AmazonProviderWithWebServices, AmazonScope, AmazonTokenUrlRegion,
+    AmazonExtensionsBuilder, AmazonProviderWithWebServices, AmazonScope, AmazonTokenUrlRegion,
 };
 use oauth2_apple::AppleProviderWithAppleJs;
 use oauth2_bitbucket::{
-    BitbucketEndpointBuilder, BitbucketProviderWithWebApplication, BitbucketScope,
+    BitbucketExtensionsBuilder, BitbucketProviderWithWebApplication, BitbucketScope,
 };
 use oauth2_digitalocean::{
-    DigitaloceanEndpointBuilder, DigitaloceanProviderWithWebApplication, DigitaloceanScope,
+    DigitaloceanExtensionsBuilder, DigitaloceanProviderWithWebApplication, DigitaloceanScope,
 };
-use oauth2_dropbox::{DropboxEndpointBuilder, DropboxProviderWithWebApplication, DropboxScope};
-use oauth2_facebook::{FacebookEndpointBuilder, FacebookProviderForWebApp, FacebookScope};
-use oauth2_github::{GithubEndpointBuilder, GithubProviderWithWebApplication, GithubScope};
+use oauth2_dropbox::{DropboxExtensionsBuilder, DropboxProviderWithWebApplication, DropboxScope};
+use oauth2_facebook::{FacebookExtensionsBuilder, FacebookProviderForWebApp, FacebookScope};
+use oauth2_github::{GithubExtensionsBuilder, GithubProviderWithWebApplication, GithubScope};
 use oauth2_gitlab::{
-    GitlabEndpointBuilder, GitlabProviderForEndUsers, GitlabScope, BASE_URL_GITLAB_COM,
+    GitlabExtensionsBuilder, GitlabProviderForEndUsers, GitlabScope, BASE_URL_GITLAB_COM,
 };
 use oauth2_google::{
-    GoogleEndpointBuilder, GoogleProviderForWebServerApps,
+    GoogleExtensionsBuilder, GoogleProviderForWebServerApps,
     GoogleProviderForWebServerAppsAccessType, GoogleScope,
 };
 use oauth2_instagram::{
-    InstagramEndpointBuilder, InstagramProviderForBasicDisplayApi, InstagramScope,
+    InstagramExtensionsBuilder, InstagramProviderForBasicDisplayApi, InstagramScope,
 };
-use oauth2_linkedin::{LinkedinEndpointBuilder, LinkedinProviderWithWebApplication, LinkedinScope};
+use oauth2_linkedin::{
+    LinkedinExtensionsBuilder, LinkedinProviderWithWebApplication, LinkedinScope,
+};
 use oauth2_mastodon::{
-    MastodonEndpointBuilder, MastodonProviderForEndUsers, MastodonScope, BASE_URL_MASTODON_SOCIAL,
+    MastodonExtensionsBuilder, MastodonProviderForEndUsers, MastodonScope, BASE_URL_MASTODON_SOCIAL,
 };
 use oauth2_microsoft::{MicrosoftProviderForWebApps, MicrosoftScope};
-use oauth2_signin::{
-    oauth2_client::additional_endpoints::DefaultEndpointBuilder, web_app::SigninFlow,
-};
-use oauth2_twitch::{TwitchEndpointBuilder, TwitchProviderForWebServerApps, TwitchScope};
+use oauth2_signin::{oauth2_client::extensions::DefaultExtensionsBuilder, web_app::SigninFlow};
+use oauth2_twitch::{TwitchExtensionsBuilder, TwitchProviderForWebServerApps, TwitchScope};
 
 use crate::config::Config;
 
@@ -56,7 +56,7 @@ impl Context {
                     clients_config.github.redirect_uri.to_owned(),
                 )?,
                 vec![GithubScope::PublicRepo, GithubScope::UserEmail],
-                GithubEndpointBuilder,
+                GithubExtensionsBuilder,
             ),
         );
         signin_flow_map.insert(
@@ -77,7 +77,7 @@ impl Context {
                     GoogleScope::Profile,
                     GoogleScope::Openid,
                 ],
-                GoogleEndpointBuilder,
+                GoogleExtensionsBuilder,
             ),
         );
         signin_flow_map.insert(
@@ -90,7 +90,7 @@ impl Context {
                     clients_config.twitch.redirect_uri.to_owned(),
                 )?,
                 vec![TwitchScope::UserReadEmail],
-                TwitchEndpointBuilder,
+                TwitchExtensionsBuilder,
             ),
         );
         signin_flow_map.insert(
@@ -104,7 +104,7 @@ impl Context {
                     clients_config.mastodon_social.redirect_uri.to_owned(),
                 )?,
                 vec![MastodonScope::Read, MastodonScope::Write],
-                MastodonEndpointBuilder,
+                MastodonExtensionsBuilder,
             ),
         );
         signin_flow_map.insert(
@@ -117,7 +117,7 @@ impl Context {
                     clients_config.apple.redirect_uri.to_owned(),
                 )?,
                 None,
-                DefaultEndpointBuilder,
+                DefaultExtensionsBuilder,
             ),
         );
         signin_flow_map.insert(
@@ -130,7 +130,7 @@ impl Context {
                     clients_config.instagram.redirect_uri.to_owned(),
                 )?,
                 vec![InstagramScope::UserMedia, InstagramScope::UserProfile],
-                InstagramEndpointBuilder,
+                InstagramExtensionsBuilder,
             ),
         );
         signin_flow_map.insert(
@@ -143,7 +143,7 @@ impl Context {
                     clients_config.facebook.redirect_uri.to_owned(),
                 )?,
                 vec![FacebookScope::Email, FacebookScope::PublicProfile],
-                FacebookEndpointBuilder,
+                FacebookExtensionsBuilder,
             ),
         );
         signin_flow_map.insert(
@@ -157,7 +157,7 @@ impl Context {
                     AmazonTokenUrlRegion::NA,
                 )?,
                 vec![AmazonScope::Profile, AmazonScope::PostalCode],
-                AmazonEndpointBuilder,
+                AmazonExtensionsBuilder,
             ),
         );
         signin_flow_map.insert(
@@ -176,7 +176,7 @@ impl Context {
                     GitlabScope::Email,
                     GitlabScope::ReadUser,
                 ],
-                GitlabEndpointBuilder,
+                GitlabExtensionsBuilder,
             ),
         );
         signin_flow_map.insert(
@@ -193,7 +193,7 @@ impl Context {
                     BitbucketScope::Email,
                     BitbucketScope::Repository,
                 ],
-                BitbucketEndpointBuilder,
+                BitbucketExtensionsBuilder,
             ),
         );
         signin_flow_map.insert(
@@ -206,7 +206,7 @@ impl Context {
                     clients_config.digitalocean.redirect_uri.to_owned(),
                 )?,
                 vec![DigitaloceanScope::Read, DigitaloceanScope::Write],
-                DigitaloceanEndpointBuilder,
+                DigitaloceanExtensionsBuilder,
             ),
         );
         signin_flow_map.insert(
@@ -219,7 +219,7 @@ impl Context {
                     clients_config.dropbox.redirect_uri.to_owned(),
                 )?,
                 vec![DropboxScope::AccountInfoRead, DropboxScope::SharingRead],
-                DropboxEndpointBuilder,
+                DropboxExtensionsBuilder,
             ),
         );
         signin_flow_map.insert(
@@ -235,7 +235,7 @@ impl Context {
                     LinkedinScope::ReadLiteprofile,
                     LinkedinScope::ReadEmailaddress,
                 ],
-                LinkedinEndpointBuilder,
+                LinkedinExtensionsBuilder,
             ),
         );
         signin_flow_map.insert(
@@ -253,7 +253,7 @@ impl Context {
                     MicrosoftScope::Email,
                     MicrosoftScope::Profile,
                 ],
-                DefaultEndpointBuilder,
+                DefaultExtensionsBuilder,
             ),
         );
 

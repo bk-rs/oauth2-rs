@@ -7,8 +7,8 @@ pub mod authorization_code_grant;
 
 pub use authorization_code_grant::LinkedinProviderWithWebApplication;
 
-pub mod additional_endpoints;
-pub use additional_endpoints::LinkedinEndpointBuilder;
+pub mod extensions;
+pub use extensions::LinkedinExtensionsBuilder;
 
 // Ref https://docs.microsoft.com/en-us/linkedin/shared/authentication/authentication?context=linkedin/context#permission-types
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]

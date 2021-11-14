@@ -8,8 +8,8 @@ pub mod authorization_code_grant;
 
 pub use authorization_code_grant::GitlabProviderForEndUsers;
 
-pub mod additional_endpoints;
-pub use additional_endpoints::GitlabEndpointBuilder;
+pub mod extensions;
+pub use extensions::GitlabExtensionsBuilder;
 
 pub fn token_url(base_url: impl AsRef<str>) -> Result<Url, UrlParseError> {
     Url::parse(base_url.as_ref())?.join("/oauth/token")

@@ -1,12 +1,12 @@
 use std::fmt;
 
 use oauth2_client::{
-    additional_endpoints::{
-        AuthorizationCodeGrantInfo, BuilderObtainUserInfoOutput, EndpointBuilder,
-        EndpointExecuteError, GrantInfo,
-    },
     authorization_code_grant::{
         provider_ext::ProviderExtAuthorizationCodeGrantStringScopeWrapper, Flow,
+    },
+    extensions::{
+        AuthorizationCodeGrantInfo, Builder as ExtensionsBuilder, BuilderObtainUserInfoOutput,
+        EndpointExecuteError, GrantInfo,
     },
     oauth2_core::types::State,
     re_exports::{Client, ClientRespondEndpointError, Url},
@@ -26,7 +26,7 @@ where
     pub flow: Flow<C>,
     pub provider: Box<dyn ProviderExtAuthorizationCodeGrant<Scope = String> + Send + Sync>,
     pub scopes: Option<Vec<String>>,
-    pub endpoint_builder: Box<dyn EndpointBuilder<String> + Send + Sync>,
+    pub extensions_builder: Box<dyn ExtensionsBuilder<String> + Send + Sync>,
     pub client_with_user_info: C,
 }
 impl<C> fmt::Debug for SigninFlow<C>
@@ -38,7 +38,7 @@ where
             .field("flow", &self.flow)
             .field("provider", &self.provider)
             .field("scopes", &self.scopes)
-            .field("endpoint_builder", &self.endpoint_builder)
+            .field("extensions_builder", &self.extensions_builder)
             .field("client_with_user_info", &self.client_with_user_info)
             .finish()
     }
@@ -52,12 +52,12 @@ where
         client: C,
         provider: P,
         scopes: impl Into<Option<Vec<<P as Provider>::Scope>>>,
-        endpoint_builder: EPB,
+        extensions_builder: EPB,
     ) -> Self
     where
         C: Clone,
         P: ProviderExtAuthorizationCodeGrant + Clone + Send + Sync + 'static,
-        EPB: EndpointBuilder<String> + Send + Sync + 'static,
+        EPB: ExtensionsBuilder<String> + Send + Sync + 'static,
     {
         Self {
             flow: Flow::new(client.clone()),
@@ -67,7 +67,7 @@ where
             scopes: scopes
                 .into()
                 .map(|x| x.iter().map(|y| y.to_string()).collect()),
-            endpoint_builder: Box::new(endpoint_builder),
+            extensions_builder: Box::new(extensions_builder),
             client_with_user_info: client,
         }
     }
@@ -119,8 +119,8 @@ where
         });
 
         match self
-            .endpoint_builder
-            .user_info_obtain(grant_info, &access_token)
+            .extensions_builder
+            .obtain_user_info(grant_info, &access_token)
         {
             Ok(BuilderObtainUserInfoOutput::None) => {
                 SigninFlowHandleCallbackRet::OkButUserInfoNone(access_token)
@@ -168,8 +168,8 @@ mod tests {
 
     use std::{collections::HashMap, error};
 
-    use oauth2_github::{GithubEndpointBuilder, GithubProviderWithWebApplication, GithubScope};
-    use oauth2_google::{GoogleEndpointBuilder, GoogleProviderForWebServerApps, GoogleScope};
+    use oauth2_github::{GithubExtensionsBuilder, GithubProviderWithWebApplication, GithubScope};
+    use oauth2_google::{GoogleExtensionsBuilder, GoogleProviderForWebServerApps, GoogleScope};
 
     use http_api_isahc_client::IsahcClient;
 
@@ -187,7 +187,7 @@ mod tests {
                     "https://client.example.com/cb".parse()?,
                 )?,
                 vec![GithubScope::User],
-                GithubEndpointBuilder,
+                GithubExtensionsBuilder,
             ),
         );
         map.insert(
@@ -200,7 +200,7 @@ mod tests {
                     "https://client.example.com/cb".parse()?,
                 )?,
                 vec![GoogleScope::Email],
-                GoogleEndpointBuilder,
+                GoogleExtensionsBuilder,
             ),
         );
 
@@ -232,7 +232,7 @@ mod tests {
                     "https://client.example.com/cb".parse()?,
                 )?,
                 vec![GithubScope::User],
-                GithubEndpointBuilder,
+                GithubExtensionsBuilder,
             ),
         );
 

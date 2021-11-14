@@ -7,8 +7,8 @@ pub mod authorization_code_grant;
 
 pub use authorization_code_grant::DigitaloceanProviderWithWebApplication;
 
-pub mod additional_endpoints;
-pub use additional_endpoints::DigitaloceanEndpointBuilder;
+pub mod extensions;
+pub use extensions::DigitaloceanExtensionsBuilder;
 
 // Ref https://docs.digitalocean.com/reference/api/oauth-api/#scopes
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]

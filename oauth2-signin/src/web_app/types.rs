@@ -1,8 +1,8 @@
 use std::error;
 
 use oauth2_client::{
-    additional_endpoints::{AccessTokenResponseSuccessfulBody, EndpointExecuteError, UserInfo},
     authorization_code_grant::{FlowBuildAuthorizationUrlError, FlowHandleCallbackError},
+    extensions::{AccessTokenResponseSuccessfulBody, EndpointExecuteError, UserInfo},
 };
 
 //

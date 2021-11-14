@@ -7,7 +7,7 @@ pub mod authorization_code_grant;
 
 pub use authorization_code_grant::WechatProviderWithWebApplication;
 
-pub mod additional_endpoints;
+pub mod extensions;
 
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
 pub enum WechatScope {

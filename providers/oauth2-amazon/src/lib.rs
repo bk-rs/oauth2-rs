@@ -12,8 +12,8 @@ pub mod device_authorization_grant;
 pub use authorization_code_grant::AmazonProviderWithWebServices;
 pub use device_authorization_grant::AmazonProviderWithDevices;
 
-pub mod additional_endpoints;
-pub use additional_endpoints::AmazonEndpointBuilder;
+pub mod extensions;
+pub use extensions::AmazonExtensionsBuilder;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum AmazonTokenUrlRegion {

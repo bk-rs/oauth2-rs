@@ -7,8 +7,8 @@ pub mod authorization_code_grant;
 
 pub use authorization_code_grant::TwitchProviderForWebServerApps;
 
-pub mod additional_endpoints;
-pub use additional_endpoints::TwitchEndpointBuilder;
+pub mod extensions;
+pub use extensions::TwitchExtensionsBuilder;
 
 /// [Ref](https://dev.twitch.tv/docs/authentication#scopes)
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]

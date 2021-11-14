@@ -7,8 +7,8 @@ pub mod authorization_code_grant;
 
 pub use authorization_code_grant::BitbucketProviderWithWebApplication;
 
-pub mod additional_endpoints;
-pub use additional_endpoints::BitbucketEndpointBuilder;
+pub mod extensions;
+pub use extensions::BitbucketExtensionsBuilder;
 
 // Ref https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/#Scopes
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]

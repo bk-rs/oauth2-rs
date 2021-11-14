@@ -12,8 +12,8 @@ pub use authorization_code_grant::MastodonProviderForEndUsers;
 pub use client_credentials_grant::MastodonProviderForApplications;
 pub use resource_owner_password_credentials_grant::MastodonProviderForBots;
 
-pub mod additional_endpoints;
-pub use additional_endpoints::MastodonEndpointBuilder;
+pub mod extensions;
+pub use extensions::MastodonExtensionsBuilder;
 
 pub fn token_url(base_url: impl AsRef<str>) -> Result<Url, UrlParseError> {
     Url::parse(base_url.as_ref())?.join("/oauth/token")

@@ -7,8 +7,8 @@ pub mod authorization_code_grant;
 
 pub use authorization_code_grant::InstagramProviderForBasicDisplayApi;
 
-pub mod additional_endpoints;
-pub use additional_endpoints::InstagramEndpointBuilder;
+pub mod extensions;
+pub use extensions::InstagramExtensionsBuilder;
 
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
 #[serde(rename_all = "snake_case")]

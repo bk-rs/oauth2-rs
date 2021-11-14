@@ -7,8 +7,8 @@ pub mod authorization_code_grant;
 
 pub use authorization_code_grant::DropboxProviderWithWebApplication;
 
-pub mod additional_endpoints;
-pub use additional_endpoints::DropboxEndpointBuilder;
+pub mod extensions;
+pub use extensions::DropboxExtensionsBuilder;
 
 // Ref App Console, Permissions tab
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
