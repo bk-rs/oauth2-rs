@@ -23,28 +23,31 @@ where
 {
     fn user_info_obtain(
         &self,
-        access_token_provider: GrantInfo<SCOPE>,
+        grant_info: GrantInfo<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
     ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>> {
-        if let Some(scope) = &access_token.scope {
-            let scope = ScopeParameter::<String>::from(scope).0;
-            if scope.contains(&WechatScope::SnsapiLogin.to_string()) {
-                let openid = access_token
-                    .extensions()
-                    .ok_or("extensions missing")?
-                    .get(KEY_OPENID)
-                    .ok_or("openid missing")?
-                    .as_str()
-                    .ok_or("openid mismatch")?
-                    .to_owned();
+        let has_snsapi_login_scope = access_token.scope.as_ref().map(|x| {
+            ScopeParameter::<String>::from(x)
+                .0
+                .contains(&WechatScope::SnsapiLogin.to_string())
+        }) == Some(true);
 
-                return Ok(UserInfoObtainOutput::Respond(Box::new(
-                    WechatUserInfoEndpoint::new(&access_token.access_token, openid),
-                )));
-            }
+        if has_snsapi_login_scope {
+            let openid = access_token
+                .extensions()
+                .ok_or("extensions missing")?
+                .get(KEY_OPENID)
+                .ok_or("openid missing")?
+                .as_str()
+                .ok_or("openid mismatch")?
+                .to_owned();
+
+            return Ok(UserInfoObtainOutput::Respond(Box::new(
+                WechatUserInfoEndpoint::new(&access_token.access_token, openid),
+            )));
         }
 
-        match access_token_provider {
+        match grant_info {
             GrantInfo::AuthorizationCodeGrant {
                 provider: _,
                 authorization_request_scopes: _,

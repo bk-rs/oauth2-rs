@@ -22,7 +22,7 @@ where
 {
     fn user_info_obtain(
         &self,
-        _access_token_provider: GrantInfo<SCOPE>,
+        _grant_info: GrantInfo<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
     ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>> {
         let scopes = access_token

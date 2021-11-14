@@ -19,10 +19,10 @@ where
 {
     fn user_info_obtain(
         &self,
-        access_token_provider: GrantInfo<SCOPE>,
+        grant_info: GrantInfo<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
     ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>> {
-        let extensions = match access_token_provider {
+        let extensions = match grant_info {
             GrantInfo::AuthorizationCodeGrant {
                 provider,
                 authorization_request_scopes: _,

@@ -10,10 +10,10 @@ where
 {
     AuthorizationCodeGrant {
         provider: &'a (dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE> + Send + Sync),
-        authorization_request_scopes: Vec<SCOPE>,
+        authorization_request_scopes: Option<&'a Vec<SCOPE>>,
     },
     DeviceAuthorizationGrant {
         provider: &'a (dyn ProviderExtDeviceAuthorizationGrant<Scope = SCOPE> + Send + Sync),
-        authorization_request_scopes: Vec<SCOPE>,
+        authorization_request_scopes: Option<&'a Vec<SCOPE>>,
     },
 }

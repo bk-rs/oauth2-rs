@@ -22,14 +22,14 @@ where
 {
     fn user_info_obtain(
         &self,
-        _access_token_provider: GrantInfo<SCOPE>,
+        _grant_info: GrantInfo<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
     ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>> {
         Ok(UserInfoObtainOutput::Respond(Box::new(
             GoogleUserInfoEndpoint::new(
                 &access_token.access_token,
-                access_token.scope.to_owned().map(|x| {
-                    ScopeParameter::<String>::from(&x)
+                access_token.scope.as_ref().map(|x| {
+                    ScopeParameter::<String>::from(x)
                         .0
                         .contains(&GoogleScope::Openid.to_string())
                 }) == Some(true),
