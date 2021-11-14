@@ -4,14 +4,14 @@ pub use oauth2_core::re_exports::{
 };
 
 //
-pub mod access_token_provider;
 pub mod endpoint_errors;
+pub mod grant_info;
 pub mod user_info;
 
-pub use access_token_provider::AccessTokenProvider;
 pub use endpoint_errors::{
     EndpointExecuteError, EndpointParseResponseError, EndpointRenderRequestError,
 };
+pub use grant_info::GrantInfo;
 pub use user_info::{UserInfo, UserInfoObtainOutput};
 
 //

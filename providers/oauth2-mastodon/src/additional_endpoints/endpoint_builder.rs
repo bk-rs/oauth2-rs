@@ -2,8 +2,7 @@ use std::error;
 
 use oauth2_client::{
     additional_endpoints::{
-        AccessTokenProvider, AccessTokenResponseSuccessfulBody, EndpointBuilder,
-        UserInfoObtainOutput,
+        AccessTokenResponseSuccessfulBody, EndpointBuilder, GrantInfo, UserInfoObtainOutput,
     },
     re_exports::Scope,
 };
@@ -20,12 +19,18 @@ where
 {
     fn user_info_obtain(
         &self,
-        access_token_provider: AccessTokenProvider<SCOPE>,
+        access_token_provider: GrantInfo<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
     ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>> {
         let extensions = match access_token_provider {
-            AccessTokenProvider::AuthorizationCodeGrant(p) => p.extensions(),
-            AccessTokenProvider::DeviceAuthorizationGrant(p) => p.extensions(),
+            GrantInfo::AuthorizationCodeGrant {
+                provider,
+                authorization_request_scopes: _,
+            } => provider.extensions(),
+            GrantInfo::DeviceAuthorizationGrant {
+                provider,
+                authorization_request_scopes: _,
+            } => provider.extensions(),
         };
 
         let base_url = extensions

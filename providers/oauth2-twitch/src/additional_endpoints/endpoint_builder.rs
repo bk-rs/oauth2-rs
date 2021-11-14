@@ -2,8 +2,7 @@ use std::error;
 
 use oauth2_client::{
     additional_endpoints::{
-        AccessTokenProvider, AccessTokenResponseSuccessfulBody, EndpointBuilder,
-        UserInfoObtainOutput,
+        AccessTokenResponseSuccessfulBody, EndpointBuilder, GrantInfo, UserInfoObtainOutput,
     },
     re_exports::Scope,
 };
@@ -20,12 +19,18 @@ where
 {
     fn user_info_obtain(
         &self,
-        access_token_provider: AccessTokenProvider<SCOPE>,
+        access_token_provider: GrantInfo<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
     ) -> Result<UserInfoObtainOutput, Box<dyn error::Error + Send + Sync>> {
         let client_id = match access_token_provider {
-            AccessTokenProvider::AuthorizationCodeGrant(p) => p.client_id(),
-            AccessTokenProvider::DeviceAuthorizationGrant(p) => p.client_id(),
+            GrantInfo::AuthorizationCodeGrant {
+                provider,
+                authorization_request_scopes: _,
+            } => provider.client_id(),
+            GrantInfo::DeviceAuthorizationGrant {
+                provider,
+                authorization_request_scopes: _,
+            } => provider.client_id(),
         };
         let client_id = client_id.ok_or("missing client_id")?;
 

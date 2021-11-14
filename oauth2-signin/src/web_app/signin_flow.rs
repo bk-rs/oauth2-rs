@@ -2,7 +2,7 @@ use std::fmt;
 
 use oauth2_client::{
     additional_endpoints::{
-        AccessTokenProvider, EndpointBuilder, EndpointExecuteError, UserInfoObtainOutput,
+        EndpointBuilder, EndpointExecuteError, GrantInfo, UserInfoObtainOutput,
     },
     authorization_code_grant::{
         provider_ext::ProviderExtAuthorizationCodeGrantStringScopeWrapper, Flow,
@@ -98,30 +98,6 @@ where
         )
     }
 
-    pub fn build_authorization_url_by_custom_scopes(
-        &self,
-        custom_scopes: Vec<String>,
-        state: impl Into<Option<State>>,
-    ) -> Result<Url, SigninFlowBuildAuthorizationUrlError> {
-        self.flow
-            .build_authorization_url(self.provider.as_ref(), Some(custom_scopes), state)
-    }
-
-    // OIDC
-    pub fn build_authorization_url_by_custom_scopes_with_oidc(
-        &self,
-        custom_scopes: Vec<String>,
-        state: impl Into<Option<State>>,
-        nonce: impl Into<Option<String>>,
-    ) -> Result<Url, SigninFlowBuildAuthorizationUrlError> {
-        self.flow.build_authorization_url_with_oidc(
-            self.provider.as_ref(),
-            Some(custom_scopes),
-            state,
-            nonce,
-        )
-    }
-
     pub async fn handle_callback(
         &self,
         query: impl AsRef<str>,
@@ -136,8 +112,10 @@ where
             Err(err) => return SigninFlowHandleCallbackRet::FlowHandleCallbackError(err),
         };
 
-        let access_token_provider =
-            AccessTokenProvider::AuthorizationCodeGrant(self.provider.as_ref());
+        let access_token_provider = GrantInfo::AuthorizationCodeGrant {
+            provider: self.provider.as_ref(),
+            authorization_request_scopes: self.scopes.to_owned().unwrap_or_default(),
+        };
 
         match self
             .endpoint_builder
@@ -228,10 +206,7 @@ mod tests {
         let github_auth_url = map
             .get("github")
             .unwrap()
-            .build_authorization_url_by_custom_scopes(
-                vec![GithubScope::User.to_string(), "custom".to_owned()],
-                "STATE".to_owned(),
-            )?;
+            .build_authorization_url("STATE".to_owned())?;
         println!("github_auth_url {}", github_auth_url);
 
         let google_auth_url = map.get("google").unwrap().build_authorization_url(None)?;
