@@ -24,7 +24,7 @@ use oauth2_google::{
 use oauth2_instagram::{
     InstagramEndpointBuilder, InstagramProviderForBasicDisplayApi, InstagramScope,
 };
-use oauth2_linkedin::{LinkedinProviderWithWebApplication, LinkedinScope};
+use oauth2_linkedin::{LinkedinEndpointBuilder, LinkedinProviderWithWebApplication, LinkedinScope};
 use oauth2_mastodon::{
     MastodonEndpointBuilder, MastodonProviderForEndUsers, MastodonScope, BASE_URL_MASTODON_SOCIAL,
 };
@@ -234,7 +234,7 @@ impl Context {
                     LinkedinScope::ReadLiteprofile,
                     LinkedinScope::ReadEmailaddress,
                 ],
-                DefaultEndpointBuilder,
+                LinkedinEndpointBuilder,
             ),
         );
 
