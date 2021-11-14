@@ -27,6 +27,7 @@ oauth2-gitlab = { version = "^0.0", path = "../../../providers/oauth2-gitlab" }
 oauth2-bitbucket = { version = "^0.0", path = "../../../providers/oauth2-bitbucket" }
 oauth2-digitalocean = { version = "^0.0", path = "../../../providers/oauth2-digitalocean" }
 oauth2-dropbox = { version = "^0.0", path = "../../../providers/oauth2-dropbox" }
+oauth2-linkedin = { version = "^0.0", path = "../../../providers/oauth2-linkedin" }
 
 tokio = { version = "1.12", default-features = false, features = ["macros", "rt-multi-thread"] }
 futures-util = { version = "0.3" }

@@ -47,6 +47,7 @@ pub struct ClientsConfig {
     pub bitbucket: ClientConfig,
     pub digitalocean: ClientConfig,
     pub dropbox: ClientConfig,
+    pub linkedin: ClientConfig,
 }
 
 #[derive(Deserialize, Debug, Clone)]

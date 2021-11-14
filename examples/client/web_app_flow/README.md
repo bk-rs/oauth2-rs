@@ -25,4 +25,5 @@ xdg-open http://oauth2-rs.lvh.me/auth/gitlab
 xdg-open http://oauth2-rs.lvh.me/auth/bitbucket
 xdg-open http://oauth2-rs.lvh.me/auth/digitalocean
 xdg-open https://oauth2-rs.lvh.me/auth/dropbox
+xdg-open http://oauth2-rs.lvh.me/auth/linkedin
 ```

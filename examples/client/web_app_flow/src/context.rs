@@ -24,6 +24,7 @@ use oauth2_google::{
 use oauth2_instagram::{
     InstagramEndpointBuilder, InstagramProviderForBasicDisplayApi, InstagramScope,
 };
+use oauth2_linkedin::{LinkedinProviderWithWebApplication, LinkedinScope};
 use oauth2_mastodon::{
     MastodonEndpointBuilder, MastodonProviderForEndUsers, MastodonScope, BASE_URL_MASTODON_SOCIAL,
 };
@@ -218,6 +219,22 @@ impl Context {
                 )?,
                 vec![DropboxScope::AccountInfoRead, DropboxScope::SharingRead],
                 DropboxEndpointBuilder,
+            ),
+        );
+        signin_flow_map.insert(
+            "linkedin",
+            SigninFlow::new(
+                IsahcClient::new()?,
+                LinkedinProviderWithWebApplication::new(
+                    clients_config.linkedin.client_id.to_owned(),
+                    clients_config.linkedin.client_secret.to_owned(),
+                    clients_config.linkedin.redirect_uri.to_owned(),
+                )?,
+                vec![
+                    LinkedinScope::ReadLiteprofile,
+                    LinkedinScope::ReadEmailaddress,
+                ],
+                DefaultEndpointBuilder,
             ),
         );
 
