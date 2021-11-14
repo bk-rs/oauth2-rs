@@ -19,6 +19,10 @@ path = "src/facebook.rs"
 name = "device_flow_amazon"
 path = "src/amazon.rs"
 
+[[bin]]
+name = "device_flow_microsoft"
+path = "src/microsoft.rs"
+
 [dependencies]
 oauth2-client = { version = "^0.0", path = "../../../oauth2-client", features = ["with-flow"] }
 
@@ -26,6 +30,7 @@ oauth2-github = { version = "^0.0", path = "../../../providers/oauth2-github" }
 oauth2-google = { version = "^0.0", path = "../../../providers/oauth2-google" }
 oauth2-facebook = { version = "^0.0", path = "../../../providers/oauth2-facebook" }
 oauth2-amazon = { version = "^0.0", path = "../../../providers/oauth2-amazon" }
+oauth2-microsoft = { version = "^0.0", path = "../../../providers/oauth2-microsoft" }
 
 tokio = { version = "1.12", default-features = false, features = ["macros", "rt-multi-thread"] }
 http-api-isahc-client = { version = "0.2", features = ["with-sleep-via-tokio"] }
