@@ -28,6 +28,7 @@ use oauth2_linkedin::{LinkedinEndpointBuilder, LinkedinProviderWithWebApplicatio
 use oauth2_mastodon::{
     MastodonEndpointBuilder, MastodonProviderForEndUsers, MastodonScope, BASE_URL_MASTODON_SOCIAL,
 };
+use oauth2_microsoft::{MicrosoftProviderForWebApps, MicrosoftScope};
 use oauth2_signin::{
     oauth2_client::additional_endpoints::DefaultEndpointBuilder, web_app::SigninFlow,
 };
@@ -235,6 +236,24 @@ impl Context {
                     LinkedinScope::ReadEmailaddress,
                 ],
                 LinkedinEndpointBuilder,
+            ),
+        );
+        signin_flow_map.insert(
+            "microsoft",
+            SigninFlow::new(
+                IsahcClient::new()?,
+                MicrosoftProviderForWebApps::new(
+                    "common".to_owned(),
+                    clients_config.microsoft.client_id.to_owned(),
+                    clients_config.microsoft.client_secret.to_owned(),
+                    clients_config.microsoft.redirect_uri.to_owned(),
+                )?,
+                vec![
+                    MicrosoftScope::Openid,
+                    MicrosoftScope::Email,
+                    MicrosoftScope::Profile,
+                ],
+                DefaultEndpointBuilder,
             ),
         );
 

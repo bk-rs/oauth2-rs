@@ -1,8 +1,10 @@
 use oauth2_client::re_exports::{Deserialize_enum_str, Scope, Serialize_enum_str};
 
+pub mod authorization_code_grant;
 pub mod device_authorization_grant;
 
-pub use device_authorization_grant::MicrosoftProviderWithDevice;
+pub use authorization_code_grant::MicrosoftProviderForWebApps;
+pub use device_authorization_grant::MicrosoftProviderForDevices;
 
 pub fn token_url(tenant: impl AsRef<str>) -> String {
     format!(
@@ -13,6 +15,12 @@ pub fn token_url(tenant: impl AsRef<str>) -> String {
 pub fn device_authorization_url(tenant: impl AsRef<str>) -> String {
     format!(
         "https://login.microsoftonline.com/{}/oauth2/v2.0/devicecode",
+        tenant.as_ref()
+    )
+}
+pub fn authorization_url(tenant: impl AsRef<str>) -> String {
+    format!(
+        "https://login.microsoftonline.com/{}/oauth2/v2.0/authorize",
         tenant.as_ref()
     )
 }

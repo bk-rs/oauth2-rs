@@ -6,13 +6,13 @@ use oauth2_client::{
 use crate::{device_authorization_url, token_url, MicrosoftScope};
 
 #[derive(Debug, Clone)]
-pub struct MicrosoftProviderWithDevice {
+pub struct MicrosoftProviderForDevices {
     client_id: ClientId,
     //
     token_endpoint_url: Url,
     device_authorization_endpoint_url: Url,
 }
-impl MicrosoftProviderWithDevice {
+impl MicrosoftProviderForDevices {
     pub fn new(tenant: impl AsRef<str>, client_id: ClientId) -> Result<Self, UrlParseError> {
         Ok(Self {
             client_id,
@@ -21,7 +21,7 @@ impl MicrosoftProviderWithDevice {
         })
     }
 }
-impl Provider for MicrosoftProviderWithDevice {
+impl Provider for MicrosoftProviderForDevices {
     type Scope = MicrosoftScope;
 
     fn client_id(&self) -> Option<&ClientId> {
@@ -36,7 +36,7 @@ impl Provider for MicrosoftProviderWithDevice {
         &self.token_endpoint_url
     }
 }
-impl ProviderExtDeviceAuthorizationGrant for MicrosoftProviderWithDevice {
+impl ProviderExtDeviceAuthorizationGrant for MicrosoftProviderForDevices {
     fn device_authorization_endpoint_url(&self) -> &Url {
         &self.device_authorization_endpoint_url
     }

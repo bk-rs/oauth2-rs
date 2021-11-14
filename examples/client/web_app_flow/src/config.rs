@@ -48,6 +48,7 @@ pub struct ClientsConfig {
     pub digitalocean: ClientConfig,
     pub dropbox: ClientConfig,
     pub linkedin: ClientConfig,
+    pub microsoft: ClientConfig,
 }
 
 #[derive(Deserialize, Debug, Clone)]

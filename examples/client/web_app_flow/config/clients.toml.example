@@ -62,3 +62,8 @@ redirect_uri = "https://oauth2-rs.lvh.me/auth/dropbox/callback"
 client_id = "xxx"
 client_secret = "xxx"
 redirect_uri = "http://oauth2-rs.lvh.me/auth/linkedin/callback"
+
+[microsoft]
+client_id = "xxx"
+client_secret = "xxx"
+redirect_uri = "https://oauth2-rs.lvh.me/auth/microsoft/callback"
