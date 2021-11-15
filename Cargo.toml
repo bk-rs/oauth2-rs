@@ -6,6 +6,7 @@ members = [
     "oauth2-lite",
     "oauth2-server",
     "oauth2-signin",
+    "oauth2-signin/integrations/*",
     # 
     "providers/*",
     # 
