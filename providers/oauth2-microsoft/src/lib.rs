@@ -1,12 +1,15 @@
 use oauth2_client::re_exports::{Deserialize_enum_str, Scope, Serialize_enum_str};
 
+pub const TENANT_COMMON: &str = "common";
+
 pub mod authorization_code_grant;
 pub mod device_authorization_grant;
 
 pub use authorization_code_grant::MicrosoftProviderForWebApps;
 pub use device_authorization_grant::MicrosoftProviderForDevices;
 
-pub const TENANT_COMMON: &str = "common";
+pub mod extensions;
+pub use extensions::MicrosoftExtensionsBuilder;
 
 pub fn token_url(tenant: impl AsRef<str>) -> String {
     format!(

@@ -30,7 +30,9 @@ use oauth2_linkedin::{
 use oauth2_mastodon::{
     MastodonExtensionsBuilder, MastodonProviderForEndUsers, MastodonScope, BASE_URL_MASTODON_SOCIAL,
 };
-use oauth2_microsoft::{MicrosoftProviderForWebApps, MicrosoftScope, TENANT_COMMON};
+use oauth2_microsoft::{
+    MicrosoftExtensionsBuilder, MicrosoftProviderForWebApps, MicrosoftScope, TENANT_COMMON,
+};
 use oauth2_signin::{oauth2_client::DefaultExtensionsBuilder, web_app::SigninFlow};
 use oauth2_twitch::{TwitchExtensionsBuilder, TwitchProviderForWebServerApps, TwitchScope};
 
@@ -253,7 +255,7 @@ impl Context {
                     MicrosoftScope::Email,
                     MicrosoftScope::Profile,
                 ],
-                DefaultExtensionsBuilder,
+                MicrosoftExtensionsBuilder,
             ),
         );
 
