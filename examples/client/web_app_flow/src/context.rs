@@ -35,7 +35,7 @@ use oauth2_microsoft::{
 };
 use oauth2_signin::{oauth2_client::DefaultExtensionsBuilder, web_app::SigninFlow};
 use oauth2_twitch::{TwitchExtensionsBuilder, TwitchProviderForWebServerApps, TwitchScope};
-use oauth2_yahoo::{YahooProviderForWebApps, YahooScope};
+use oauth2_yahoo::{YahooExtensionsBuilder, YahooProviderForWebApps, YahooScope};
 
 use crate::config::Config;
 
@@ -269,7 +269,7 @@ impl Context {
                     clients_config.yahoo.redirect_uri,
                 )?,
                 vec![YahooScope::Openid, YahooScope::Email, YahooScope::Profile],
-                DefaultExtensionsBuilder,
+                YahooExtensionsBuilder,
             ),
         );
 

@@ -7,6 +7,9 @@ pub mod authorization_code_grant;
 
 pub use authorization_code_grant::YahooProviderForWebApps;
 
+pub mod extensions;
+pub use extensions::YahooExtensionsBuilder;
+
 /// [Ref](https://developer.yahoo.com/oauth2/guide/yahoo_scopes/)
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
 pub enum YahooScope {
