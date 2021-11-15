@@ -78,6 +78,12 @@ where
     fn token_endpoint_url(&self) -> &Url {
         self.inner.token_endpoint_url()
     }
+
+    fn extra(&self) -> Option<Map<String, Value>> {
+        self.inner.extra()
+    }
+
+    // Note
 }
 
 impl<P> ProviderExtClientCredentialsGrant for ProviderExtClientCredentialsGrantStringScopeWrapper<P>
