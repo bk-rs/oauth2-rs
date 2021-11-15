@@ -2,8 +2,7 @@ use std::error;
 
 use oauth2_client::{
     extensions::{
-        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoOutput, ExtensionsBuilder,
-        GrantInfo,
+        AccessTokenResponseSuccessfulBody, Builder, BuilderObtainUserInfoOutput, GrantInfo,
     },
     re_exports::Scope,
 };
@@ -14,7 +13,7 @@ use super::LinkedinUserInfoEndpoint;
 #[derive(Debug, Clone)]
 pub struct LinkedinExtensionsBuilder;
 
-impl<SCOPE> ExtensionsBuilder<SCOPE> for LinkedinExtensionsBuilder
+impl<SCOPE> Builder<SCOPE> for LinkedinExtensionsBuilder
 where
     SCOPE: Scope,
 {

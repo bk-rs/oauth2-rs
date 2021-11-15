@@ -10,10 +10,7 @@ pub mod grant_info;
 pub mod user_info;
 pub mod user_info_endpoint;
 
-pub use builder::{
-    Builder, Builder as ExtensionsBuilder, BuilderObtainUserInfoOutput, DefaultBuilder,
-    DefaultBuilder as DefaultExtensionsBuilder,
-};
+pub use builder::{Builder, BuilderObtainUserInfoOutput, DefaultBuilder};
 pub use endpoint_errors::{
     EndpointExecuteError, EndpointParseResponseError, EndpointRenderRequestError,
 };

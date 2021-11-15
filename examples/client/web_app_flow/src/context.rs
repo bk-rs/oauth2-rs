@@ -31,7 +31,7 @@ use oauth2_mastodon::{
     MastodonExtensionsBuilder, MastodonProviderForEndUsers, MastodonScope, BASE_URL_MASTODON_SOCIAL,
 };
 use oauth2_microsoft::{MicrosoftProviderForWebApps, MicrosoftScope, TENANT_COMMON};
-use oauth2_signin::{oauth2_client::extensions::DefaultExtensionsBuilder, web_app::SigninFlow};
+use oauth2_signin::{oauth2_client::DefaultExtensionsBuilder, web_app::SigninFlow};
 use oauth2_twitch::{TwitchExtensionsBuilder, TwitchProviderForWebServerApps, TwitchScope};
 
 use crate::config::Config;

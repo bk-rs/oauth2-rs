@@ -2,8 +2,8 @@ use std::error;
 
 use oauth2_client::{
     extensions::{
-        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoOutput, ExtensionsBuilder,
-        GrantInfo, UserInfo,
+        AccessTokenResponseSuccessfulBody, Builder, BuilderObtainUserInfoOutput, GrantInfo,
+        UserInfo,
     },
     re_exports::Scope,
 };
@@ -12,7 +12,7 @@ use oauth2_client::{
 #[derive(Debug, Clone)]
 pub struct DigitaloceanExtensionsBuilder;
 
-impl<SCOPE> ExtensionsBuilder<SCOPE> for DigitaloceanExtensionsBuilder
+impl<SCOPE> Builder<SCOPE> for DigitaloceanExtensionsBuilder
 where
     SCOPE: Scope,
 {

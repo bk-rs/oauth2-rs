@@ -2,7 +2,7 @@ use std::error;
 
 use oauth2_client::{
     extensions::{
-        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoOutput, ExtensionsBuilder,
+        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoOutput, Builder,
         GrantInfo, UserInfo,
     },
     oauth2_core::types::ScopeParameter,
@@ -17,7 +17,7 @@ use super::WechatUserInfoEndpoint;
 #[derive(Debug, Clone)]
 pub struct WechatExtensionsBuilder;
 
-impl<SCOPE> ExtensionsBuilder<SCOPE> for WechatExtensionsBuilder
+impl<SCOPE> Builder<SCOPE> for WechatExtensionsBuilder
 where
     SCOPE: Scope,
 {

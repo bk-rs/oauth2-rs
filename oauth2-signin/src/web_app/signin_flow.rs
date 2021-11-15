@@ -5,12 +5,11 @@ use oauth2_client::{
         provider_ext::ProviderExtAuthorizationCodeGrantStringScopeWrapper, Flow,
     },
     extensions::{
-        AuthorizationCodeGrantInfo, Builder as ExtensionsBuilder, BuilderObtainUserInfoOutput,
-        EndpointExecuteError, GrantInfo,
+        AuthorizationCodeGrantInfo, BuilderObtainUserInfoOutput, EndpointExecuteError, GrantInfo,
     },
     oauth2_core::types::State,
     re_exports::{Client, ClientRespondEndpointError, Url},
-    Provider, ProviderExtAuthorizationCodeGrant,
+    ExtensionsBuilder, Provider, ProviderExtAuthorizationCodeGrant,
 };
 
 use super::{SigninFlowBuildAuthorizationUrlError, SigninFlowHandleCallbackRet};

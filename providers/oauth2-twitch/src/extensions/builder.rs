@@ -2,8 +2,7 @@ use std::error;
 
 use oauth2_client::{
     extensions::{
-        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoOutput, ExtensionsBuilder,
-        GrantInfo,
+        AccessTokenResponseSuccessfulBody, Builder, BuilderObtainUserInfoOutput, GrantInfo,
     },
     re_exports::Scope,
 };
@@ -14,7 +13,7 @@ use super::TwitchUserInfoEndpoint;
 #[derive(Debug, Clone)]
 pub struct TwitchExtensionsBuilder;
 
-impl<SCOPE> ExtensionsBuilder<SCOPE> for TwitchExtensionsBuilder
+impl<SCOPE> Builder<SCOPE> for TwitchExtensionsBuilder
 where
     SCOPE: Scope,
 {

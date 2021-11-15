@@ -2,7 +2,7 @@ use std::error;
 
 use oauth2_client::{
     extensions::{
-        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoOutput, ExtensionsBuilder,
+        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoOutput, Builder,
         GrantInfo, UserInfo,
     },
     oauth2_core::types::ScopeParameter,
@@ -17,7 +17,7 @@ use super::DropboxUserInfoEndpoint;
 #[derive(Debug, Clone)]
 pub struct DropboxExtensionsBuilder;
 
-impl<SCOPE> ExtensionsBuilder<SCOPE> for DropboxExtensionsBuilder
+impl<SCOPE> Builder<SCOPE> for DropboxExtensionsBuilder
 where
     SCOPE: Scope,
 {

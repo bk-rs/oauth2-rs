@@ -2,7 +2,7 @@ use std::error;
 
 use oauth2_client::{
     extensions::{
-        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoOutput, ExtensionsBuilder,
+        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoOutput, Builder,
         GrantInfo,
     },
     re_exports::Scope,
@@ -14,7 +14,7 @@ use super::MastodonUserInfoEndpoint;
 #[derive(Debug, Clone)]
 pub struct MastodonExtensionsBuilder;
 
-impl<SCOPE> ExtensionsBuilder<SCOPE> for MastodonExtensionsBuilder
+impl<SCOPE> Builder<SCOPE> for MastodonExtensionsBuilder
 where
     SCOPE: Scope,
 {

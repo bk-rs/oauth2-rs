@@ -21,3 +21,5 @@ pub use authorization_code_grant::provider_ext::ProviderExtAuthorizationCodeGran
 pub use client_credentials_grant::provider_ext::ProviderExtClientCredentialsGrant;
 pub use device_authorization_grant::provider_ext::ProviderExtDeviceAuthorizationGrant;
 pub use resource_owner_password_credentials_grant::provider_ext::ProviderExtResourceOwnerPasswordCredentialsGrant;
+
+pub use extensions::{Builder as ExtensionsBuilder, DefaultBuilder as DefaultExtensionsBuilder};

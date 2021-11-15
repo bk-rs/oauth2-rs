@@ -2,7 +2,7 @@ use std::error;
 
 use oauth2_client::{
     extensions::{
-        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoOutput, ExtensionsBuilder,
+        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoOutput, Builder,
         GrantInfo,
     },
     oauth2_core::types::ScopeParameter,
@@ -17,7 +17,7 @@ use super::GitlabUserInfoEndpoint;
 #[derive(Debug, Clone)]
 pub struct GitlabExtensionsBuilder;
 
-impl<SCOPE> ExtensionsBuilder<SCOPE> for GitlabExtensionsBuilder
+impl<SCOPE> Builder<SCOPE> for GitlabExtensionsBuilder
 where
     SCOPE: Scope,
 {

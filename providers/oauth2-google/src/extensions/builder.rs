@@ -2,8 +2,7 @@ use std::error;
 
 use oauth2_client::{
     extensions::{
-        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoOutput, ExtensionsBuilder,
-        GrantInfo,
+        AccessTokenResponseSuccessfulBody, Builder, BuilderObtainUserInfoOutput, GrantInfo,
     },
     oauth2_core::types::ScopeParameter,
     re_exports::Scope,
@@ -17,7 +16,7 @@ use super::GoogleUserInfoEndpoint;
 #[derive(Debug, Clone)]
 pub struct GoogleExtensionsBuilder;
 
-impl<SCOPE> ExtensionsBuilder<SCOPE> for GoogleExtensionsBuilder
+impl<SCOPE> Builder<SCOPE> for GoogleExtensionsBuilder
 where
     SCOPE: Scope,
 {
