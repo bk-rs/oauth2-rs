@@ -29,6 +29,7 @@ oauth2-digitalocean = { version = "^0.0", path = "../../../providers/oauth2-digi
 oauth2-dropbox = { version = "^0.0", path = "../../../providers/oauth2-dropbox" }
 oauth2-linkedin = { version = "^0.0", path = "../../../providers/oauth2-linkedin" }
 oauth2-microsoft = { version = "^0.0", path = "../../../providers/oauth2-microsoft" }
+oauth2-yahoo = { version = "^0.0", path = "../../../providers/oauth2-yahoo" }
 
 tokio = { version = "1.12", default-features = false, features = ["macros", "rt-multi-thread"] }
 futures-util = { version = "0.3" }

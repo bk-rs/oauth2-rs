@@ -49,6 +49,7 @@ pub struct ClientsConfig {
     pub dropbox: ClientConfig,
     pub linkedin: ClientConfig,
     pub microsoft: ClientConfig,
+    pub yahoo: ClientConfig,
 }
 
 #[derive(Deserialize, Debug, Clone)]
