@@ -18,7 +18,7 @@ pub trait ProviderExtClientCredentialsGrant: Provider + DynClone {
         None
     }
 
-    fn access_token_request_body_extensions(
+    fn access_token_request_body_extra(
         &self,
         _body: &BodyWithClientCredentialsGrant<<Self as Provider>::Scope>,
     ) -> Option<Result<Map<String, Value>, Box<dyn error::Error + Send + Sync + 'static>>> {
@@ -94,7 +94,7 @@ where
             .map(|x| x.iter().map(|y| y.to_string()).collect())
     }
 
-    fn access_token_request_body_extensions(
+    fn access_token_request_body_extra(
         &self,
         body: &BodyWithClientCredentialsGrant<<Self as Provider>::Scope>,
     ) -> Option<Result<Map<String, Value>, Box<dyn error::Error + Send + Sync + 'static>>> {
@@ -106,7 +106,7 @@ where
                 Err(err) => return Some(Err(Box::new(err))),
             };
 
-        self.inner.access_token_request_body_extensions(&body)
+        self.inner.access_token_request_body_extra(&body)
     }
 
     // Note

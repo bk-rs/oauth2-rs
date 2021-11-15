@@ -77,7 +77,7 @@ impl ProviderExtAuthorizationCodeGrant for TwitchProviderForWebServerApps {
         &self.authorization_endpoint_url
     }
 
-    fn authorization_request_query_extensions(&self) -> Option<Map<String, Value>> {
+    fn authorization_request_query_extra(&self) -> Option<Map<String, Value>> {
         let mut map = Map::new();
 
         if let Some(force_verify) = &self.force_verify {
@@ -254,7 +254,7 @@ mod tests {
 
         match body_ret {
             Ok(body) => {
-                let map = body.extensions().unwrap();
+                let map = body.extra().unwrap();
                 assert!(map.is_empty());
             }
             Err(body) => panic!("{:?}", body),

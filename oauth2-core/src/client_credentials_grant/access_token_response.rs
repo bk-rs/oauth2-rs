@@ -19,7 +19,7 @@ where
     pub scope: Option<ScopeParameter<SCOPE>>,
 
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
-    pub _extensions: Option<Map<String, Value>>,
+    pub _extra: Option<Map<String, Value>>,
 }
 
 impl<SCOPE> SuccessfulBody<SCOPE>
@@ -37,15 +37,15 @@ where
             token_type,
             expires_in,
             scope,
-            _extensions: None,
+            _extra: None,
         }
     }
 
-    pub fn set_extensions(&mut self, extensions: Map<String, Value>) {
-        self._extensions = Some(extensions);
+    pub fn set_extra(&mut self, extra: Map<String, Value>) {
+        self._extra = Some(extra);
     }
-    pub fn extensions(&self) -> Option<&Map<String, Value>> {
-        self._extensions.as_ref()
+    pub fn extra(&self) -> Option<&Map<String, Value>> {
+        self._extra.as_ref()
     }
 }
 
@@ -61,8 +61,8 @@ where
             None,
             body.scope.to_owned(),
         );
-        if let Some(extensions) = body.extensions() {
-            this.set_extensions(extensions.to_owned());
+        if let Some(extra) = body.extra() {
+            this.set_extra(extra.to_owned());
         }
         this
     }

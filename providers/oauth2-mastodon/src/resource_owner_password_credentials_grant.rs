@@ -42,7 +42,7 @@ impl Provider for MastodonProviderForBots {
         self.inner.token_endpoint_url()
     }
 
-    fn extensions(&self) -> Option<Map<String, Value>> {
+    fn extra(&self) -> Option<Map<String, Value>> {
         let mut map = Map::new();
         map.insert(
             "base_url".to_owned(),

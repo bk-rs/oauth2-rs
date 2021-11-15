@@ -33,7 +33,7 @@ pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone {
 
     fn authorization_endpoint_url(&self) -> &Url;
 
-    fn authorization_request_query_extensions(&self) -> Option<Map<String, Value>> {
+    fn authorization_request_query_extra(&self) -> Option<Map<String, Value>> {
         None
     }
 
@@ -46,7 +46,7 @@ pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone {
 
     fn authorization_request_url_modifying(&self, _url: &mut Url) {}
 
-    fn access_token_request_body_extensions(
+    fn access_token_request_body_extra(
         &self,
         _body: &AccessTokenRequestBody,
     ) -> Option<Map<String, Value>> {
@@ -135,8 +135,8 @@ where
         self.inner.token_endpoint_url()
     }
 
-    fn extensions(&self) -> Option<Map<String, Value>> {
-        self.inner.extensions()
+    fn extra(&self) -> Option<Map<String, Value>> {
+        self.inner.extra()
     }
 
     // Note
@@ -165,8 +165,8 @@ where
         self.inner.authorization_endpoint_url()
     }
 
-    fn authorization_request_query_extensions(&self) -> Option<Map<String, Value>> {
-        self.inner.authorization_request_query_extensions()
+    fn authorization_request_query_extra(&self) -> Option<Map<String, Value>> {
+        self.inner.authorization_request_query_extra()
     }
 
     fn authorization_request_query_serializing(
@@ -187,11 +187,11 @@ where
         self.inner.authorization_request_url_modifying(url)
     }
 
-    fn access_token_request_body_extensions(
+    fn access_token_request_body_extra(
         &self,
         body: &AccessTokenRequestBody,
     ) -> Option<Map<String, Value>> {
-        self.inner.access_token_request_body_extensions(body)
+        self.inner.access_token_request_body_extra(body)
     }
 
     fn access_token_request_rendering(

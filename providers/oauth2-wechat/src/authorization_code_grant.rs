@@ -286,7 +286,7 @@ impl From<WechatAccessTokenResponseSuccessfulBody>
                 Some(scope.into())
             },
         );
-        body.set_extensions(map);
+        body.set_extra(map);
 
         body
     }
@@ -388,7 +388,7 @@ mod tests {
                     body.scope,
                     Some(vec![WechatScope::Other("SCOPE".to_owned())].into())
                 );
-                let map = body.extensions().unwrap();
+                let map = body.extra().unwrap();
                 assert_eq!(map.get("openid").unwrap(), "OPENID");
             }
             Err(body) => panic!("{:?}", body),

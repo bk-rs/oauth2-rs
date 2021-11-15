@@ -107,7 +107,7 @@ impl ProviderExtAuthorizationCodeGrant for GoogleProviderForWebServerApps {
         &self.authorization_endpoint_url
     }
 
-    fn authorization_request_query_extensions(&self) -> Option<Map<String, Value>> {
+    fn authorization_request_query_extra(&self) -> Option<Map<String, Value>> {
         let mut map = Map::new();
 
         if let Some(access_type) = &self.access_type {

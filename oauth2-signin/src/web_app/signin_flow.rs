@@ -48,16 +48,16 @@ impl<C> SigninFlow<C>
 where
     C: Client,
 {
-    pub fn new<P, EPB>(
+    pub fn new<P, EB>(
         client: C,
         provider: P,
         scopes: impl Into<Option<Vec<<P as Provider>::Scope>>>,
-        extensions_builder: EPB,
+        extensions_builder: EB,
     ) -> Self
     where
         C: Clone,
         P: ProviderExtAuthorizationCodeGrant + Clone + Send + Sync + 'static,
-        EPB: ExtensionsBuilder<String> + Send + Sync + 'static,
+        EB: ExtensionsBuilder<String> + Send + Sync + 'static,
     {
         Self {
             flow: Flow::new(client.clone()),

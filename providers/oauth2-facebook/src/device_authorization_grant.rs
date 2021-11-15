@@ -67,7 +67,7 @@ impl ProviderExtDeviceAuthorizationGrant for FacebookProviderForDevices {
         &self.device_authorization_endpoint_url
     }
 
-    fn device_authorization_request_body_extensions(&self) -> Option<Map<String, Value>> {
+    fn device_authorization_request_body_extra(&self) -> Option<Map<String, Value>> {
         let mut map = Map::new();
 
         map.insert(
@@ -133,7 +133,7 @@ impl ProviderExtDeviceAuthorizationGrant for FacebookProviderForDevices {
         }
     }
 
-    fn device_access_token_request_body_extensions(
+    fn device_access_token_request_body_extra(
         &self,
         body: &BodyWithDeviceAuthorizationGrant,
         _device_authorization_response_body: &DeviceAuthorizationResponseSuccessfulBody,
@@ -262,7 +262,7 @@ impl TryFrom<FacebookDeviceAuthorizationResponseErrorBody>
             Some(body.error.message.to_owned()),
             None,
         );
-        body_new.set_extensions(
+        body_new.set_extra(
             serde_json::to_value(body)
                 .map(|x| x.as_object().cloned())?
                 .ok_or_else(|| "unreachable".to_owned())?,
@@ -306,7 +306,7 @@ impl TryFrom<FacebookDeviceAccessTokenResponseErrorBody>
                     Some(body.error.message.to_owned()),
                     None,
                 );
-                body_new.set_extensions(
+                body_new.set_extra(
                     serde_json::to_value(body)
                         .map(|x| x.as_object().cloned())?
                         .ok_or_else(|| "unreachable".to_owned())?,
@@ -320,7 +320,7 @@ impl TryFrom<FacebookDeviceAccessTokenResponseErrorBody>
                     Some(body.error.message.to_owned()),
                     None,
                 );
-                body_new.set_extensions(
+                body_new.set_extra(
                     serde_json::to_value(body)
                         .map(|x| x.as_object().cloned())?
                         .ok_or_else(|| "unreachable".to_owned())?,
@@ -458,7 +458,7 @@ mod tests {
         )?;
         match body_ret {
             Ok(Ok(body)) => {
-                let map = body.extensions().unwrap();
+                let map = body.extra().unwrap();
                 assert_eq!(
                     map.get("data_access_expiration_time").unwrap().as_u64(),
                     Some(1644569029)

@@ -15,7 +15,7 @@ pub trait Provider: DynClone {
     fn token_endpoint_url(&self) -> &Url;
 
     // e.g. Mastodon's base_url
-    fn extensions(&self) -> Option<Map<String, Value>> {
+    fn extra(&self) -> Option<Map<String, Value>> {
         None
     }
 }

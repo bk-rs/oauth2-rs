@@ -51,7 +51,7 @@ pub struct BodyWithAuthorizationCodeGrant {
     pub client_secret: Option<ClientSecret>,
 
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
-    _extensions: Option<Map<String, Value>>,
+    _extra: Option<Map<String, Value>>,
 }
 
 impl BodyWithAuthorizationCodeGrant {
@@ -66,15 +66,15 @@ impl BodyWithAuthorizationCodeGrant {
             redirect_uri,
             client_id,
             client_secret,
-            _extensions: None,
+            _extra: None,
         }
     }
 
-    pub fn set_extensions(&mut self, extensions: Map<String, Value>) {
-        self._extensions = Some(extensions);
+    pub fn set_extra(&mut self, extra: Map<String, Value>) {
+        self._extra = Some(extra);
     }
-    pub fn extensions(&self) -> Option<&Map<String, Value>> {
-        self._extensions.as_ref()
+    pub fn extra(&self) -> Option<&Map<String, Value>> {
+        self._extra.as_ref()
     }
 }
 
@@ -89,7 +89,7 @@ pub struct BodyWithDeviceAuthorizationGrant {
     pub client_secret: Option<ClientSecret>,
 
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
-    _extensions: Option<Map<String, Value>>,
+    _extra: Option<Map<String, Value>>,
 }
 
 impl BodyWithDeviceAuthorizationGrant {
@@ -102,15 +102,15 @@ impl BodyWithDeviceAuthorizationGrant {
             device_code,
             client_id,
             client_secret,
-            _extensions: None,
+            _extra: None,
         }
     }
 
-    pub fn set_extensions(&mut self, extensions: Map<String, Value>) {
-        self._extensions = Some(extensions);
+    pub fn set_extra(&mut self, extra: Map<String, Value>) {
+        self._extra = Some(extra);
     }
-    pub fn extensions(&self) -> Option<&Map<String, Value>> {
-        self._extensions.as_ref()
+    pub fn extra(&self) -> Option<&Map<String, Value>> {
+        self._extra.as_ref()
     }
 }
 
@@ -126,7 +126,7 @@ where
     pub client_password: Option<ClientPassword>,
 
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
-    _extensions: Option<Map<String, Value>>,
+    _extra: Option<Map<String, Value>>,
 }
 
 impl<SCOPE> BodyWithClientCredentialsGrant<SCOPE>
@@ -137,7 +137,7 @@ where
         Self {
             scope,
             client_password: None,
-            _extensions: None,
+            _extra: None,
         }
     }
 
@@ -148,15 +148,15 @@ where
         Self {
             scope,
             client_password: Some(client_password),
-            _extensions: None,
+            _extra: None,
         }
     }
 
-    pub fn set_extensions(&mut self, extensions: Map<String, Value>) {
-        self._extensions = Some(extensions);
+    pub fn set_extra(&mut self, extra: Map<String, Value>) {
+        self._extra = Some(extra);
     }
-    pub fn extensions(&self) -> Option<&Map<String, Value>> {
-        self._extensions.as_ref()
+    pub fn extra(&self) -> Option<&Map<String, Value>> {
+        self._extra.as_ref()
     }
 
     pub fn try_from_t_with_string(
@@ -170,8 +170,8 @@ where
 
         let mut this = Self::new(scope);
         this.client_password = body.client_password.to_owned();
-        if let Some(extensions) = body.extensions() {
-            this.set_extensions(extensions.to_owned());
+        if let Some(extra) = body.extra() {
+            this.set_extra(extra.to_owned());
         }
         Ok(this)
     }
@@ -192,7 +192,7 @@ where
     pub client_password: Option<ClientPassword>,
 
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
-    _extensions: Option<Map<String, Value>>,
+    _extra: Option<Map<String, Value>>,
 }
 
 impl<SCOPE> BodyWithResourceOwnerPasswordCredentialsGrant<SCOPE>
@@ -209,7 +209,7 @@ where
             password: password.as_ref().to_owned(),
             scope,
             client_password: None,
-            _extensions: None,
+            _extra: None,
         }
     }
 
@@ -224,15 +224,15 @@ where
             password: password.as_ref().to_owned(),
             scope,
             client_password: Some(client_password),
-            _extensions: None,
+            _extra: None,
         }
     }
 
-    pub fn set_extensions(&mut self, extensions: Map<String, Value>) {
-        self._extensions = Some(extensions);
+    pub fn set_extra(&mut self, extra: Map<String, Value>) {
+        self._extra = Some(extra);
     }
-    pub fn extensions(&self) -> Option<&Map<String, Value>> {
-        self._extensions.as_ref()
+    pub fn extra(&self) -> Option<&Map<String, Value>> {
+        self._extra.as_ref()
     }
 
     pub fn try_from_t_with_string(
@@ -246,8 +246,8 @@ where
 
         let mut this = Self::new(body.username.to_owned(), body.password.to_owned(), scope);
         this.client_password = body.client_password.to_owned();
-        if let Some(extensions) = body.extensions() {
-            this.set_extensions(extensions.to_owned());
+        if let Some(extra) = body.extra() {
+            this.set_extra(extra.to_owned());
         }
         Ok(this)
     }
@@ -303,23 +303,23 @@ mod tests_with_device_authorization_grant {
     }
 
     #[test]
-    fn test_ser_de_extensions() {
+    fn test_ser_de_extra() {
         //
-        let mut extensions = Map::new();
-        extensions.insert("foo".to_owned(), Value::String("bar".to_owned()));
+        let mut extra = Map::new();
+        extra.insert("foo".to_owned(), Value::String("bar".to_owned()));
         let mut body = BodyWithDeviceAuthorizationGrant::new(
             "your_device_code".to_owned(),
             Some("your_client_id".to_owned()),
             Some("your_client_secret".to_owned()),
         );
-        body.set_extensions(extensions.to_owned());
+        body.set_extra(extra.to_owned());
         let body = Body::<String>::DeviceAuthorizationGrant(body);
         let body_str = serde_urlencoded::to_string(body).unwrap();
         assert_eq!(body_str, "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Adevice_code&device_code=your_device_code&client_id=your_client_id&client_secret=your_client_secret&foo=bar");
 
         match serde_urlencoded::from_str::<Body<String>>(body_str.as_str()) {
             Ok(Body::DeviceAuthorizationGrant(body)) => {
-                assert_eq!(body.extensions(), Some(&extensions));
+                assert_eq!(body.extra(), Some(&extra));
             }
             #[allow(unreachable_patterns)]
             Ok(body) => panic!("{:?}", body),
@@ -367,13 +367,13 @@ mod tests_with_client_credentials_grant {
     }
 
     #[test]
-    fn test_ser_de_extensions() {
+    fn test_ser_de_extra() {
         let body_str = "grant_type=client_credentials&foo=bar";
         match serde_urlencoded::from_str::<Body<String>>(body_str) {
             Ok(Body::ClientCredentialsGrant(body)) => {
                 assert_eq!(body.client_password, None);
                 assert_eq!(
-                    body.extensions().unwrap().get("foo").unwrap().as_str(),
+                    body.extra().unwrap().get("foo").unwrap().as_str(),
                     Some("bar")
                 )
             }
@@ -391,7 +391,7 @@ mod tests_with_client_credentials_grant {
                     "CLIENT_ID"
                 );
                 assert_eq!(
-                    body.extensions().unwrap().get("foo").unwrap().as_str(),
+                    body.extra().unwrap().get("foo").unwrap().as_str(),
                     Some("bar")
                 )
             }

@@ -70,8 +70,8 @@ where
         );
         query.nonce = self.nonce.to_owned();
 
-        if let Some(extensions) = self.provider.authorization_request_query_extensions() {
-            query.set_extensions(extensions);
+        if let Some(extra) = self.provider.authorization_request_query_extra() {
+            query.set_extra(extra);
         }
 
         let query_str = if let Some(query_str_ret) = self

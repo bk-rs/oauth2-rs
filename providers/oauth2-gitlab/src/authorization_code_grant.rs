@@ -45,7 +45,7 @@ impl Provider for GitlabProviderForEndUsers {
         self.inner.token_endpoint_url()
     }
 
-    fn extensions(&self) -> Option<Map<String, Value>> {
+    fn extra(&self) -> Option<Map<String, Value>> {
         let mut map = Map::new();
         map.insert(
             "base_url".to_owned(),
@@ -105,7 +105,7 @@ mod tests {
 
         match body_ret {
             Ok(body) => {
-                let map = body.extensions().unwrap();
+                let map = body.extra().unwrap();
                 assert!(map.get("created_at").is_some());
             }
             Err(body) => panic!("{:?}", body),

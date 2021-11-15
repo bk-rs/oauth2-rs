@@ -83,11 +83,11 @@ where
             self.provider.client_id().cloned(),
             self.provider.client_secret().cloned(),
         );
-        if let Some(extensions) = self.provider.device_access_token_request_body_extensions(
+        if let Some(extra) = self.provider.device_access_token_request_body_extra(
             &body,
             &self.device_authorization_response_successful_body,
         ) {
-            body.set_extensions(extensions);
+            body.set_extra(extra);
         }
 
         if let Some(request_ret) = self.provider.device_access_token_request_rendering(

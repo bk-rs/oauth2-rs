@@ -15,22 +15,22 @@ pub struct SuccessfulQuery {
     pub state: Option<State>,
 
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
-    _extensions: Option<Map<String, Value>>,
+    _extra: Option<Map<String, Value>>,
 }
 impl SuccessfulQuery {
     pub fn new(code: Code, state: Option<State>) -> Self {
         Self {
             code,
             state,
-            _extensions: None,
+            _extra: None,
         }
     }
 
-    pub fn set_extensions(&mut self, extensions: Map<String, Value>) {
-        self._extensions = Some(extensions);
+    pub fn set_extra(&mut self, extra: Map<String, Value>) {
+        self._extra = Some(extra);
     }
-    pub fn extensions(&self) -> Option<&Map<String, Value>> {
-        self._extensions.as_ref()
+    pub fn extra(&self) -> Option<&Map<String, Value>> {
+        self._extra.as_ref()
     }
 }
 

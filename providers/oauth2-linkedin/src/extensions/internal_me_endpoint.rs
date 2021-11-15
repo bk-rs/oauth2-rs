@@ -53,7 +53,7 @@ pub struct User {
     pub id: String,
     //
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
-    pub _extensions: Option<Map<String, Value>>,
+    pub _extra: Option<Map<String, Value>>,
 }
 
 #[derive(thiserror::Error, Debug)]

@@ -27,7 +27,7 @@ pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone {
 
     fn device_authorization_endpoint_url(&self) -> &Url;
 
-    fn device_authorization_request_body_extensions(&self) -> Option<Map<String, Value>> {
+    fn device_authorization_request_body_extra(&self) -> Option<Map<String, Value>> {
         None
     }
 
@@ -50,7 +50,7 @@ pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone {
         None
     }
 
-    fn device_access_token_request_body_extensions(
+    fn device_access_token_request_body_extra(
         &self,
         _body: &BodyWithDeviceAuthorizationGrant,
         _device_authorization_response_body: &DeviceAuthorizationResponseSuccessfulBody,
@@ -159,8 +159,8 @@ where
         self.inner.device_authorization_endpoint_url()
     }
 
-    fn device_authorization_request_body_extensions(&self) -> Option<Map<String, Value>> {
-        self.inner.device_authorization_request_body_extensions()
+    fn device_authorization_request_body_extra(&self) -> Option<Map<String, Value>> {
+        self.inner.device_authorization_request_body_extra()
     }
 
     fn device_authorization_request_rendering(
@@ -190,13 +190,13 @@ where
         self.inner.device_authorization_response_parsing(response)
     }
 
-    fn device_access_token_request_body_extensions(
+    fn device_access_token_request_body_extra(
         &self,
         body: &BodyWithDeviceAuthorizationGrant,
         device_authorization_response_body: &DeviceAuthorizationResponseSuccessfulBody,
     ) -> Option<Map<String, Value>> {
         self.inner
-            .device_access_token_request_body_extensions(body, device_authorization_response_body)
+            .device_access_token_request_body_extra(body, device_authorization_response_body)
     }
 
     fn device_access_token_request_rendering(

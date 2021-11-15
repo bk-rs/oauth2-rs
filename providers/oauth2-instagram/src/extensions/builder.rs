@@ -24,7 +24,7 @@ where
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
     ) -> Result<BuilderObtainUserInfoOutput, Box<dyn error::Error + Send + Sync>> {
         let ig_user_id = access_token
-            .extensions()
+            .extra()
             .map(|x| x.get("user_id").cloned())
             .ok_or("Missing user_id")?
             .ok_or("Missing user_id")?

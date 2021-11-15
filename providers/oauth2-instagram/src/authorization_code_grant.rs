@@ -86,7 +86,7 @@ mod tests {
 
         match body_ret {
             Ok(body) => {
-                let map = body.extensions().unwrap();
+                let map = body.extra().unwrap();
                 assert_eq!(
                     map.get("user_id").unwrap().as_u64(),
                     Some(17841403401953170)

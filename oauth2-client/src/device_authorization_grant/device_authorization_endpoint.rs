@@ -62,8 +62,8 @@ where
             self.provider.client_id().cloned(),
             self.scopes.to_owned().map(Into::into),
         );
-        if let Some(extensions) = self.provider.device_authorization_request_body_extensions() {
-            body.set_extensions(extensions);
+        if let Some(extra) = self.provider.device_authorization_request_body_extra() {
+            body.set_extra(extra);
         }
 
         if let Some(request_ret) = self.provider.device_authorization_request_rendering(&body) {

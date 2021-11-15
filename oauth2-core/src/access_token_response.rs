@@ -37,7 +37,7 @@ where
     pub id_token: Option<String>,
 
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
-    pub _extensions: Option<Map<String, Value>>,
+    pub _extra: Option<Map<String, Value>>,
 }
 impl<SCOPE> SuccessfulBody<SCOPE>
 where
@@ -57,15 +57,15 @@ where
             refresh_token,
             scope,
             id_token: None,
-            _extensions: None,
+            _extra: None,
         }
     }
 
-    pub fn set_extensions(&mut self, extensions: Map<String, Value>) {
-        self._extensions = Some(extensions);
+    pub fn set_extra(&mut self, extra: Map<String, Value>) {
+        self._extra = Some(extra);
     }
-    pub fn extensions(&self) -> Option<&Map<String, Value>> {
-        self._extensions.as_ref()
+    pub fn extra(&self) -> Option<&Map<String, Value>> {
+        self._extra.as_ref()
     }
 
     pub fn try_from_t_with_string(
@@ -84,8 +84,8 @@ where
             body.refresh_token.to_owned(),
             scope,
         );
-        if let Some(extensions) = body.extensions() {
-            this.set_extensions(extensions.to_owned());
+        if let Some(extra) = body.extra() {
+            this.set_extra(extra.to_owned());
         }
         Ok(this)
     }
@@ -105,8 +105,8 @@ where
                 .to_owned()
                 .map(|x| ScopeParameter::<String>::from(&x)),
         );
-        if let Some(extensions) = body.extensions() {
-            this.set_extensions(extensions.to_owned());
+        if let Some(extra) = body.extra() {
+            this.set_extra(extra.to_owned());
         }
         this
     }
@@ -126,7 +126,7 @@ pub struct ErrorBody {
     pub error_uri: Option<Url>,
 
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
-    _extensions: Option<Map<String, Value>>,
+    _extra: Option<Map<String, Value>>,
 }
 impl ErrorBody {
     pub fn new(
@@ -138,15 +138,15 @@ impl ErrorBody {
             error,
             error_description,
             error_uri,
-            _extensions: None,
+            _extra: None,
         }
     }
 
-    pub fn set_extensions(&mut self, extensions: Map<String, Value>) {
-        self._extensions = Some(extensions);
+    pub fn set_extra(&mut self, extra: Map<String, Value>) {
+        self._extra = Some(extra);
     }
-    pub fn extensions(&self) -> Option<&Map<String, Value>> {
-        self._extensions.as_ref()
+    pub fn extra(&self) -> Option<&Map<String, Value>> {
+        self._extra.as_ref()
     }
 }
 

@@ -77,15 +77,13 @@ where
         } else {
             BodyWithClientCredentialsGrant::new(self.scopes.to_owned().map(Into::into))
         };
-        if let Some(extensions_ret) = self.provider.access_token_request_body_extensions(&body) {
-            match extensions_ret {
-                Ok(extensions) => {
-                    body.set_extensions(extensions);
+        if let Some(extra_ret) = self.provider.access_token_request_body_extra(&body) {
+            match extra_ret {
+                Ok(extra) => {
+                    body.set_extra(extra);
                 }
                 Err(err) => {
-                    return Err(AccessTokenEndpointError::MakeRequestBodyExtensionsFailed(
-                        err,
-                    ));
+                    return Err(AccessTokenEndpointError::MakeRequestBodyExtraFailed(err));
                 }
             }
         }
@@ -140,8 +138,8 @@ pub enum AccessTokenEndpointError {
     #[error("ClientSecretMissing")]
     ClientSecretMissing,
     //
-    #[error("MakeRequestBodyExtensionsFailed {0}")]
-    MakeRequestBodyExtensionsFailed(Box<dyn error::Error + Send + Sync>),
+    #[error("MakeRequestBodyExtraFailed {0}")]
+    MakeRequestBodyExtraFailed(Box<dyn error::Error + Send + Sync>),
     //
     #[error("SerRequestBodyFailed {0}")]
     SerRequestBodyFailed(SerdeUrlencodedSerError),

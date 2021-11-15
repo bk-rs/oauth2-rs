@@ -26,9 +26,9 @@ where
         _grant_info: GrantInfo<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
     ) -> Result<BuilderObtainUserInfoOutput, Box<dyn error::Error + Send + Sync>> {
-        let extensions = access_token.extensions().ok_or("extensions missing")?;
+        let extra = access_token.extra().ok_or("extra missing")?;
 
-        let uid = extensions
+        let uid = extra
             .get("uid")
             .ok_or("uid missing")?
             .as_str()
@@ -42,7 +42,7 @@ where
             .unwrap_or_default();
 
         if scopes.contains(&DropboxScope::SharingRead.to_string()) {
-            let account_id = extensions
+            let account_id = extra
                 .get("account_id")
                 .ok_or("account_id missing")?
                 .as_str()
@@ -58,7 +58,7 @@ where
             uid,
             name: None,
             email: None,
-            raw: extensions.to_owned(),
+            raw: extra.to_owned(),
         }))
     }
 }

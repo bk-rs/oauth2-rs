@@ -34,8 +34,8 @@ where
 
         if has_snsapi_login_scope {
             let openid = access_token
-                .extensions()
-                .ok_or("extensions missing")?
+                .extra()
+                .ok_or("extra missing")?
                 .get(KEY_OPENID)
                 .ok_or("openid missing")?
                 .as_str()
@@ -50,8 +50,8 @@ where
         match grant_info {
             GrantInfo::AuthorizationCodeGrant(_) => {
                 let uid = access_token
-                    .extensions()
-                    .ok_or("extensions missing")?
+                    .extra()
+                    .ok_or("extra missing")?
                     .get(KEY_OPENID)
                     .ok_or("openid missing")?
                     .as_str()

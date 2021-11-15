@@ -22,8 +22,8 @@ where
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
     ) -> Result<BuilderObtainUserInfoOutput, Box<dyn error::Error + Send + Sync>> {
         let info = access_token
-            .extensions()
-            .ok_or("extensions missing")?
+            .extra()
+            .ok_or("extra missing")?
             .get("info")
             .ok_or("info missing")?
             .as_object()

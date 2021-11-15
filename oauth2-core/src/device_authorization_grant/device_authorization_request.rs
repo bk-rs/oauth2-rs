@@ -24,7 +24,7 @@ where
     pub scope: Option<ScopeParameter<SCOPE>>,
 
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
-    _extensions: Option<Map<String, Value>>,
+    _extra: Option<Map<String, Value>>,
 }
 
 impl<SCOPE> Body<SCOPE>
@@ -35,15 +35,15 @@ where
         Self {
             client_id,
             scope,
-            _extensions: None,
+            _extra: None,
         }
     }
 
-    pub fn set_extensions(&mut self, extensions: Map<String, Value>) {
-        self._extensions = Some(extensions);
+    pub fn set_extra(&mut self, extra: Map<String, Value>) {
+        self._extra = Some(extra);
     }
-    pub fn extensions(&self) -> Option<&Map<String, Value>> {
-        self._extensions.as_ref()
+    pub fn extra(&self) -> Option<&Map<String, Value>> {
+        self._extra.as_ref()
     }
 
     pub fn try_from_t_with_string(body: &Body<String>) -> Result<Self, ScopeFromStrError> {
@@ -54,8 +54,8 @@ where
         };
 
         let mut this = Self::new(body.client_id.to_owned(), scope);
-        if let Some(extensions) = body.extensions() {
-            this.set_extensions(extensions.to_owned());
+        if let Some(extra) = body.extra() {
+            this.set_extra(extra.to_owned());
         }
         Ok(this)
     }

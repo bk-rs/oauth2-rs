@@ -23,12 +23,12 @@ where
         grant_info: GrantInfo<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
     ) -> Result<BuilderObtainUserInfoOutput, Box<dyn error::Error + Send + Sync>> {
-        let extensions = match grant_info {
-            GrantInfo::AuthorizationCodeGrant(info) => info.provider.extensions(),
-            GrantInfo::DeviceAuthorizationGrant(info) => info.provider.extensions(),
+        let extra = match grant_info {
+            GrantInfo::AuthorizationCodeGrant(info) => info.provider.extra(),
+            GrantInfo::DeviceAuthorizationGrant(info) => info.provider.extra(),
         };
 
-        let base_url = extensions
+        let base_url = extra
             .map(|x| x.get("base_url").cloned())
             .ok_or("Missing base_url")?
             .ok_or("Missing base_url")?
