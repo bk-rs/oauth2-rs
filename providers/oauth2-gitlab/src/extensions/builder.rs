@@ -1,9 +1,7 @@
-use std::error;
-
 use oauth2_client::{
     extensions::{
-        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoOutput, Builder,
-        GrantInfo,
+        AccessTokenResponseSuccessfulBody, Builder, BuilderObtainUserInfoError,
+        BuilderObtainUserInfoOutput, GrantInfo,
     },
     oauth2_core::types::ScopeParameter,
     re_exports::Scope,
@@ -25,7 +23,7 @@ where
         &self,
         _grant_info: GrantInfo<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> Result<BuilderObtainUserInfoOutput, Box<dyn error::Error + Send + Sync>> {
+    ) -> Result<BuilderObtainUserInfoOutput, BuilderObtainUserInfoError> {
         let scopes = access_token
             .scope
             .to_owned()

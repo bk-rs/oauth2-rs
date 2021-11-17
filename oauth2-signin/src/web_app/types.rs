@@ -1,8 +1,9 @@
-use std::error;
-
 use oauth2_client::{
     authorization_code_grant::{FlowBuildAuthorizationUrlError, FlowHandleCallbackError},
-    extensions::{AccessTokenResponseSuccessfulBody, EndpointExecuteError, UserInfo},
+    extensions::{
+        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoError,
+        EndpointExecuteError as UserInfoEndpointExecuteError, UserInfo,
+    },
 };
 
 //
@@ -18,13 +19,13 @@ pub enum SigninFlowHandleCallbackRet {
     OkButUserInfoObtainError(
         (
             AccessTokenResponseSuccessfulBody<String>,
-            Box<dyn error::Error + Send + Sync>,
+            BuilderObtainUserInfoError,
         ),
     ),
     OkButUserInfoEndpointExecuteError(
         (
             AccessTokenResponseSuccessfulBody<String>,
-            EndpointExecuteError,
+            UserInfoEndpointExecuteError,
         ),
     ),
     FlowHandleCallbackError(FlowHandleCallbackError),

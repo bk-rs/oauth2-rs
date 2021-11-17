@@ -1,9 +1,7 @@
-use std::error;
-
 use oauth2_client::{
     extensions::{
-        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoOutput, Builder,
-        GrantInfo,
+        AccessTokenResponseSuccessfulBody, Builder, BuilderObtainUserInfoError,
+        BuilderObtainUserInfoOutput, GrantInfo,
     },
     re_exports::Scope,
 };
@@ -22,7 +20,7 @@ where
         &self,
         grant_info: GrantInfo<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> Result<BuilderObtainUserInfoOutput, Box<dyn error::Error + Send + Sync>> {
+    ) -> Result<BuilderObtainUserInfoOutput, BuilderObtainUserInfoError> {
         let extra = match grant_info {
             GrantInfo::AuthorizationCodeGrant(info) => info.provider.extra(),
             GrantInfo::DeviceAuthorizationGrant(info) => info.provider.extra(),
@@ -30,14 +28,18 @@ where
 
         let base_url = extra
             .map(|x| x.get("base_url").cloned())
-            .ok_or("Missing base_url")?
-            .ok_or("Missing base_url")?
+            .ok_or("base_url missing")
+            .map_err(BuilderObtainUserInfoError::Unreachable)?
+            .ok_or("base_url missing")
+            .map_err(BuilderObtainUserInfoError::Unreachable)?
             .as_str()
-            .ok_or("Mismatch base_url")?
+            .ok_or("base_url mismatch")
+            .map_err(BuilderObtainUserInfoError::Unreachable)?
             .to_owned();
 
         Ok(BuilderObtainUserInfoOutput::Respond(Box::new(
-            MastodonUserInfoEndpoint::new(base_url, &access_token.access_token)?,
+            MastodonUserInfoEndpoint::new(base_url, &access_token.access_token)
+                .map_err(|err| BuilderObtainUserInfoError::Other(Box::new(err)))?,
         )))
     }
 }

@@ -1,9 +1,7 @@
-use std::error;
-
 use oauth2_client::{
     extensions::{
-        AccessTokenResponseSuccessfulBody, Builder, BuilderObtainUserInfoOutput, GrantInfo,
-        UserInfo,
+        AccessTokenResponseSuccessfulBody, Builder, BuilderObtainUserInfoError,
+        BuilderObtainUserInfoOutput, GrantInfo, UserInfo,
     },
     re_exports::Scope,
 };
@@ -20,34 +18,43 @@ where
         &self,
         _grant_info: GrantInfo<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> Result<BuilderObtainUserInfoOutput, Box<dyn error::Error + Send + Sync>> {
+    ) -> Result<BuilderObtainUserInfoOutput, BuilderObtainUserInfoError> {
         let info = access_token
             .extra()
-            .ok_or("extra missing")?
+            .ok_or("extra missing")
+            .map_err(BuilderObtainUserInfoError::Unreachable)?
             .get("info")
-            .ok_or("info missing")?
+            .ok_or("info missing")
+            .map_err(BuilderObtainUserInfoError::Unreachable)?
             .as_object()
-            .ok_or("openid mismatch")?;
+            .ok_or("info mismatch")
+            .map_err(BuilderObtainUserInfoError::Unreachable)?;
 
         let uid = info
             .get("uuid")
-            .ok_or("uuid missing")?
+            .ok_or("uuid missing")
+            .map_err(BuilderObtainUserInfoError::Unreachable)?
             .as_str()
-            .ok_or("uuid mismatch")?
+            .ok_or("uuid mismatch")
+            .map_err(BuilderObtainUserInfoError::Unreachable)?
             .to_owned();
 
         let name = info
             .get("name")
-            .ok_or("name missing")?
+            .ok_or("name missing")
+            .map_err(BuilderObtainUserInfoError::Unreachable)?
             .as_str()
-            .ok_or("name mismatch")?
+            .ok_or("name mismatch")
+            .map_err(BuilderObtainUserInfoError::Unreachable)?
             .to_owned();
 
         let email = info
             .get("email")
-            .ok_or("email missing")?
+            .ok_or("email missing")
+            .map_err(BuilderObtainUserInfoError::Unreachable)?
             .as_str()
-            .ok_or("email mismatch")?
+            .ok_or("email mismatch")
+            .map_err(BuilderObtainUserInfoError::Unreachable)?
             .to_owned();
 
         Ok(BuilderObtainUserInfoOutput::Static(UserInfo {

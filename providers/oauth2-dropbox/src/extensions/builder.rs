@@ -1,9 +1,7 @@
-use std::error;
-
 use oauth2_client::{
     extensions::{
-        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoOutput, Builder,
-        GrantInfo, UserInfo,
+        AccessTokenResponseSuccessfulBody, Builder, BuilderObtainUserInfoError,
+        BuilderObtainUserInfoOutput, GrantInfo, UserInfo,
     },
     oauth2_core::types::ScopeParameter,
     re_exports::Scope,
@@ -25,14 +23,19 @@ where
         &self,
         _grant_info: GrantInfo<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> Result<BuilderObtainUserInfoOutput, Box<dyn error::Error + Send + Sync>> {
-        let extra = access_token.extra().ok_or("extra missing")?;
+    ) -> Result<BuilderObtainUserInfoOutput, BuilderObtainUserInfoError> {
+        let extra = access_token
+            .extra()
+            .ok_or("extra missing")
+            .map_err(BuilderObtainUserInfoError::Unreachable)?;
 
         let uid = extra
             .get("uid")
-            .ok_or("uid missing")?
+            .ok_or("uid missing")
+            .map_err(BuilderObtainUserInfoError::Unreachable)?
             .as_str()
-            .ok_or("uid mismatch")?
+            .ok_or("uid mismatch")
+            .map_err(BuilderObtainUserInfoError::Unreachable)?
             .to_owned();
 
         let scopes = access_token
@@ -44,9 +47,11 @@ where
         if scopes.contains(&DropboxScope::SharingRead.to_string()) {
             let account_id = extra
                 .get("account_id")
-                .ok_or("account_id missing")?
+                .ok_or("account_id missing")
+                .map_err(BuilderObtainUserInfoError::Unreachable)?
                 .as_str()
-                .ok_or("account_id mismatch")?
+                .ok_or("account_id mismatch")
+                .map_err(BuilderObtainUserInfoError::Unreachable)?
                 .to_owned();
 
             return Ok(BuilderObtainUserInfoOutput::Respond(Box::new(

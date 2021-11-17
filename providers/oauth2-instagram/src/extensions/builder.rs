@@ -1,8 +1,7 @@
-use std::error;
-
 use oauth2_client::{
     extensions::{
-        AccessTokenResponseSuccessfulBody, Builder, BuilderObtainUserInfoOutput, GrantInfo,
+        AccessTokenResponseSuccessfulBody, Builder, BuilderObtainUserInfoError,
+        BuilderObtainUserInfoOutput, GrantInfo,
     },
     re_exports::Scope,
 };
@@ -21,14 +20,17 @@ where
         &self,
         _grant_info: GrantInfo<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> Result<BuilderObtainUserInfoOutput, Box<dyn error::Error + Send + Sync>> {
+    ) -> Result<BuilderObtainUserInfoOutput, BuilderObtainUserInfoError> {
         let ig_user_id = access_token
             .extra()
             .map(|x| x.get("user_id").cloned())
-            .ok_or("Missing user_id")?
-            .ok_or("Missing user_id")?
+            .ok_or("user_id missing")
+            .map_err(BuilderObtainUserInfoError::Unreachable)?
+            .ok_or("user_id missing")
+            .map_err(BuilderObtainUserInfoError::Unreachable)?
             .as_u64()
-            .ok_or("Mismatch user_id")?
+            .ok_or("user_id mismatch")
+            .map_err(BuilderObtainUserInfoError::Unreachable)?
             .to_owned();
 
         Ok(BuilderObtainUserInfoOutput::Respond(Box::new(

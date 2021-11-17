@@ -17,7 +17,7 @@ where
         &self,
         _grant_info: GrantInfo<SCOPE>,
         _access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> Result<BuilderObtainUserInfoOutput, Box<dyn error::Error + Send + Sync>>;
+    ) -> Result<BuilderObtainUserInfoOutput, BuilderObtainUserInfoError>;
 }
 
 #[derive(Debug)]
@@ -25,6 +25,16 @@ pub enum BuilderObtainUserInfoOutput {
     None,
     Static(UserInfo),
     Respond(UserInfoEndpointBox),
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum BuilderObtainUserInfoError {
+    //
+    #[error("Unreachable {0}")]
+    Unreachable(&'static str),
+    //
+    #[error("Other {0}")]
+    Other(Box<dyn error::Error + Send + Sync>),
 }
 
 //
@@ -52,7 +62,7 @@ where
         &self,
         _grant_info: GrantInfo<SCOPE>,
         _access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> Result<BuilderObtainUserInfoOutput, Box<dyn error::Error + Send + Sync>> {
+    ) -> Result<BuilderObtainUserInfoOutput, BuilderObtainUserInfoError> {
         Ok(BuilderObtainUserInfoOutput::None)
     }
 }

@@ -1,9 +1,7 @@
-use std::error;
-
 use oauth2_client::{
     extensions::{
-        AccessTokenResponseSuccessfulBody, BuilderObtainUserInfoOutput, Builder,
-        GrantInfo, UserInfo,
+        AccessTokenResponseSuccessfulBody, Builder, BuilderObtainUserInfoError,
+        BuilderObtainUserInfoOutput, GrantInfo, UserInfo,
     },
     oauth2_core::types::ScopeParameter,
     re_exports::Scope,
@@ -25,7 +23,7 @@ where
         &self,
         grant_info: GrantInfo<SCOPE>,
         access_token: &AccessTokenResponseSuccessfulBody<SCOPE>,
-    ) -> Result<BuilderObtainUserInfoOutput, Box<dyn error::Error + Send + Sync>> {
+    ) -> Result<BuilderObtainUserInfoOutput, BuilderObtainUserInfoError> {
         let has_snsapi_login_scope = access_token.scope.as_ref().map(|x| {
             ScopeParameter::<String>::from(x)
                 .0
@@ -35,11 +33,14 @@ where
         if has_snsapi_login_scope {
             let openid = access_token
                 .extra()
-                .ok_or("extra missing")?
+                .ok_or("extra missing")
+                .map_err(BuilderObtainUserInfoError::Unreachable)?
                 .get(KEY_OPENID)
-                .ok_or("openid missing")?
+                .ok_or("openid missing")
+                .map_err(BuilderObtainUserInfoError::Unreachable)?
                 .as_str()
-                .ok_or("openid mismatch")?
+                .ok_or("openid mismatch")
+                .map_err(BuilderObtainUserInfoError::Unreachable)?
                 .to_owned();
 
             return Ok(BuilderObtainUserInfoOutput::Respond(Box::new(
@@ -51,11 +52,14 @@ where
             GrantInfo::AuthorizationCodeGrant(_) => {
                 let uid = access_token
                     .extra()
-                    .ok_or("extra missing")?
+                    .ok_or("extra missing")
+                    .map_err(BuilderObtainUserInfoError::Unreachable)?
                     .get(KEY_OPENID)
-                    .ok_or("openid missing")?
+                    .ok_or("openid missing")
+                    .map_err(BuilderObtainUserInfoError::Unreachable)?
                     .as_str()
-                    .ok_or("openid mismatch")?
+                    .ok_or("openid mismatch")
+                    .map_err(BuilderObtainUserInfoError::Unreachable)?
                     .to_owned();
 
                 return Ok(BuilderObtainUserInfoOutput::Static(UserInfo {
