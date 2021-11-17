@@ -6,7 +6,7 @@ use std::{error, fs, sync::Arc};
 
 use futures_util::future;
 use log::info;
-use oauth2_signin::oauth2_client::utils::gen_state;
+use oauth2_signin::oauth2_client::utils::{gen_nonce, gen_state};
 use poem::{
     get, handler,
     http::Uri,
@@ -71,8 +71,8 @@ async fn auth_handler(
     let state = gen_state(10);
     session.set(state_session_key(&provider).as_str(), state.to_owned());
 
-    let url = if flow.provider.oidc_support().is_some() {
-        let nonce = gen_state(32);
+    let url = if flow.is_oidc_support() {
+        let nonce = gen_nonce(32);
         session.set(nonce_session_key(&provider).as_str(), nonce.to_owned());
 
         flow.build_authorization_url_with_oidc(state, nonce)?
@@ -112,12 +112,13 @@ async fn auth_callback_handler(
     session.remove(state_session_key(&provider).as_str());
     info!("{} state {:?}", provider, state);
 
-    let ret = if flow.provider.oidc_support().is_some() {
+    let ret = if flow.is_oidc_support() {
         let nonce = session.get::<String>(nonce_session_key(&provider).as_str());
         session.remove(nonce_session_key(&provider).as_str());
         info!("{} nonce {:?}", provider, nonce);
 
-        flow.handle_callback(query_raw, state).await
+        flow.handle_callback_with_oidc(query_raw, state, nonce)
+            .await
     } else {
         flow.handle_callback(query_raw, state).await
     };

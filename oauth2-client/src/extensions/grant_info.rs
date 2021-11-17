@@ -1,6 +1,6 @@
 use crate::{
-    oauth2_core::types::Scope, ProviderExtAuthorizationCodeGrant,
-    ProviderExtDeviceAuthorizationGrant,
+    oauth2_core::types::{Nonce, Scope},
+    ProviderExtAuthorizationCodeGrant, ProviderExtDeviceAuthorizationGrant,
 };
 
 //
@@ -20,6 +20,7 @@ where
 {
     pub provider: &'a (dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE> + Send + Sync),
     pub authorization_request_scopes: Option<&'a Vec<SCOPE>>,
+    pub authorization_request_nonce: Option<&'a Nonce>,
 }
 
 #[derive(Clone)]

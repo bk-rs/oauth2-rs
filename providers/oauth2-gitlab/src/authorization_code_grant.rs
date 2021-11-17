@@ -1,4 +1,5 @@
 use oauth2_client::{
+    authorization_code_grant::provider_ext::ProviderExtAuthorizationCodeGrantOidcSupportType,
     re_exports::{ClientId, ClientSecret, Map, RedirectUri, Url, UrlParseError, Value},
     Provider, ProviderExtAuthorizationCodeGrant,
 };
@@ -59,17 +60,16 @@ impl ProviderExtAuthorizationCodeGrant for GitlabProviderForEndUsers {
         self.inner.redirect_uri()
     }
 
+    fn oidc_support_type(&self) -> Option<ProviderExtAuthorizationCodeGrantOidcSupportType> {
+        Some(ProviderExtAuthorizationCodeGrantOidcSupportType::Yes)
+    }
+
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
         Some(vec![
             GitlabScope::Openid,
             GitlabScope::Profile,
             GitlabScope::Email,
         ])
-    }
-
-    // OIDC
-    fn oidc_support(&self) -> Option<bool> {
-        Some(false)
     }
 
     fn authorization_endpoint_url(&self) -> &Url {

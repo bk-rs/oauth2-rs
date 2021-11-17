@@ -6,7 +6,7 @@ use serde_enum_str::{Deserialize_enum_str, Serialize_enum_str};
 use serde_json::{Map, Value};
 use url::Url;
 
-use crate::types::{AccessTokenType, Scope, ScopeFromStrError, ScopeParameter};
+use crate::types::{AccessTokenType, IdToken, Scope, ScopeFromStrError, ScopeParameter};
 
 pub const CONTENT_TYPE: Mime = mime::APPLICATION_JSON;
 pub const GENERAL_ERROR_BODY_KEY_ERROR: &str = "error";
@@ -34,7 +34,7 @@ where
 
     // OIDC
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub id_token: Option<String>,
+    pub id_token: Option<IdToken>,
 
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     pub _extra: Option<Map<String, Value>>,

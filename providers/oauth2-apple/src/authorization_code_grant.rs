@@ -1,4 +1,5 @@
 use oauth2_client::{
+    authorization_code_grant::provider_ext::ProviderExtAuthorizationCodeGrantOidcSupportType,
     re_exports::{ClientId, ClientSecret, RedirectUri, Url, UrlParseError},
     Provider, ProviderExtAuthorizationCodeGrant,
 };
@@ -49,13 +50,12 @@ impl ProviderExtAuthorizationCodeGrant for AppleProviderWithAppleJs {
         Some(&self.redirect_uri)
     }
 
-    fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
-        None
+    fn oidc_support_type(&self) -> Option<ProviderExtAuthorizationCodeGrantOidcSupportType> {
+        Some(ProviderExtAuthorizationCodeGrantOidcSupportType::Force)
     }
 
-    // OIDC
-    fn oidc_support(&self) -> Option<bool> {
-        Some(true)
+    fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
+        None
     }
 
     fn authorization_endpoint_url(&self) -> &Url {

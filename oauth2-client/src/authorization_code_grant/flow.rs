@@ -10,7 +10,7 @@ use oauth2_core::{
         authorization_response::ErrorQuery as A_RES_ErrorQuery,
     },
     serde::{de::DeserializeOwned, Serialize},
-    types::{Code, Scope, State},
+    types::{Code, Nonce, Scope, State},
     url::{ParseError as UrlParseError, Url},
 };
 
@@ -55,7 +55,7 @@ where
         SCOPE: Scope + Serialize,
     {
         // Step 1
-        build_authorization_url(provider, scopes, state, None)
+        self.build_authorization_url_with_oidc(provider, scopes, state, None)
     }
 
     // OIDC
@@ -64,7 +64,7 @@ where
         provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
         scopes: impl Into<Option<Vec<SCOPE>>>,
         state: impl Into<Option<State>>,
-        nonce: impl Into<Option<String>>,
+        nonce: impl Into<Option<Nonce>>,
     ) -> Result<Url, FlowBuildAuthorizationUrlError>
     where
         SCOPE: Scope + Serialize,
@@ -166,7 +166,7 @@ pub fn build_authorization_url<SCOPE>(
     provider: &dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
     scopes: impl Into<Option<Vec<SCOPE>>>,
     state: impl Into<Option<State>>,
-    nonce: impl Into<Option<String>>,
+    nonce: impl Into<Option<Nonce>>,
 ) -> Result<Url, FlowBuildAuthorizationUrlError>
 where
     SCOPE: Scope + Serialize,

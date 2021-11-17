@@ -15,3 +15,9 @@ pub type ClientId = String;
 pub type ClientSecret = String;
 pub type State = String;
 pub type Code = String;
+
+//
+//
+//
+pub type IdToken = String;
+pub type Nonce = String;

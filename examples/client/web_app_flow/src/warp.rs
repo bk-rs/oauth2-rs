@@ -6,7 +6,7 @@ use std::{error, sync::Arc};
 
 use futures_util::future;
 use log::info;
-use oauth2_signin::oauth2_client::utils::gen_state;
+use oauth2_signin::oauth2_client::utils::{gen_nonce, gen_state};
 use warp::{http::Uri, Filter};
 use warp_sessions::{MemoryStore, SessionWithStore};
 
@@ -77,8 +77,8 @@ async fn auth_handler(
         .insert(state_session_key(&provider).as_str(), state.to_owned())
         .unwrap();
 
-    let url = if flow.provider.oidc_support().is_some() {
-        let nonce = gen_state(32);
+    let url = if flow.is_oidc_support() {
+        let nonce = gen_nonce(32);
         session_with_store
             .session
             .insert(nonce_session_key(&provider).as_str(), nonce.to_owned())
@@ -116,7 +116,7 @@ async fn auth_callback_handler(
         .remove(state_session_key(&provider).as_str());
     info!("{} state {:?}", provider, state);
 
-    let ret = if flow.provider.oidc_support().is_some() {
+    let ret = if flow.is_oidc_support() {
         let nonce = session_with_store
             .session
             .get::<String>(nonce_session_key(&provider).as_str());
@@ -125,7 +125,8 @@ async fn auth_callback_handler(
             .remove(nonce_session_key(&provider).as_str());
         info!("{} nonce {:?}", provider, nonce);
 
-        flow.handle_callback(query_raw, state).await
+        flow.handle_callback_with_oidc(query_raw, state, nonce)
+            .await
     } else {
         flow.handle_callback(query_raw, state).await
     };

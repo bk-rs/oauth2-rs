@@ -4,7 +4,7 @@ use http::Method;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 
-use crate::types::{ClientId, Scope, ScopeFromStrError, ScopeParameter, State};
+use crate::types::{ClientId, Nonce, Scope, ScopeFromStrError, ScopeParameter, State};
 
 pub const METHOD: Method = Method::GET;
 pub const RESPONSE_TYPE: &str = "code";
@@ -28,7 +28,7 @@ where
 
     // OIDC
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub nonce: Option<String>,
+    pub nonce: Option<Nonce>,
 
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     _extra: Option<Map<String, Value>>,

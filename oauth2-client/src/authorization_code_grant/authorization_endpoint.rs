@@ -11,7 +11,7 @@ use oauth2_core::{
     },
     http::Error as HttpError,
     serde::Serialize,
-    types::{Scope, State},
+    types::{Nonce, Scope, State},
 };
 use serde_json::{Map, Value};
 use serde_qs::Error as SerdeQsError;
@@ -29,7 +29,7 @@ where
     provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
     scopes: Option<Vec<SCOPE>>,
     state: Option<State>,
-    pub nonce: Option<String>,
+    pub nonce: Option<Nonce>,
 }
 impl<'a, SCOPE> AuthorizationEndpoint<'a, SCOPE>
 where

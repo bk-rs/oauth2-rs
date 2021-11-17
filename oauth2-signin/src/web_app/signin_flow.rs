@@ -2,12 +2,16 @@ use std::fmt;
 
 use oauth2_client::{
     authorization_code_grant::{
-        provider_ext::ProviderExtAuthorizationCodeGrantStringScopeWrapper, Flow,
+        provider_ext::{
+            ProviderExtAuthorizationCodeGrantOidcSupportType,
+            ProviderExtAuthorizationCodeGrantStringScopeWrapper,
+        },
+        Flow,
     },
     extensions::{
         AuthorizationCodeGrantInfo, BuilderObtainUserInfoOutput, EndpointExecuteError, GrantInfo,
     },
-    oauth2_core::types::State,
+    oauth2_core::types::{Nonce, State},
     re_exports::{Client, ClientRespondEndpointError, Url},
     ExtensionsBuilder, Provider, ProviderExtAuthorizationCodeGrant,
 };
@@ -76,19 +80,28 @@ impl<C> SigninFlow<C>
 where
     C: Client + Send + Sync,
 {
+    pub fn is_oidc_support(&self) -> bool {
+        self.provider.oidc_support_type().map(|x| {
+            matches!(
+                x,
+                ProviderExtAuthorizationCodeGrantOidcSupportType::Yes
+                    | ProviderExtAuthorizationCodeGrantOidcSupportType::Force
+            )
+        }) == Some(true)
+    }
+
     pub fn build_authorization_url(
         &self,
         state: impl Into<Option<State>>,
     ) -> Result<Url, SigninFlowBuildAuthorizationUrlError> {
-        self.flow
-            .build_authorization_url(self.provider.as_ref(), self.scopes.to_owned(), state)
+        self.build_authorization_url_with_oidc(state, None)
     }
 
     // OIDC
     pub fn build_authorization_url_with_oidc(
         &self,
         state: impl Into<Option<State>>,
-        nonce: impl Into<Option<String>>,
+        nonce: impl Into<Option<Nonce>>,
     ) -> Result<Url, SigninFlowBuildAuthorizationUrlError> {
         self.flow.build_authorization_url_with_oidc(
             self.provider.as_ref(),
@@ -103,6 +116,15 @@ where
         query: impl AsRef<str>,
         state: impl Into<Option<State>>,
     ) -> SigninFlowHandleCallbackRet {
+        self.handle_callback_with_oidc(query, state, None).await
+    }
+
+    pub async fn handle_callback_with_oidc(
+        &self,
+        query: impl AsRef<str>,
+        state: impl Into<Option<State>>,
+        nonce: impl Into<Option<Nonce>>,
+    ) -> SigninFlowHandleCallbackRet {
         let access_token = match self
             .flow
             .handle_callback_by_query(self.provider.as_ref(), query, state)
@@ -112,9 +134,11 @@ where
             Err(err) => return SigninFlowHandleCallbackRet::FlowHandleCallbackError(err),
         };
 
+        let nonce = nonce.into();
         let grant_info = GrantInfo::AuthorizationCodeGrant(AuthorizationCodeGrantInfo {
             provider: self.provider.as_ref(),
             authorization_request_scopes: self.scopes.as_ref(),
+            authorization_request_nonce: nonce.as_ref(),
         });
 
         match self

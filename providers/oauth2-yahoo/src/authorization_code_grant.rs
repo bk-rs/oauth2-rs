@@ -1,4 +1,5 @@
 use oauth2_client::{
+    authorization_code_grant::provider_ext::ProviderExtAuthorizationCodeGrantOidcSupportType,
     re_exports::{ClientId, ClientSecret, RedirectUri, Url, UrlParseError},
     Provider, ProviderExtAuthorizationCodeGrant,
 };
@@ -49,17 +50,16 @@ impl ProviderExtAuthorizationCodeGrant for YahooProviderForWebApps {
         Some(&self.redirect_uri)
     }
 
+    fn oidc_support_type(&self) -> Option<ProviderExtAuthorizationCodeGrantOidcSupportType> {
+        Some(ProviderExtAuthorizationCodeGrantOidcSupportType::Yes)
+    }
+
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
         Some(vec![
             YahooScope::Openid,
             YahooScope::Email,
             YahooScope::Profile,
         ])
-    }
-
-    // OIDC
-    fn oidc_support(&self) -> Option<bool> {
-        Some(false)
     }
 
     fn authorization_endpoint_url(&self) -> &Url {

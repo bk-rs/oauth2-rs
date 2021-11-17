@@ -10,6 +10,7 @@ use oauth2_client::{
 //
 pub type SigninFlowBuildAuthorizationUrlError = FlowBuildAuthorizationUrlError;
 
+//
 #[derive(Debug)]
 pub enum SigninFlowHandleCallbackRet {
     Ok((AccessTokenResponseSuccessfulBody<String>, UserInfo)),

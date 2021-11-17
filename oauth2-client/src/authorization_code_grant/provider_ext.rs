@@ -16,18 +16,27 @@ use crate::{
 };
 
 //
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum ProviderExtAuthorizationCodeGrantOidcSupportType {
+    No,
+    Yes,
+    Force,
+}
+impl Default for ProviderExtAuthorizationCodeGrantOidcSupportType {
+    fn default() -> Self {
+        Self::No
+    }
+}
+
+//
 pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone {
     fn redirect_uri(&self) -> Option<&RedirectUri>;
 
-    fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
+    fn oidc_support_type(&self) -> Option<ProviderExtAuthorizationCodeGrantOidcSupportType> {
         None
     }
 
-    // OIDC
-    fn oidc_support(&self) -> Option<bool> {
-        // None -> Not Support
-        // Some(false) -> Support
-        // Some(true) -> Force
+    fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
         None
     }
 
@@ -150,15 +159,14 @@ where
         self.inner.redirect_uri()
     }
 
+    fn oidc_support_type(&self) -> Option<ProviderExtAuthorizationCodeGrantOidcSupportType> {
+        self.inner.oidc_support_type()
+    }
+
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
         self.inner
             .scopes_default()
             .map(|x| x.iter().map(|y| y.to_string()).collect())
-    }
-
-    // OIDC
-    fn oidc_support(&self) -> Option<bool> {
-        self.inner.oidc_support()
     }
 
     fn authorization_endpoint_url(&self) -> &Url {
