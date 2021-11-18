@@ -24,8 +24,6 @@ Enable "Sign In with Apple"
 Identifier: com.xxx.oauth2-services
 ```
 
-
-
 3. Edit your Services ID Configuration
 
 Enable "Sign In with Apple", then Configure, select "Primary App ID" to "******.com.xxx.oauth2-app"
@@ -52,8 +50,9 @@ Download filename is "AuthKey_{Key ID}.p8"
 
 "Team ID" in https://developer.apple.com/account/#!/membership
 
-"client_id" is The Bundle ID for App ID or Identifier for Services ID, e.g. "com.xxx.oauth2-app"
+"client_id" is The Identifier for Services ID, e.g. "com.xxx.oauth2-services"
 
+Ref https://github.com/bk-rs/apple-rs/blob/main/apple-siwa-client-secret/cli/src/bin/apple_siwa_client_secret_gen.rs
 
 JWT HEADER
 
