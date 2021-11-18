@@ -142,7 +142,7 @@ async fn auth_callback_handler(
         session.remove(nonce_session_key(&provider).as_str());
         info!("{} nonce {:?}", provider, nonce);
         if let Some(nonce) = nonce {
-            config.set_state(nonce);
+            config.set_nonce(nonce);
         }
     }
 
