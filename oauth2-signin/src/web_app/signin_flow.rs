@@ -11,7 +11,7 @@ use oauth2_client::{
     extensions::{
         AuthorizationCodeGrantInfo, BuilderObtainUserInfoOutput, EndpointExecuteError, GrantInfo,
     },
-    oauth2_core::types::{Nonce, State},
+    oauth2_core::types::{CodeChallenge, CodeChallengeMethod, CodeVerifier, Nonce, State},
     re_exports::{Client, ClientRespondEndpointError, Url},
     ExtensionsBuilder, Provider, ProviderExtAuthorizationCodeGrant,
 };
@@ -93,20 +93,23 @@ where
     pub fn build_authorization_url(
         &self,
         state: impl Into<Option<State>>,
+        code_challenge: impl Into<Option<(CodeChallenge, CodeChallengeMethod)>>,
     ) -> Result<Url, SigninFlowBuildAuthorizationUrlError> {
-        self.build_authorization_url_with_oidc(state, None)
+        self.build_authorization_url_with_oidc(state, code_challenge, None)
     }
 
     // OIDC
     pub fn build_authorization_url_with_oidc(
         &self,
         state: impl Into<Option<State>>,
+        code_challenge: impl Into<Option<(CodeChallenge, CodeChallengeMethod)>>,
         nonce: impl Into<Option<Nonce>>,
     ) -> Result<Url, SigninFlowBuildAuthorizationUrlError> {
         self.flow.build_authorization_url_with_oidc(
             self.provider.as_ref(),
             self.scopes.to_owned(),
             state,
+            code_challenge,
             nonce,
         )
     }
@@ -115,19 +118,22 @@ where
         &self,
         query: impl AsRef<str>,
         state: impl Into<Option<State>>,
+        code_verifier: impl Into<Option<CodeVerifier>>,
     ) -> SigninFlowHandleCallbackRet {
-        self.handle_callback_with_oidc(query, state, None).await
+        self.handle_callback_with_oidc(query, state, code_verifier, None)
+            .await
     }
 
     pub async fn handle_callback_with_oidc(
         &self,
         query: impl AsRef<str>,
         state: impl Into<Option<State>>,
+        code_verifier: impl Into<Option<CodeVerifier>>,
         nonce: impl Into<Option<Nonce>>,
     ) -> SigninFlowHandleCallbackRet {
         let access_token = match self
             .flow
-            .handle_callback_by_query(self.provider.as_ref(), query, state)
+            .handle_callback_by_query(self.provider.as_ref(), query, state, code_verifier)
             .await
         {
             Ok(x) => x,
@@ -230,10 +236,13 @@ mod tests {
         let github_auth_url = map
             .get("github")
             .unwrap()
-            .build_authorization_url("STATE".to_owned())?;
+            .build_authorization_url("STATE".to_owned(), None)?;
         println!("github_auth_url {}", github_auth_url);
 
-        let google_auth_url = map.get("google").unwrap().build_authorization_url(None)?;
+        let google_auth_url = map
+            .get("google")
+            .unwrap()
+            .build_authorization_url(None, None)?;
         println!("google_auth_url {}", google_auth_url);
 
         //
@@ -262,7 +271,7 @@ mod tests {
         let _ = map
             .get("github")
             .unwrap()
-            .handle_callback("code=CODE&state=STATE", "xxx".to_owned())
+            .handle_callback("code=CODE&state=STATE", "xxx".to_owned(), None)
             .await;
 
         Ok(())

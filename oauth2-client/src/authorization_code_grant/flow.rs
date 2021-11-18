@@ -10,7 +10,7 @@ use oauth2_core::{
         authorization_response::ErrorQuery as A_RES_ErrorQuery,
     },
     serde::{de::DeserializeOwned, Serialize},
-    types::{Code, Nonce, Scope, State},
+    types::{Code, CodeChallenge, CodeChallengeMethod, CodeVerifier, Nonce, Scope, State},
     url::{ParseError as UrlParseError, Url},
 };
 
@@ -50,12 +50,13 @@ where
         provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
         scopes: impl Into<Option<Vec<SCOPE>>>,
         state: impl Into<Option<State>>,
+        code_challenge: impl Into<Option<(CodeChallenge, CodeChallengeMethod)>>,
     ) -> Result<Url, FlowBuildAuthorizationUrlError>
     where
         SCOPE: Scope + Serialize,
     {
         // Step 1
-        self.build_authorization_url_with_oidc(provider, scopes, state, None)
+        self.build_authorization_url_with_oidc(provider, scopes, state, code_challenge, None)
     }
 
     // OIDC
@@ -64,13 +65,14 @@ where
         provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
         scopes: impl Into<Option<Vec<SCOPE>>>,
         state: impl Into<Option<State>>,
+        code_challenge: impl Into<Option<(CodeChallenge, CodeChallengeMethod)>>,
         nonce: impl Into<Option<Nonce>>,
     ) -> Result<Url, FlowBuildAuthorizationUrlError>
     where
         SCOPE: Scope + Serialize,
     {
         // Step 1
-        build_authorization_url(provider, scopes, state, nonce)
+        build_authorization_url(provider, scopes, state, code_challenge, nonce)
     }
 }
 
@@ -83,6 +85,7 @@ where
         provider: &(dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE> + Send + Sync),
         query: impl AsRef<str>,
         state: impl Into<Option<State>>,
+        code_verifier: impl Into<Option<CodeVerifier>>,
     ) -> Result<AT_RES_SuccessfulBody<SCOPE>, FlowHandleCallbackError>
     where
         SCOPE: Scope + Serialize + DeserializeOwned + Send + Sync,
@@ -103,18 +106,24 @@ where
             }
         }
 
-        self.handle_callback(provider, query.code).await
+        self.handle_callback(provider, query.code, code_verifier)
+            .await
     }
 
     pub async fn handle_callback<SCOPE>(
         &self,
         provider: &(dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE> + Send + Sync),
         code: Code,
+        code_verifier: impl Into<Option<CodeVerifier>>,
     ) -> Result<AT_RES_SuccessfulBody<SCOPE>, FlowHandleCallbackError>
     where
         SCOPE: Scope + Serialize + DeserializeOwned + Send + Sync,
     {
-        let access_token_endpoint = AccessTokenEndpoint::new(provider, code);
+        let mut access_token_endpoint = AccessTokenEndpoint::new(provider, code);
+
+        if let Some(code_verifier) = code_verifier.into() {
+            access_token_endpoint.set_code_verifier(code_verifier);
+        }
 
         let access_token_ret = self
             .client_with_token
@@ -166,6 +175,7 @@ pub fn build_authorization_url<SCOPE>(
     provider: &dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
     scopes: impl Into<Option<Vec<SCOPE>>>,
     state: impl Into<Option<State>>,
+    code_challenge: impl Into<Option<(CodeChallenge, CodeChallengeMethod)>>,
     nonce: impl Into<Option<Nonce>>,
 ) -> Result<Url, FlowBuildAuthorizationUrlError>
 where
@@ -174,7 +184,14 @@ where
     let scopes = scopes.into().or_else(|| provider.scopes_default());
 
     let mut authorization_endpoint = AuthorizationEndpoint::new(provider, scopes, state);
-    authorization_endpoint.nonce = nonce.into();
+
+    if let Some((code_challenge, code_challenge_method)) = code_challenge.into() {
+        authorization_endpoint.set_code_challenge(code_challenge, code_challenge_method);
+    }
+
+    if let Some(nonce) = nonce.into() {
+        authorization_endpoint.set_nonce(nonce);
+    }
 
     let authorization_endpoint_request = authorization_endpoint
         .render_request()

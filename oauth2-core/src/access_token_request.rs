@@ -9,7 +9,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 
 use crate::types::{
-    ClientId, ClientPassword, ClientSecret, Code, Scope, ScopeFromStrError, ScopeParameter,
+    ClientId, ClientPassword, ClientSecret, Code, CodeVerifier, Scope, ScopeFromStrError,
+    ScopeParameter,
 };
 
 pub const METHOD: Method = Method::POST;
@@ -50,6 +51,10 @@ pub struct BodyWithAuthorizationCodeGrant {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub client_secret: Option<ClientSecret>,
 
+    // PKCE
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub code_verifier: Option<CodeVerifier>,
+
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     _extra: Option<Map<String, Value>>,
 }
@@ -60,12 +65,14 @@ impl BodyWithAuthorizationCodeGrant {
         redirect_uri: Option<String>,
         client_id: Option<ClientId>,
         client_secret: Option<ClientSecret>,
+        code_verifier: Option<CodeVerifier>,
     ) -> Self {
         Self {
             code,
             redirect_uri,
             client_id,
             client_secret,
+            code_verifier,
             _extra: None,
         }
     }

@@ -84,10 +84,10 @@ async fn auth_handler(
             .insert(nonce_session_key(&provider).as_str(), nonce.to_owned())
             .unwrap();
 
-        flow.build_authorization_url_with_oidc(state, nonce)
+        flow.build_authorization_url_with_oidc(state, None, nonce)
             .unwrap()
     } else {
-        flow.build_authorization_url(state).unwrap()
+        flow.build_authorization_url(state, None).unwrap()
     };
 
     info!("{} authorization_url {}", provider, url.as_str());
@@ -125,10 +125,10 @@ async fn auth_callback_handler(
             .remove(nonce_session_key(&provider).as_str());
         info!("{} nonce {:?}", provider, nonce);
 
-        flow.handle_callback_with_oidc(query_raw, state, nonce)
+        flow.handle_callback_with_oidc(query_raw, state, None, nonce)
             .await
     } else {
-        flow.handle_callback(query_raw, state).await
+        flow.handle_callback(query_raw, state, None).await
     };
 
     info!("{} {:?}", provider, ret);

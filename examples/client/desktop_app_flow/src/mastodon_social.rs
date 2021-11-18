@@ -30,7 +30,7 @@ async fn run(client_id: String, client_secret: String) -> Result<(), Box<dyn err
         RedirectUri::Oob,
     )?;
 
-    let authorization_url = flow.build_authorization_url(&provider, scopes, None)?;
+    let authorization_url = flow.build_authorization_url(&provider, scopes, None, None)?;
 
     println!("authorization_url: {:?}", authorization_url.as_str());
 
@@ -58,7 +58,7 @@ async fn run(client_id: String, client_secret: String) -> Result<(), Box<dyn err
     code = code.trim_end().to_owned();
     println!("code: {:?}", code);
 
-    let access_token_body = flow.handle_callback(&provider, code).await?;
+    let access_token_body = flow.handle_callback(&provider, code, None).await?;
 
     println!("access_token_body: {:?}", access_token_body);
 

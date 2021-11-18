@@ -26,7 +26,9 @@ serde = { version = "1.0", default-features = false, features = ["derive"] }
 serde-enum-str = { version = "0.2", default-features = false }
 serde_json = { version = "1.0", default-features = false }
 url = { version = "2.2", default-features = false, features = ["serde"] }
+
 base64 = { version = "0.13", default-features = false, features = ["std"] }
+sha2 = { version = "0.9", default-features = false }
 
 [dev-dependencies]
 serde_json = { version = "1.0" }

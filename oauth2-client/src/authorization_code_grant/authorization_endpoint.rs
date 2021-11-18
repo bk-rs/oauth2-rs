@@ -11,7 +11,7 @@ use oauth2_core::{
     },
     http::Error as HttpError,
     serde::Serialize,
-    types::{Nonce, Scope, State},
+    types::{CodeChallenge, CodeChallengeMethod, Nonce, Scope, State},
 };
 use serde_json::{Map, Value};
 use serde_qs::Error as SerdeQsError;
@@ -29,7 +29,8 @@ where
     provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
     scopes: Option<Vec<SCOPE>>,
     state: Option<State>,
-    pub nonce: Option<Nonce>,
+    code_challenge: Option<(CodeChallenge, CodeChallengeMethod)>,
+    nonce: Option<Nonce>,
 }
 impl<'a, SCOPE> AuthorizationEndpoint<'a, SCOPE>
 where
@@ -44,8 +45,21 @@ where
             provider,
             scopes: scopes.into(),
             state: state.into(),
+            code_challenge: None,
             nonce: None,
         }
+    }
+
+    pub fn set_code_challenge(
+        &mut self,
+        code_challenge: CodeChallenge,
+        code_challenge_method: CodeChallengeMethod,
+    ) {
+        self.code_challenge = Some((code_challenge, code_challenge_method))
+    }
+
+    pub fn set_nonce(&mut self, nonce: Nonce) {
+        self.nonce = Some(nonce);
     }
 }
 
@@ -68,6 +82,10 @@ where
             self.scopes.to_owned().map(Into::into),
             self.state.to_owned(),
         );
+        if let Some((code_challenge, code_challenge_method)) = &self.code_challenge {
+            query.code_challenge = Some(code_challenge.to_owned());
+            query.code_challenge_method = Some(code_challenge_method.to_owned());
+        }
         query.nonce = self.nonce.to_owned();
 
         if let Some(extra) = self.provider.authorization_request_query_extra() {

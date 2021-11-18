@@ -15,7 +15,7 @@ use oauth2_core::{
         Error as HttpError,
     },
     serde::{de::DeserializeOwned, Serialize},
-    types::{Code, Scope},
+    types::{Code, CodeVerifier, Scope},
 };
 use serde_json::{Error as SerdeJsonError, Map, Value};
 use serde_urlencoded::ser::Error as SerdeUrlencodedSerError;
@@ -32,6 +32,7 @@ where
 {
     provider: &'a (dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE> + Send + Sync),
     code: Code,
+    code_verifier: Option<CodeVerifier>,
 }
 impl<'a, SCOPE> AccessTokenEndpoint<'a, SCOPE>
 where
@@ -41,7 +42,15 @@ where
         provider: &'a (dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE> + Send + Sync),
         code: Code,
     ) -> Self {
-        Self { provider, code }
+        Self {
+            provider,
+            code,
+            code_verifier: None,
+        }
+    }
+
+    pub fn set_code_verifier(&mut self, code_verifier: CodeVerifier) {
+        self.code_verifier = Some(code_verifier);
     }
 }
 
@@ -60,6 +69,7 @@ where
             self.provider.redirect_uri().map(|x| x.to_string()),
             self.provider.client_id().cloned(),
             self.provider.client_secret().cloned(),
+            self.code_verifier.to_owned(),
         );
         if let Some(extra) = self.provider.access_token_request_body_extra(&body) {
             body.set_extra(extra);

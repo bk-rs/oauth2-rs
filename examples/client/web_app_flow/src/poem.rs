@@ -75,9 +75,9 @@ async fn auth_handler(
         let nonce = gen_nonce(32);
         session.set(nonce_session_key(&provider).as_str(), nonce.to_owned());
 
-        flow.build_authorization_url_with_oidc(state, nonce)?
+        flow.build_authorization_url_with_oidc(state, None, nonce)?
     } else {
-        flow.build_authorization_url(state)?
+        flow.build_authorization_url(state, None)?
     };
 
     info!("{} authorization_url {}", provider, url.as_str());
@@ -117,10 +117,10 @@ async fn auth_callback_handler(
         session.remove(nonce_session_key(&provider).as_str());
         info!("{} nonce {:?}", provider, nonce);
 
-        flow.handle_callback_with_oidc(query_raw, state, nonce)
+        flow.handle_callback_with_oidc(query_raw, state, None, nonce)
             .await
     } else {
-        flow.handle_callback(query_raw, state).await
+        flow.handle_callback(query_raw, state, None).await
     };
 
     info!("{} {:?}", provider, ret);
