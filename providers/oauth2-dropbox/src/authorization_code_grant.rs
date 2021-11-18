@@ -1,4 +1,5 @@
 use oauth2_client::{
+    authorization_code_grant::provider_ext::ProviderExtAuthorizationCodeGrantPkceSupportType,
     re_exports::{ClientId, ClientSecret, RedirectUri, Url, UrlParseError},
     Provider, ProviderExtAuthorizationCodeGrant,
 };
@@ -47,6 +48,10 @@ impl Provider for DropboxProviderWithWebApplication {
 impl ProviderExtAuthorizationCodeGrant for DropboxProviderWithWebApplication {
     fn redirect_uri(&self) -> Option<&RedirectUri> {
         Some(&self.redirect_uri)
+    }
+
+    fn pkce_support_type(&self) -> Option<ProviderExtAuthorizationCodeGrantPkceSupportType> {
+        Some(ProviderExtAuthorizationCodeGrantPkceSupportType::Yes)
     }
 
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
