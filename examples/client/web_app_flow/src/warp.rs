@@ -87,7 +87,7 @@ async fn auth_handler(
         .unwrap();
     config.set_state(state);
 
-    if flow.is_oidc_support() {
+    if flow.is_oidc_enabled() {
         let nonce = gen_nonce(32);
         session_with_store
             .session
@@ -96,7 +96,7 @@ async fn auth_handler(
         config.set_nonce(nonce);
     }
 
-    if flow.is_pkce_support() {
+    if flow.is_pkce_enabled() {
         let code_verifier = gen_code_verifier(64);
         session_with_store
             .session
@@ -142,7 +142,7 @@ async fn auth_callback_handler(
         config.set_state(state);
     }
 
-    if flow.is_oidc_support() {
+    if flow.is_oidc_enabled() {
         let nonce = session_with_store
             .session
             .get::<String>(nonce_session_key(&provider).as_str());
@@ -155,7 +155,7 @@ async fn auth_callback_handler(
         }
     }
 
-    if flow.is_pkce_support() {
+    if flow.is_pkce_enabled() {
         let code_verifier = session_with_store
             .session
             .get::<String>(code_verifier_session_key(&provider).as_str());

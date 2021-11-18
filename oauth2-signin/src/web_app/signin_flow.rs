@@ -34,6 +34,7 @@ where
     pub scopes: Option<Vec<String>>,
     pub extensions_builder: Box<dyn ExtensionsBuilder<String> + Send + Sync>,
     pub client_with_user_info: C,
+    pkce_enabled: bool,
 }
 impl<C> fmt::Debug for SigninFlow<C>
 where
@@ -46,6 +47,7 @@ where
             .field("scopes", &self.scopes)
             .field("extensions_builder", &self.extensions_builder)
             .field("client_with_user_info", &self.client_with_user_info)
+            .field("pkce_enabled", &self.pkce_enabled)
             .finish()
     }
 }
@@ -75,7 +77,20 @@ where
                 .map(|x| x.iter().map(|y| y.to_string()).collect()),
             extensions_builder: Box::new(extensions_builder),
             client_with_user_info: client,
+            pkce_enabled: true,
         }
+    }
+
+    pub fn configure<F>(mut self, mut f: F) -> Self
+    where
+        F: FnMut(&mut Self),
+    {
+        f(&mut self);
+        self
+    }
+
+    pub fn disable_pkce(&mut self) {
+        self.pkce_enabled = false;
     }
 }
 
@@ -83,7 +98,7 @@ impl<C> SigninFlow<C>
 where
     C: Client + Send + Sync,
 {
-    pub fn is_oidc_support(&self) -> bool {
+    pub fn is_oidc_enabled(&self) -> bool {
         if let Some(oidc_support_type) = self.provider.oidc_support_type() {
             match oidc_support_type {
                 ProviderExtAuthorizationCodeGrantOidcSupportType::No => {}
@@ -104,11 +119,11 @@ where
         false
     }
 
-    pub fn is_pkce_support(&self) -> bool {
+    pub fn is_pkce_enabled(&self) -> bool {
         if let Some(pkce_support_type) = self.provider.pkce_support_type() {
             match pkce_support_type {
                 ProviderExtAuthorizationCodeGrantPkceSupportType::No => {}
-                ProviderExtAuthorizationCodeGrantPkceSupportType::Yes => {}
+                ProviderExtAuthorizationCodeGrantPkceSupportType::Yes => return self.pkce_enabled,
             }
         }
 

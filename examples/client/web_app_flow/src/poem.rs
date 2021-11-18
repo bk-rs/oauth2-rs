@@ -82,13 +82,13 @@ async fn auth_handler(
     session.set(state_session_key(&provider).as_str(), state.to_owned());
     config.set_state(state);
 
-    if flow.is_oidc_support() {
+    if flow.is_oidc_enabled() {
         let nonce = gen_nonce(32);
         session.set(nonce_session_key(&provider).as_str(), nonce.to_owned());
         config.set_nonce(nonce);
     };
 
-    if flow.is_pkce_support() {
+    if flow.is_pkce_enabled() {
         let code_verifier = gen_code_verifier(64);
         session.set(
             code_verifier_session_key(&provider).as_str(),
@@ -137,7 +137,7 @@ async fn auth_callback_handler(
         config.set_state(state);
     }
 
-    if flow.is_oidc_support() {
+    if flow.is_oidc_enabled() {
         let nonce = session.get::<String>(nonce_session_key(&provider).as_str());
         session.remove(nonce_session_key(&provider).as_str());
         info!("{} nonce {:?}", provider, nonce);
@@ -146,7 +146,7 @@ async fn auth_callback_handler(
         }
     }
 
-    if flow.is_pkce_support() {
+    if flow.is_pkce_enabled() {
         let code_verifier = session.get::<String>(code_verifier_session_key(&provider).as_str());
         session.remove(code_verifier_session_key(&provider).as_str());
         info!("{} code_verifier {:?}", provider, code_verifier);
