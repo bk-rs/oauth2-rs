@@ -23,7 +23,7 @@ pub fn gen_nonce(length: impl Into<Option<usize>>) -> Nonce {
 }
 
 pub fn gen_code_verifier(length: impl Into<Option<usize>>) -> CodeVerifier {
-    let length = length.into().unwrap_or(43);
+    let length = length.into().unwrap_or(64);
     let length = min(CODE_VERIFIER_LEN_MAX, length);
     let length = max(CODE_VERIFIER_LEN_MIN, length);
 
