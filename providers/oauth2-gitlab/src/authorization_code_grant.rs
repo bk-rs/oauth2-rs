@@ -1,5 +1,8 @@
 use oauth2_client::{
-    authorization_code_grant::provider_ext::ProviderExtAuthorizationCodeGrantOidcSupportType,
+    authorization_code_grant::provider_ext::{
+        ProviderExtAuthorizationCodeGrantOidcSupportType,
+        ProviderExtAuthorizationCodeGrantPkceSupportType,
+    },
     re_exports::{ClientId, ClientSecret, Map, RedirectUri, Url, UrlParseError, Value},
     Provider, ProviderExtAuthorizationCodeGrant,
 };
@@ -62,6 +65,10 @@ impl ProviderExtAuthorizationCodeGrant for GitlabProviderForEndUsers {
 
     fn oidc_support_type(&self) -> Option<ProviderExtAuthorizationCodeGrantOidcSupportType> {
         Some(ProviderExtAuthorizationCodeGrantOidcSupportType::Yes)
+    }
+
+    fn pkce_support_type(&self) -> Option<ProviderExtAuthorizationCodeGrantPkceSupportType> {
+        Some(ProviderExtAuthorizationCodeGrantPkceSupportType::Yes)
     }
 
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {

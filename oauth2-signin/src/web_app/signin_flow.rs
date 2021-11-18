@@ -4,6 +4,7 @@ use oauth2_client::{
     authorization_code_grant::{
         provider_ext::{
             ProviderExtAuthorizationCodeGrantOidcSupportType,
+            ProviderExtAuthorizationCodeGrantPkceSupportType,
             ProviderExtAuthorizationCodeGrantStringScopeWrapper,
         },
         Flow,
@@ -90,6 +91,13 @@ where
                     | ProviderExtAuthorizationCodeGrantOidcSupportType::Force
             )
         }) == Some(true)
+    }
+
+    pub fn is_pkce_support(&self) -> bool {
+        self.provider
+            .pkce_support_type()
+            .map(|x| matches!(x, ProviderExtAuthorizationCodeGrantPkceSupportType::Yes))
+            == Some(true)
     }
 
     pub fn build_authorization_url(

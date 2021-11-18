@@ -7,6 +7,7 @@ pub use url;
 
 //
 pub mod re_exports;
+pub mod utils;
 
 //
 pub mod types;

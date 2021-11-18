@@ -7,7 +7,10 @@ use std::{error, sync::Arc};
 use futures_util::future;
 use log::info;
 use oauth2_signin::{
-    oauth2_client::utils::{gen_nonce, gen_state},
+    oauth2_client::{
+        oauth2_core::utils::gen_code_challenge,
+        utils::{gen_code_verifier, gen_nonce, gen_state},
+    },
     web_app::{
         SigninFlowBuildAuthorizationUrlConfiguration, SigninFlowHandleCallbackByQueryConfiguration,
     },
@@ -93,6 +96,19 @@ async fn auth_handler(
         config.set_nonce(nonce);
     }
 
+    if flow.is_pkce_support() {
+        let code_verifier = gen_code_verifier(64);
+        session_with_store
+            .session
+            .insert(
+                code_verifier_session_key(&provider).as_str(),
+                code_verifier.to_owned(),
+            )
+            .unwrap();
+        let (code_challenge, code_challenge_method) = gen_code_challenge(code_verifier, None);
+        config.set_code_challenge(code_challenge, code_challenge_method);
+    }
+
     let url = flow.build_authorization_url(config).unwrap();
 
     info!("{} authorization_url {}", provider, url.as_str());
@@ -139,6 +155,19 @@ async fn auth_callback_handler(
         }
     }
 
+    if flow.is_pkce_support() {
+        let code_verifier = session_with_store
+            .session
+            .get::<String>(code_verifier_session_key(&provider).as_str());
+        session_with_store
+            .session
+            .remove(code_verifier_session_key(&provider).as_str());
+        info!("{} code_verifier {:?}", provider, code_verifier);
+        if let Some(code_verifier) = code_verifier {
+            config.set_code_verifier(code_verifier);
+        }
+    }
+
     let ret = flow.handle_callback_by_query(query_raw, config).await;
 
     info!("{} {:?}", provider, ret);
@@ -152,4 +181,8 @@ fn state_session_key(provider: &str) -> String {
 
 fn nonce_session_key(provider: &str) -> String {
     format!("nonce_{}", provider)
+}
+
+fn code_verifier_session_key(provider: &str) -> String {
+    format!("code_verifier_{}", provider)
 }

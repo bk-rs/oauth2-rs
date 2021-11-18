@@ -28,11 +28,26 @@ impl Default for ProviderExtAuthorizationCodeGrantOidcSupportType {
     }
 }
 
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum ProviderExtAuthorizationCodeGrantPkceSupportType {
+    No,
+    Yes,
+}
+impl Default for ProviderExtAuthorizationCodeGrantPkceSupportType {
+    fn default() -> Self {
+        Self::No
+    }
+}
+
 //
 pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone {
     fn redirect_uri(&self) -> Option<&RedirectUri>;
 
     fn oidc_support_type(&self) -> Option<ProviderExtAuthorizationCodeGrantOidcSupportType> {
+        None
+    }
+
+    fn pkce_support_type(&self) -> Option<ProviderExtAuthorizationCodeGrantPkceSupportType> {
         None
     }
 
@@ -161,6 +176,10 @@ where
 
     fn oidc_support_type(&self) -> Option<ProviderExtAuthorizationCodeGrantOidcSupportType> {
         self.inner.oidc_support_type()
+    }
+
+    fn pkce_support_type(&self) -> Option<ProviderExtAuthorizationCodeGrantPkceSupportType> {
+        self.inner.pkce_support_type()
     }
 
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
