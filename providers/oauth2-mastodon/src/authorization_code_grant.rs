@@ -88,12 +88,10 @@ mod tests {
             RedirectUri::new("https://client.example.com/cb")?,
         )?;
 
-        let request = AuthorizationEndpoint::new(
-            &provider,
-            vec![MastodonScope::Read, MastodonScope::Write],
-            "STATE".to_owned(),
-        )
-        .render_request()?;
+        let request =
+            AuthorizationEndpoint::new(&provider, vec![MastodonScope::Read, MastodonScope::Write])
+                .configure(|x| x.state = Some("STATE".to_owned()))
+                .render_request()?;
 
         assert_eq!(request.uri(), "https://mastodon.social/oauth/authorize?response_type=code&client_id=CLIENT_ID&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&scope=read+write&state=STATE");
 

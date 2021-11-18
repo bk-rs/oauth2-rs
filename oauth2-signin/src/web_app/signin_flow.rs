@@ -6,12 +6,12 @@ use oauth2_client::{
             ProviderExtAuthorizationCodeGrantOidcSupportType,
             ProviderExtAuthorizationCodeGrantStringScopeWrapper,
         },
-        Flow,
+        Flow, FlowBuildAuthorizationUrlConfiguration,
     },
     extensions::{
         AuthorizationCodeGrantInfo, BuilderObtainUserInfoOutput, EndpointExecuteError, GrantInfo,
     },
-    oauth2_core::types::{CodeChallenge, CodeChallengeMethod, CodeVerifier, Nonce, State},
+    oauth2_core::types::{CodeVerifier, Nonce, State},
     re_exports::{Client, ClientRespondEndpointError, Url},
     ExtensionsBuilder, Provider, ProviderExtAuthorizationCodeGrant,
 };
@@ -92,26 +92,10 @@ where
 
     pub fn build_authorization_url(
         &self,
-        state: impl Into<Option<State>>,
-        code_challenge: impl Into<Option<(CodeChallenge, CodeChallengeMethod)>>,
+        config: impl Into<Option<FlowBuildAuthorizationUrlConfiguration>>,
     ) -> Result<Url, SigninFlowBuildAuthorizationUrlError> {
-        self.build_authorization_url_with_oidc(state, code_challenge, None)
-    }
-
-    // OIDC
-    pub fn build_authorization_url_with_oidc(
-        &self,
-        state: impl Into<Option<State>>,
-        code_challenge: impl Into<Option<(CodeChallenge, CodeChallengeMethod)>>,
-        nonce: impl Into<Option<Nonce>>,
-    ) -> Result<Url, SigninFlowBuildAuthorizationUrlError> {
-        self.flow.build_authorization_url_with_oidc(
-            self.provider.as_ref(),
-            self.scopes.to_owned(),
-            state,
-            code_challenge,
-            nonce,
-        )
+        self.flow
+            .build_authorization_url(self.provider.as_ref(), self.scopes.to_owned(), config)
     }
 
     pub async fn handle_callback(
@@ -233,16 +217,10 @@ mod tests {
             ),
         );
 
-        let github_auth_url = map
-            .get("github")
-            .unwrap()
-            .build_authorization_url("STATE".to_owned(), None)?;
+        let github_auth_url = map.get("github").unwrap().build_authorization_url(None)?;
         println!("github_auth_url {}", github_auth_url);
 
-        let google_auth_url = map
-            .get("google")
-            .unwrap()
-            .build_authorization_url(None, None)?;
+        let google_auth_url = map.get("google").unwrap().build_authorization_url(None)?;
         println!("google_auth_url {}", google_auth_url);
 
         //

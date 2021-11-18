@@ -188,12 +188,9 @@ mod tests {
             x.force_verify = Some(true);
         });
 
-        let request = AuthorizationEndpoint::new(
-            &provider,
-            vec![TwitchScope::UserReadEmail],
-            "STATE".to_owned(),
-        )
-        .render_request()?;
+        let request = AuthorizationEndpoint::new(&provider, vec![TwitchScope::UserReadEmail])
+            .configure(|x| x.state = Some("STATE".to_owned()))
+            .render_request()?;
 
         assert_eq!(request.uri(), "https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=CLIENT_ID&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&scope=user%3Aread%3Aemail&state=STATE&force_verify=true");
 

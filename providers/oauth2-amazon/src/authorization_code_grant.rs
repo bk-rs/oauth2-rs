@@ -82,8 +82,8 @@ mod tests {
         let request = AuthorizationEndpoint::new(
             &provider,
             vec![AmazonScope::Profile, AmazonScope::PostalCode],
-            "STATE".to_owned(),
         )
+        .configure(|x| x.state = Some("STATE".to_owned()))
         .render_request()?;
 
         assert_eq!(request.uri(), "https://www.amazon.com/ap/oa?response_type=code&client_id=CLIENT_ID&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&scope=profile+postal_code&state=STATE");

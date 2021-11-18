@@ -6,7 +6,10 @@ use std::{error, sync::Arc};
 
 use futures_util::future;
 use log::info;
-use oauth2_signin::oauth2_client::utils::{gen_nonce, gen_state};
+use oauth2_signin::oauth2_client::{
+    authorization_code_grant::FlowBuildAuthorizationUrlConfiguration,
+    utils::{gen_nonce, gen_state},
+};
 use warp::{http::Uri, Filter};
 use warp_sessions::{MemoryStore, SessionWithStore};
 
@@ -77,18 +80,20 @@ async fn auth_handler(
         .insert(state_session_key(&provider).as_str(), state.to_owned())
         .unwrap();
 
-    let url = if flow.is_oidc_support() {
+    let mut config = FlowBuildAuthorizationUrlConfiguration::default();
+    config.set_state(state);
+
+    if flow.is_oidc_support() {
         let nonce = gen_nonce(32);
         session_with_store
             .session
             .insert(nonce_session_key(&provider).as_str(), nonce.to_owned())
             .unwrap();
 
-        flow.build_authorization_url_with_oidc(state, None, nonce)
-            .unwrap()
-    } else {
-        flow.build_authorization_url(state, None).unwrap()
-    };
+        config.set_nonce(nonce);
+    }
+
+    let url = flow.build_authorization_url(config).unwrap();
 
     info!("{} authorization_url {}", provider, url.as_str());
 

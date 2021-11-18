@@ -239,9 +239,9 @@ mod tests {
             x.include_granted_scopes = Some(true);
         });
 
-        let request =
-            AuthorizationEndpoint::new(&provider, vec![GoogleScope::Email], "STATE".to_owned())
-                .render_request()?;
+        let request = AuthorizationEndpoint::new(&provider, vec![GoogleScope::Email])
+            .configure(|x| x.state = Some("STATE".to_owned()))
+            .render_request()?;
 
         assert_eq!(request.uri(), "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=CLIENT_ID&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&scope=email&state=STATE&access_type=offline&include_granted_scopes=true");
 

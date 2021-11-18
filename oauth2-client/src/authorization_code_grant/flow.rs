@@ -49,30 +49,13 @@ where
         &self,
         provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
         scopes: impl Into<Option<Vec<SCOPE>>>,
-        state: impl Into<Option<State>>,
-        code_challenge: impl Into<Option<(CodeChallenge, CodeChallengeMethod)>>,
+        config: impl Into<Option<FlowBuildAuthorizationUrlConfiguration>>,
     ) -> Result<Url, FlowBuildAuthorizationUrlError>
     where
         SCOPE: Scope + Serialize,
     {
         // Step 1
-        self.build_authorization_url_with_oidc(provider, scopes, state, code_challenge, None)
-    }
-
-    // OIDC
-    pub fn build_authorization_url_with_oidc<SCOPE>(
-        &self,
-        provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
-        scopes: impl Into<Option<Vec<SCOPE>>>,
-        state: impl Into<Option<State>>,
-        code_challenge: impl Into<Option<(CodeChallenge, CodeChallengeMethod)>>,
-        nonce: impl Into<Option<Nonce>>,
-    ) -> Result<Url, FlowBuildAuthorizationUrlError>
-    where
-        SCOPE: Scope + Serialize,
-    {
-        // Step 1
-        build_authorization_url(provider, scopes, state, code_challenge, nonce)
+        build_authorization_url(provider, scopes, config)
     }
 }
 
@@ -122,7 +105,7 @@ where
         let mut access_token_endpoint = AccessTokenEndpoint::new(provider, code);
 
         if let Some(code_verifier) = code_verifier.into() {
-            access_token_endpoint.set_code_verifier(code_verifier);
+            access_token_endpoint.set_code_verifier(code_verifier.to_owned());
         }
 
         let access_token_ret = self
@@ -171,26 +154,66 @@ pub enum FlowHandleCallbackError {
 //
 //
 //
+#[derive(Debug, Clone, Default)]
+pub struct FlowBuildAuthorizationUrlConfiguration {
+    pub state: Option<State>,
+    pub code_challenge: Option<(CodeChallenge, CodeChallengeMethod)>,
+    pub nonce: Option<Nonce>,
+}
+impl FlowBuildAuthorizationUrlConfiguration {
+    pub fn configure<F>(mut self, mut f: F) -> Self
+    where
+        F: FnMut(&mut Self),
+    {
+        f(&mut self);
+        self
+    }
+
+    pub fn set_state(&mut self, state: State) {
+        self.state = Some(state);
+    }
+
+    pub fn set_code_challenge(
+        &mut self,
+        code_challenge: CodeChallenge,
+        code_challenge_method: CodeChallengeMethod,
+    ) {
+        self.code_challenge = Some((code_challenge, code_challenge_method));
+    }
+
+    pub fn set_nonce(&mut self, nonce: Nonce) {
+        self.nonce = Some(nonce);
+    }
+}
+
+//
+//
+//
 pub fn build_authorization_url<SCOPE>(
     provider: &dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
     scopes: impl Into<Option<Vec<SCOPE>>>,
-    state: impl Into<Option<State>>,
-    code_challenge: impl Into<Option<(CodeChallenge, CodeChallengeMethod)>>,
-    nonce: impl Into<Option<Nonce>>,
+    config: impl Into<Option<FlowBuildAuthorizationUrlConfiguration>>,
 ) -> Result<Url, FlowBuildAuthorizationUrlError>
 where
     SCOPE: Scope + Serialize,
 {
     let scopes = scopes.into().or_else(|| provider.scopes_default());
 
-    let mut authorization_endpoint = AuthorizationEndpoint::new(provider, scopes, state);
+    let config = config.into().unwrap_or_default();
 
-    if let Some((code_challenge, code_challenge_method)) = code_challenge.into() {
-        authorization_endpoint.set_code_challenge(code_challenge, code_challenge_method);
+    let mut authorization_endpoint = AuthorizationEndpoint::new(provider, scopes);
+
+    if let Some(state) = &config.state {
+        authorization_endpoint.set_state(state.to_owned());
     }
 
-    if let Some(nonce) = nonce.into() {
-        authorization_endpoint.set_nonce(nonce);
+    if let Some((code_challenge, code_challenge_method)) = &config.code_challenge {
+        authorization_endpoint
+            .set_code_challenge(code_challenge.to_owned(), code_challenge_method.to_owned());
+    }
+
+    if let Some(nonce) = &config.nonce {
+        authorization_endpoint.set_nonce(nonce.to_owned());
     }
 
     let authorization_endpoint_request = authorization_endpoint

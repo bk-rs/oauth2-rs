@@ -25,7 +25,7 @@ async fn run(client_id: String, client_secret: String) -> Result<(), Box<dyn err
     let flow = Flow::new(IsahcClient::new()?);
     let provider = GoogleProviderForDesktopApps::new(client_id, client_secret, RedirectUri::Oob)?;
 
-    let authorization_url = flow.build_authorization_url(&provider, scopes, None, None)?;
+    let authorization_url = flow.build_authorization_url(&provider, scopes, None)?;
 
     println!("authorization_url: {:?}", authorization_url.as_str());
 

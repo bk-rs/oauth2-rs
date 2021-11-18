@@ -28,9 +28,9 @@ where
 {
     provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
     scopes: Option<Vec<SCOPE>>,
-    state: Option<State>,
-    code_challenge: Option<(CodeChallenge, CodeChallengeMethod)>,
-    nonce: Option<Nonce>,
+    pub state: Option<State>,
+    pub code_challenge: Option<(CodeChallenge, CodeChallengeMethod)>,
+    pub nonce: Option<Nonce>,
 }
 impl<'a, SCOPE> AuthorizationEndpoint<'a, SCOPE>
 where
@@ -39,15 +39,26 @@ where
     pub fn new(
         provider: &'a dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE>,
         scopes: impl Into<Option<Vec<SCOPE>>>,
-        state: impl Into<Option<State>>,
     ) -> Self {
         Self {
             provider,
             scopes: scopes.into(),
-            state: state.into(),
+            state: None,
             code_challenge: None,
             nonce: None,
         }
+    }
+
+    pub fn configure<F>(mut self, mut f: F) -> Self
+    where
+        F: FnMut(&mut Self),
+    {
+        f(&mut self);
+        self
+    }
+
+    pub fn set_state(&mut self, state: State) {
+        self.state = Some(state);
     }
 
     pub fn set_code_challenge(
@@ -55,7 +66,7 @@ where
         code_challenge: CodeChallenge,
         code_challenge_method: CodeChallengeMethod,
     ) {
-        self.code_challenge = Some((code_challenge, code_challenge_method))
+        self.code_challenge = Some((code_challenge, code_challenge_method));
     }
 
     pub fn set_nonce(&mut self, nonce: Nonce) {

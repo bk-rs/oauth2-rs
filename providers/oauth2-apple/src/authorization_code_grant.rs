@@ -103,9 +103,9 @@ mod tests {
             RedirectUri::new("https://client.example.com/cb")?,
         )?;
 
-        let request =
-            AuthorizationEndpoint::new(&provider, vec![AppleScope::Email], "STATE".to_owned())
-                .render_request()?;
+        let request = AuthorizationEndpoint::new(&provider, vec![AppleScope::Email])
+            .configure(|x| x.state = Some("STATE".to_owned()))
+            .render_request()?;
 
         assert_eq!(request.uri(), "https://appleid.apple.com/auth/authorize?response_type=code+id_token&client_id=CLIENT_ID&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&state=STATE");
 

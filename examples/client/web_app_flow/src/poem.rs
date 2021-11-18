@@ -6,7 +6,10 @@ use std::{error, fs, sync::Arc};
 
 use futures_util::future;
 use log::info;
-use oauth2_signin::oauth2_client::utils::{gen_nonce, gen_state};
+use oauth2_signin::oauth2_client::{
+    authorization_code_grant::FlowBuildAuthorizationUrlConfiguration,
+    utils::{gen_nonce, gen_state},
+};
 use poem::{
     get, handler,
     http::Uri,
@@ -71,14 +74,17 @@ async fn auth_handler(
     let state = gen_state(10);
     session.set(state_session_key(&provider).as_str(), state.to_owned());
 
-    let url = if flow.is_oidc_support() {
+    let mut config = FlowBuildAuthorizationUrlConfiguration::default();
+    config.set_state(state);
+
+    if flow.is_oidc_support() {
         let nonce = gen_nonce(32);
         session.set(nonce_session_key(&provider).as_str(), nonce.to_owned());
 
-        flow.build_authorization_url_with_oidc(state, None, nonce)?
-    } else {
-        flow.build_authorization_url(state, None)?
+        config.set_nonce(nonce);
     };
+
+    let url = flow.build_authorization_url(config)?;
 
     info!("{} authorization_url {}", provider, url.as_str());
 

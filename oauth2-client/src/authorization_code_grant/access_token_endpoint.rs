@@ -32,7 +32,7 @@ where
 {
     provider: &'a (dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE> + Send + Sync),
     code: Code,
-    code_verifier: Option<CodeVerifier>,
+    pub code_verifier: Option<CodeVerifier>,
 }
 impl<'a, SCOPE> AccessTokenEndpoint<'a, SCOPE>
 where
@@ -47,6 +47,14 @@ where
             code,
             code_verifier: None,
         }
+    }
+
+    pub fn configure<F>(mut self, mut f: F) -> Self
+    where
+        F: FnMut(&mut Self),
+    {
+        f(&mut self);
+        self
     }
 
     pub fn set_code_verifier(&mut self, code_verifier: CodeVerifier) {
