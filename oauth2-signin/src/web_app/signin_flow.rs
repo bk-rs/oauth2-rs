@@ -6,17 +6,19 @@ use oauth2_client::{
             ProviderExtAuthorizationCodeGrantOidcSupportType,
             ProviderExtAuthorizationCodeGrantStringScopeWrapper,
         },
-        Flow, FlowBuildAuthorizationUrlConfiguration,
+        Flow,
     },
     extensions::{
         AuthorizationCodeGrantInfo, BuilderObtainUserInfoOutput, EndpointExecuteError, GrantInfo,
     },
-    oauth2_core::types::{CodeVerifier, Nonce, State},
     re_exports::{Client, ClientRespondEndpointError, Url},
     ExtensionsBuilder, Provider, ProviderExtAuthorizationCodeGrant,
 };
 
-use super::{SigninFlowBuildAuthorizationUrlError, SigninFlowHandleCallbackRet};
+use super::{
+    SigninFlowBuildAuthorizationUrlConfiguration, SigninFlowBuildAuthorizationUrlError,
+    SigninFlowHandleCallbackByQueryConfiguration, SigninFlowHandleCallbackRet,
+};
 
 //
 //
@@ -92,39 +94,30 @@ where
 
     pub fn build_authorization_url(
         &self,
-        config: impl Into<Option<FlowBuildAuthorizationUrlConfiguration>>,
+        config: impl Into<Option<SigninFlowBuildAuthorizationUrlConfiguration>>,
     ) -> Result<Url, SigninFlowBuildAuthorizationUrlError> {
         self.flow
             .build_authorization_url(self.provider.as_ref(), self.scopes.to_owned(), config)
     }
 
-    pub async fn handle_callback(
+    pub async fn handle_callback_by_query(
         &self,
         query: impl AsRef<str>,
-        state: impl Into<Option<State>>,
-        code_verifier: impl Into<Option<CodeVerifier>>,
+        config: impl Into<Option<SigninFlowHandleCallbackByQueryConfiguration>>,
     ) -> SigninFlowHandleCallbackRet {
-        self.handle_callback_with_oidc(query, state, code_verifier, None)
-            .await
-    }
+        let config: SigninFlowHandleCallbackByQueryConfiguration =
+            config.into().unwrap_or_default();
+        let nonce = config.nonce.to_owned();
 
-    pub async fn handle_callback_with_oidc(
-        &self,
-        query: impl AsRef<str>,
-        state: impl Into<Option<State>>,
-        code_verifier: impl Into<Option<CodeVerifier>>,
-        nonce: impl Into<Option<Nonce>>,
-    ) -> SigninFlowHandleCallbackRet {
         let access_token = match self
             .flow
-            .handle_callback_by_query(self.provider.as_ref(), query, state, code_verifier)
+            .handle_callback_by_query(self.provider.as_ref(), query, Some(config.into()))
             .await
         {
             Ok(x) => x,
             Err(err) => return SigninFlowHandleCallbackRet::FlowHandleCallbackError(err),
         };
 
-        let nonce = nonce.into();
         let grant_info = GrantInfo::AuthorizationCodeGrant(AuthorizationCodeGrantInfo {
             provider: self.provider.as_ref(),
             authorization_request_scopes: self.scopes.as_ref(),
@@ -249,7 +242,7 @@ mod tests {
         let _ = map
             .get("github")
             .unwrap()
-            .handle_callback("code=CODE&state=STATE", "xxx".to_owned(), None)
+            .handle_callback_by_query("code=CODE&state=STATE", None)
             .await;
 
         Ok(())

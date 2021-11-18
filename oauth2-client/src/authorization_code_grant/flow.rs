@@ -67,8 +67,7 @@ where
         &self,
         provider: &(dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE> + Send + Sync),
         query: impl AsRef<str>,
-        state: impl Into<Option<State>>,
-        code_verifier: impl Into<Option<CodeVerifier>>,
+        config: impl Into<Option<FlowHandleCallbackByQueryConfiguration>>,
     ) -> Result<AT_RES_SuccessfulBody<SCOPE>, FlowHandleCallbackError>
     where
         SCOPE: Scope + Serialize + DeserializeOwned + Send + Sync,
@@ -79,7 +78,9 @@ where
 
         let query = query.map_err(FlowHandleCallbackError::AuthorizationFailed)?;
 
-        if let Some(ref state) = state.into() {
+        let config: FlowHandleCallbackByQueryConfiguration = config.into().unwrap_or_default();
+
+        if let Some(ref state) = &config.state {
             if let Some(query_state) = &query.state {
                 if state != query_state {
                     return Err(FlowHandleCallbackError::StateMismatch);
@@ -89,7 +90,7 @@ where
             }
         }
 
-        self.handle_callback(provider, query.code, code_verifier)
+        self.handle_callback(provider, query.code, Some(config.into()))
             .await
     }
 
@@ -97,14 +98,16 @@ where
         &self,
         provider: &(dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE> + Send + Sync),
         code: Code,
-        code_verifier: impl Into<Option<CodeVerifier>>,
+        config: impl Into<Option<FlowHandleCallbackConfiguration>>,
     ) -> Result<AT_RES_SuccessfulBody<SCOPE>, FlowHandleCallbackError>
     where
         SCOPE: Scope + Serialize + DeserializeOwned + Send + Sync,
     {
+        let config: FlowHandleCallbackConfiguration = config.into().unwrap_or_default();
+
         let mut access_token_endpoint = AccessTokenEndpoint::new(provider, code);
 
-        if let Some(code_verifier) = code_verifier.into() {
+        if let Some(code_verifier) = &config.code_verifier {
             access_token_endpoint.set_code_verifier(code_verifier.to_owned());
         }
 
@@ -161,6 +164,10 @@ pub struct FlowBuildAuthorizationUrlConfiguration {
     pub nonce: Option<Nonce>,
 }
 impl FlowBuildAuthorizationUrlConfiguration {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     pub fn configure<F>(mut self, mut f: F) -> Self
     where
         F: FnMut(&mut Self),
@@ -187,6 +194,65 @@ impl FlowBuildAuthorizationUrlConfiguration {
 }
 
 //
+#[derive(Debug, Clone, Default)]
+pub struct FlowHandleCallbackByQueryConfiguration {
+    pub state: Option<State>,
+    pub code_verifier: Option<CodeVerifier>,
+}
+impl FlowHandleCallbackByQueryConfiguration {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn configure<F>(mut self, mut f: F) -> Self
+    where
+        F: FnMut(&mut Self),
+    {
+        f(&mut self);
+        self
+    }
+
+    pub fn set_state(&mut self, state: State) {
+        self.state = Some(state);
+    }
+
+    pub fn set_code_verifier(&mut self, code_verifier: CodeVerifier) {
+        self.code_verifier = Some(code_verifier);
+    }
+}
+
+//
+#[derive(Debug, Clone, Default)]
+pub struct FlowHandleCallbackConfiguration {
+    pub code_verifier: Option<CodeVerifier>,
+}
+impl FlowHandleCallbackConfiguration {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn configure<F>(mut self, mut f: F) -> Self
+    where
+        F: FnMut(&mut Self),
+    {
+        f(&mut self);
+        self
+    }
+
+    pub fn set_code_verifier(&mut self, code_verifier: CodeVerifier) {
+        self.code_verifier = Some(code_verifier);
+    }
+}
+
+impl From<FlowHandleCallbackByQueryConfiguration> for FlowHandleCallbackConfiguration {
+    fn from(c: FlowHandleCallbackByQueryConfiguration) -> Self {
+        Self {
+            code_verifier: c.code_verifier,
+        }
+    }
+}
+
+//
 //
 //
 pub fn build_authorization_url<SCOPE>(
@@ -199,7 +265,7 @@ where
 {
     let scopes = scopes.into().or_else(|| provider.scopes_default());
 
-    let config = config.into().unwrap_or_default();
+    let config: FlowBuildAuthorizationUrlConfiguration = config.into().unwrap_or_default();
 
     let mut authorization_endpoint = AuthorizationEndpoint::new(provider, scopes);
 

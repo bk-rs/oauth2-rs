@@ -6,9 +6,11 @@ use std::{error, fs, sync::Arc};
 
 use futures_util::future;
 use log::info;
-use oauth2_signin::oauth2_client::{
-    authorization_code_grant::FlowBuildAuthorizationUrlConfiguration,
-    utils::{gen_nonce, gen_state},
+use oauth2_signin::{
+    oauth2_client::utils::{gen_nonce, gen_state},
+    web_app::{
+        SigninFlowBuildAuthorizationUrlConfiguration, SigninFlowHandleCallbackByQueryConfiguration,
+    },
 };
 use poem::{
     get, handler,
@@ -71,16 +73,15 @@ async fn auth_handler(
         .get(provider.as_str())
         .ok_or("provider not found")?;
 
+    let mut config = SigninFlowBuildAuthorizationUrlConfiguration::new();
+
     let state = gen_state(10);
     session.set(state_session_key(&provider).as_str(), state.to_owned());
-
-    let mut config = FlowBuildAuthorizationUrlConfiguration::default();
     config.set_state(state);
 
     if flow.is_oidc_support() {
         let nonce = gen_nonce(32);
         session.set(nonce_session_key(&provider).as_str(), nonce.to_owned());
-
         config.set_nonce(nonce);
     };
 
@@ -114,20 +115,25 @@ async fn auth_callback_handler(
         .get(provider.as_str())
         .ok_or("provider not found")?;
 
+    let mut config = SigninFlowHandleCallbackByQueryConfiguration::new();
+
     let state = session.get::<String>(state_session_key(&provider).as_str());
     session.remove(state_session_key(&provider).as_str());
     info!("{} state {:?}", provider, state);
+    if let Some(state) = state {
+        config.set_state(state);
+    }
 
-    let ret = if flow.is_oidc_support() {
+    if flow.is_oidc_support() {
         let nonce = session.get::<String>(nonce_session_key(&provider).as_str());
         session.remove(nonce_session_key(&provider).as_str());
         info!("{} nonce {:?}", provider, nonce);
+        if let Some(nonce) = nonce {
+            config.set_state(nonce);
+        }
+    }
 
-        flow.handle_callback_with_oidc(query_raw, state, None, nonce)
-            .await
-    } else {
-        flow.handle_callback(query_raw, state, None).await
-    };
+    let ret = flow.handle_callback_by_query(query_raw, config).await;
 
     info!("{} {:?}", provider, ret);
 
