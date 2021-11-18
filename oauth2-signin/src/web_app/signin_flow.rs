@@ -84,20 +84,35 @@ where
     C: Client + Send + Sync,
 {
     pub fn is_oidc_support(&self) -> bool {
-        self.provider.oidc_support_type().map(|x| {
-            matches!(
-                x,
-                ProviderExtAuthorizationCodeGrantOidcSupportType::Yes
-                    | ProviderExtAuthorizationCodeGrantOidcSupportType::Force
-            )
-        }) == Some(true)
+        if let Some(oidc_support_type) = self.provider.oidc_support_type() {
+            match oidc_support_type {
+                ProviderExtAuthorizationCodeGrantOidcSupportType::No => {}
+                ProviderExtAuthorizationCodeGrantOidcSupportType::Yes => {
+                    if self
+                        .scopes
+                        .to_owned()
+                        .map(|x| x.contains(&"openid".to_owned()))
+                        == Some(true)
+                    {
+                        return true;
+                    }
+                }
+                ProviderExtAuthorizationCodeGrantOidcSupportType::Force => return true,
+            }
+        }
+
+        false
     }
 
     pub fn is_pkce_support(&self) -> bool {
-        self.provider
-            .pkce_support_type()
-            .map(|x| matches!(x, ProviderExtAuthorizationCodeGrantPkceSupportType::Yes))
-            == Some(true)
+        if let Some(pkce_support_type) = self.provider.pkce_support_type() {
+            match pkce_support_type {
+                ProviderExtAuthorizationCodeGrantPkceSupportType::No => {}
+                ProviderExtAuthorizationCodeGrantPkceSupportType::Yes => {}
+            }
+        }
+
+        false
     }
 
     pub fn build_authorization_url(
