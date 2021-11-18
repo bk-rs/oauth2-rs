@@ -65,6 +65,15 @@ impl BodyWithAuthorizationCodeGrant {
         redirect_uri: Option<String>,
         client_id: Option<ClientId>,
         client_secret: Option<ClientSecret>,
+    ) -> Self {
+        Self::internal_new(code, redirect_uri, client_id, client_secret, None)
+    }
+
+    fn internal_new(
+        code: Code,
+        redirect_uri: Option<String>,
+        client_id: Option<ClientId>,
+        client_secret: Option<ClientSecret>,
         code_verifier: Option<CodeVerifier>,
     ) -> Self {
         Self {

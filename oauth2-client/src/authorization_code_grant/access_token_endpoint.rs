@@ -69,8 +69,12 @@ where
             self.provider.redirect_uri().map(|x| x.to_string()),
             self.provider.client_id().cloned(),
             self.provider.client_secret().cloned(),
-            self.code_verifier.to_owned(),
         );
+
+        if let Some(code_verifier) = &self.code_verifier {
+            body.code_verifier = Some(code_verifier.to_owned());
+        }
+
         if let Some(extra) = self.provider.access_token_request_body_extra(&body) {
             body.set_extra(extra);
         }
