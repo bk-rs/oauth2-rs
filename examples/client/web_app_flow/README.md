@@ -28,4 +28,5 @@ xdg-open https://oauth2-rs.lvh.me/auth/dropbox
 xdg-open http://oauth2-rs.lvh.me/auth/linkedin
 xdg-open https://oauth2-rs.lvh.me/auth/microsoft
 xdg-open https://oauth2-rs.lvh.me/auth/yahoo
+xdg-open https://oauth2-rs.lvh.me/auth/okta
 ```

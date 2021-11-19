@@ -72,3 +72,9 @@ redirect_uri = "https://oauth2-rs.lvh.me/auth/microsoft/callback"
 client_id = "xxx"
 client_secret = "xxx"
 redirect_uri = "https://oauth2-rs.lvh.me/auth/yahoo/callback"
+
+[okta]
+client_id = "xxx"
+client_secret = "xxx"
+redirect_uri = "https://oauth2-rs.lvh.me/auth/okta/callback"
+domain = "dev-xxxxxx.okta.com"

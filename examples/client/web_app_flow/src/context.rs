@@ -33,6 +33,7 @@ use oauth2_mastodon::{
 use oauth2_microsoft::{
     MicrosoftExtensionsBuilder, MicrosoftProviderForWebApps, MicrosoftScope, TENANT_COMMON,
 };
+use oauth2_okta::{OktaProviderForWebApplication, OktaScope};
 use oauth2_signin::{oauth2_client::DefaultExtensionsBuilder, web_app::SigninFlow};
 use oauth2_twitch::{TwitchExtensionsBuilder, TwitchProviderForWebServerApps, TwitchScope};
 use oauth2_yahoo::{YahooExtensionsBuilder, YahooProviderForWebApps, YahooScope};
@@ -270,6 +271,28 @@ impl Context {
                 )?,
                 vec![YahooScope::Openid, YahooScope::Email, YahooScope::Profile],
                 YahooExtensionsBuilder,
+            ),
+        );
+        signin_flow_map.insert(
+            "okta",
+            SigninFlow::new(
+                IsahcClient::new()?,
+                OktaProviderForWebApplication::new(
+                    clients_config
+                        .okta
+                        .extra
+                        .get("domain")
+                        .cloned()
+                        .unwrap()
+                        .as_str()
+                        .unwrap(),
+                    None,
+                    clients_config.okta.client_id.to_owned(),
+                    clients_config.okta.client_secret.to_owned(),
+                    clients_config.okta.redirect_uri,
+                )?,
+                vec![OktaScope::Openid, OktaScope::Email, OktaScope::Profile],
+                DefaultExtensionsBuilder,
             ),
         );
 

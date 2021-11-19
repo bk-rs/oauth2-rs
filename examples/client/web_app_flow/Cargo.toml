@@ -30,6 +30,7 @@ oauth2-dropbox = { version = "^0.0", path = "../../../providers/oauth2-dropbox" 
 oauth2-linkedin = { version = "^0.0", path = "../../../providers/oauth2-linkedin" }
 oauth2-microsoft = { version = "^0.0", path = "../../../providers/oauth2-microsoft" }
 oauth2-yahoo = { version = "^0.0", path = "../../../providers/oauth2-yahoo" }
+oauth2-okta = { version = "^0.0", path = "../../../providers/oauth2-okta" }
 
 tokio = { version = "1.12", default-features = false, features = ["macros", "rt-multi-thread"] }
 futures-util = { version = "0.3" }
@@ -44,6 +45,7 @@ poem = { version = "1.0", features = ["tls", "session"] }
 
 
 serde = { version = "1.0", default-features = false, features = ["derive"] }
-toml = { version = "0.5" }
-pretty_env_logger = { version = "0.4" }
-log = { version = "0.4" }
+serde_json = { version = "1.0", default-features = false }
+toml = { version = "0.5", default-features = false }
+pretty_env_logger = { version = "0.4", default-features = false }
+log = { version = "0.4", default-features = false }

@@ -1,6 +1,7 @@
 use std::{env, error, fs, path::PathBuf};
 
 use serde::Deserialize;
+use serde_json::{Map, Value};
 
 use oauth2_signin::oauth2_client::re_exports::{ClientId, ClientSecret, RedirectUri};
 
@@ -50,6 +51,7 @@ pub struct ClientsConfig {
     pub linkedin: ClientConfig,
     pub microsoft: ClientConfig,
     pub yahoo: ClientConfig,
+    pub okta: ClientConfig,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -57,4 +59,7 @@ pub struct ClientConfig {
     pub client_id: ClientId,
     pub client_secret: ClientSecret,
     pub redirect_uri: RedirectUri,
+    //
+    #[serde(flatten)]
+    pub extra: Map<String, Value>,
 }
