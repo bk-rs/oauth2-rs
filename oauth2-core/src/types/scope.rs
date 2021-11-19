@@ -13,6 +13,8 @@ use serde::{
 
 pub const SCOPE_PARAMETER_DELIMITATION: char = ' ';
 
+pub const SCOPE_OPENID: &str = "openid";
+
 //
 pub trait Scope: str::FromStr + ToString + fmt::Debug + Clone + cmp::PartialEq {}
 

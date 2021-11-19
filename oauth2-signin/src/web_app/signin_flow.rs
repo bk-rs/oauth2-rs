@@ -12,6 +12,7 @@ use oauth2_client::{
     extensions::{
         AuthorizationCodeGrantInfo, BuilderObtainUserInfoOutput, EndpointExecuteError, GrantInfo,
     },
+    oauth2_core::types::scope::SCOPE_OPENID,
     re_exports::{Client, ClientRespondEndpointError, Url},
     ExtensionsBuilder, Provider, ProviderExtAuthorizationCodeGrant,
 };
@@ -106,7 +107,7 @@ where
                     if self
                         .scopes
                         .to_owned()
-                        .map(|x| x.contains(&"openid".to_owned()))
+                        .map(|x| x.contains(&SCOPE_OPENID.to_owned()))
                         == Some(true)
                     {
                         return true;
