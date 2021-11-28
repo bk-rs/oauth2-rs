@@ -53,7 +53,7 @@ impl From<SigninFlowHandleCallbackByQueryConfiguration> for FlowHandleCallbackBy
     fn from(c: SigninFlowHandleCallbackByQueryConfiguration) -> Self {
         Self {
             state: c.state.to_owned(),
-            code_verifier: c.code_verifier.to_owned(),
+            code_verifier: c.code_verifier,
         }
     }
 }
