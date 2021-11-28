@@ -1,6 +1,6 @@
 [package]
 name = "oauth2-facebook"
-version = "0.0.0"
+version = "0.1.0"
 authors = ["vkill <vkill.net@gmail.com>"]
 edition = "2021"
 description = "OAuth 2.0 Facebook"
@@ -13,7 +13,7 @@ categories = []
 readme = "README.md"
 
 [dependencies]
-oauth2-client = { version = "^0.0", path = "../../oauth2-client", default-features = false }
+oauth2-client = { version = "^0.1", path = "../../oauth2-client", default-features = false }
 serde = { version = "1.0", default-features = false }
 
 serde-aux = { version = "2.2", default-features = false }

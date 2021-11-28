@@ -23,9 +23,9 @@ default = ["with-github"]
 with-github = ["oauth2-github"]
 
 [dependencies]
-oauth2-client = { version = "^0.0", path = "../oauth2-client" }
+oauth2-client = { version = "^0.1", path = "../oauth2-client" }
 
-oauth2-github = { version = "^0.0", path = "../providers/oauth2-github", optional = true }
+oauth2-github = { version = "^0.1", path = "../providers/oauth2-github", optional = true }
 
 tokio = { version = "1.12", default-features = false, features = ["macros", "rt-multi-thread"] }
 http-api-isahc-client = { version = "0.2", features = ["with-sleep-via-tokio"] }

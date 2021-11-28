@@ -1,6 +1,6 @@
 [package]
 name = "oauth2-client"
-version = "0.0.0"
+version = "0.1.0"
 authors = ["vkill <vkill.net@gmail.com>"]
 edition = "2021"
 description = "OAuth 2.0 Client"
@@ -21,7 +21,7 @@ default = ["with-flow"]
 with-flow = ["http-api-client"]
 
 [dependencies]
-oauth2-core = { version = "^0.0", path = "../oauth2-core" }
+oauth2-core = { version = "^0.1", path = "../oauth2-core" }
 
 http-api-client-endpoint = { version = "0.2", default-features = false }
 http-api-client = { version = "0.2", default-features = false, optional = true }

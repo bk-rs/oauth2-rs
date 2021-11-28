@@ -8,9 +8,9 @@ name = "client_credentials_flow_mastodon_social"
 path = "src/mastodon_social.rs"
 
 [dependencies]
-oauth2-client = { version = "^0.0", path = "../../../oauth2-client", features = ["with-flow"] }
+oauth2-client = { version = "^0.1", path = "../../../oauth2-client", features = ["with-flow"] }
 
-oauth2-mastodon = { version = "^0.0", path = "../../../providers/oauth2-mastodon" }
+oauth2-mastodon = { version = "^0.1", path = "../../../providers/oauth2-mastodon" }
 
 tokio = { version = "1.12", default-features = false, features = ["macros", "rt-multi-thread"] }
 http-api-isahc-client = { version = "0.2", features = ["with-sleep-via-tokio"] }
