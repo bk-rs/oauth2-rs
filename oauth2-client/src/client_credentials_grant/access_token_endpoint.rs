@@ -69,6 +69,13 @@ where
                 .ok_or(AccessTokenEndpointError::ClientSecretMissing)?,
         );
 
+        //
+        let mut url = self.provider.token_endpoint_url().to_owned();
+
+        //
+        self.provider.access_token_request_url_modifying(&mut url);
+
+        //
         let mut body = if self.provider.client_password_in_request_body() {
             BodyWithClientCredentialsGrant::new_with_client_password(
                 self.scopes.to_owned().map(Into::into),
@@ -94,17 +101,21 @@ where
         let body_str = serde_urlencoded::to_string(body)
             .map_err(AccessTokenEndpointError::SerRequestBodyFailed)?;
 
+        //
         let mut request = Request::builder()
             .method(REQ_METHOD)
-            .uri(self.provider.token_endpoint_url().as_str())
+            .uri(url.as_str())
             .header(CONTENT_TYPE, REQ_CONTENT_TYPE.to_string())
             .header(ACCEPT, RES_CONTENT_TYPE.to_string());
         if !self.provider.client_password_in_request_body() {
             request = request.header(AUTHORIZATION, client_password.header_authorization());
         }
-        let request = request
+        let mut request = request
             .body(body_str.as_bytes().to_vec())
             .map_err(AccessTokenEndpointError::MakeRequestFailed)?;
+
+        //
+        self.provider.access_token_request_modifying(&mut request);
 
         Ok(request)
     }

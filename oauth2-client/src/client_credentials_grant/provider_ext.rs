@@ -4,7 +4,7 @@ use dyn_clone::{clone_trait_object, DynClone};
 pub use oauth2_core::access_token_request::BodyWithClientCredentialsGrant;
 
 use crate::{
-    re_exports::{ClientId, ClientSecret, Map, Scope, Url, Value},
+    re_exports::{Body, ClientId, ClientSecret, Map, Request, Scope, Url, Value},
     Provider,
 };
 
@@ -24,6 +24,10 @@ pub trait ProviderExtClientCredentialsGrant: Provider + DynClone {
     ) -> Option<Result<Map<String, Value>, Box<dyn error::Error + Send + Sync + 'static>>> {
         None
     }
+
+    fn access_token_request_url_modifying(&self, _url: &mut Url) {}
+
+    fn access_token_request_modifying(&self, _request: &mut Request<Body>) {}
 }
 
 clone_trait_object!(<SCOPE> ProviderExtClientCredentialsGrant<Scope = SCOPE> where SCOPE: Scope + Clone);
@@ -115,5 +119,12 @@ where
         self.inner.access_token_request_body_extra(&body)
     }
 
+    fn access_token_request_url_modifying(&self, url: &mut Url) {
+        self.inner.access_token_request_url_modifying(url)
+    }
+
+    fn access_token_request_modifying(&self, request: &mut Request<Body>) {
+        self.inner.access_token_request_modifying(request)
+    }
     // Note
 }
