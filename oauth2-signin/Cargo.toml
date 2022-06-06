@@ -23,4 +23,4 @@ oauth2-google = { version = "^0.1", path = "../providers/oauth2-google" }
 
 http-api-isahc-client = { version = "0.2", default-features = false }
 
-tokio = { version = "1.12", default-features = false, features = ["macros", "rt"] }
+tokio = { version = "1", default-features = false, features = ["macros", "rt"] }

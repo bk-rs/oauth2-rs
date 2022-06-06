@@ -12,7 +12,7 @@ oauth2-client = { version = "^0.1", path = "../../../oauth2-client", features = 
 
 oauth2-mastodon = { version = "^0.1", path = "../../../providers/oauth2-mastodon" }
 
-tokio = { version = "1.12", default-features = false, features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1", default-features = false, features = ["macros", "rt-multi-thread"] }
 http-api-isahc-client = { version = "0.2", features = ["with-sleep-via-tokio"] }
 
 pretty_env_logger = { version = "0.4" }

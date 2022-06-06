@@ -7,10 +7,6 @@ edition = "2021"
 name = "web_app_flow_warp"
 path = "src/warp.rs"
 
-[[bin]]
-name = "web_app_flow_poem"
-path = "src/poem.rs"
-
 [dependencies]
 oauth2-signin = { version = "^0.1", path = "../../../oauth2-signin" }
 http-api-isahc-client = { version = "0.2" }
@@ -32,16 +28,13 @@ oauth2-microsoft = { version = "^0.1", path = "../../../providers/oauth2-microso
 oauth2-yahoo = { version = "^0.1", path = "../../../providers/oauth2-yahoo" }
 oauth2-okta = { version = "^0.1", path = "../../../providers/oauth2-okta" }
 
-tokio = { version = "1.12", default-features = false, features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1", default-features = false, features = ["macros", "rt-multi-thread"] }
 futures-util = { version = "0.3" }
 async-trait = { version = "0.1" }
 
 
 warp = { version = "0.3", default-features = false, features = ["tls"] }
 warp-sessions = { version = "1.0", default-features = false }
-
-
-poem = { version = "1.0", features = ["tls", "session"] }
 
 
 serde = { version = "1.0", default-features = false, features = ["derive"] }

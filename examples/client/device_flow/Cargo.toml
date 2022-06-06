@@ -32,7 +32,7 @@ oauth2-facebook = { version = "^0.1", path = "../../../providers/oauth2-facebook
 oauth2-amazon = { version = "^0.1", path = "../../../providers/oauth2-amazon" }
 oauth2-microsoft = { version = "^0.1", path = "../../../providers/oauth2-microsoft" }
 
-tokio = { version = "1.12", default-features = false, features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1", default-features = false, features = ["macros", "rt-multi-thread"] }
 http-api-isahc-client = { version = "0.2", features = ["with-sleep-via-tokio"] }
 
 pretty_env_logger = { version = "0.4" }
