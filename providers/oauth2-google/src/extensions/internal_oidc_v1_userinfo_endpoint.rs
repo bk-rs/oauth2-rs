@@ -11,7 +11,7 @@ pub const URL: &str = "https://openidconnect.googleapis.com/v1/userinfo";
 pub struct OidcV1UserInfoEndpoint {
     access_token: String,
 }
-impl<'a> OidcV1UserInfoEndpoint {
+impl OidcV1UserInfoEndpoint {
     pub fn new(access_token: impl AsRef<str>) -> Self {
         Self {
             access_token: access_token.as_ref().to_owned(),

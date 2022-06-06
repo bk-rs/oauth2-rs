@@ -80,15 +80,15 @@ where
 
         let mut body = if self.provider.client_password_in_request_body() {
             BodyWithResourceOwnerPasswordCredentialsGrant::new_with_client_password(
-                self.username.to_owned(),
-                self.password.to_owned(),
+                &self.username,
+                &self.password,
                 self.scopes.to_owned().map(Into::into),
                 client_password.to_owned(),
             )
         } else {
             BodyWithResourceOwnerPasswordCredentialsGrant::new(
-                self.username.to_owned(),
-                self.password.to_owned(),
+                &self.username,
+                &self.password,
                 self.scopes.to_owned().map(Into::into),
             )
         };

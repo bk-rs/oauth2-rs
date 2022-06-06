@@ -23,7 +23,7 @@ pub fn authorization_url(base_url: impl AsRef<str>) -> Result<Url, UrlParseError
 }
 
 // Ref https://docs.joinmastodon.org/api/oauth-scopes/
-#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
+#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq, Eq)]
 pub enum MastodonScope {
     //
     //

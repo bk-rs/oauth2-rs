@@ -31,7 +31,7 @@ pub fn authorization_url(tenant: impl AsRef<str>) -> String {
 }
 
 // Ref https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-permissions-and-consent
-#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
+#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq, Eq)]
 pub enum MicrosoftScope {
     //
     #[serde(rename = "openid")]

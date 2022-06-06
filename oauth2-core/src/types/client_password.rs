@@ -9,7 +9,7 @@ use crate::types::{ClientId, ClientSecret};
 pub const HEADER_AUTHORIZATION_PREFIX: &str = "Basic ";
 
 //
-#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
 pub struct ClientPassword {
     pub client_id: ClientId,
     pub client_secret: ClientSecret,

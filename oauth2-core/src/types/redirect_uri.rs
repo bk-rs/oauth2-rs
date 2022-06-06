@@ -8,7 +8,7 @@ use serde::{
 };
 use url::Url;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RedirectUri {
     Url(Url),
     /// https://developers.google.com/identity/protocols/oauth2/native-app

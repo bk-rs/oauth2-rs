@@ -11,7 +11,7 @@ pub mod extensions;
 pub use extensions::BitbucketExtensionsBuilder;
 
 // Ref https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/#Scopes
-#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
+#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq, Eq)]
 pub enum BitbucketScope {
     //
     #[serde(rename = "account")]

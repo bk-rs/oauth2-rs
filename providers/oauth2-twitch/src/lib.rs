@@ -11,7 +11,7 @@ pub mod extensions;
 pub use extensions::TwitchExtensionsBuilder;
 
 /// [Ref](https://dev.twitch.tv/docs/authentication#scopes)
-#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
+#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq, Eq)]
 pub enum TwitchScope {
     //
     #[serde(rename = "user:read:email")]

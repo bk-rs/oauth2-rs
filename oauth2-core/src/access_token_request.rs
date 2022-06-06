@@ -260,7 +260,7 @@ where
             None
         };
 
-        let mut this = Self::new(body.username.to_owned(), body.password.to_owned(), scope);
+        let mut this = Self::new(&body.username, &body.password, scope);
         this.client_password = body.client_password.to_owned();
         if let Some(extra) = body.extra() {
             this.set_extra(extra.to_owned());

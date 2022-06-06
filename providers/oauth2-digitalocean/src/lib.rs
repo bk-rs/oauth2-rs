@@ -11,7 +11,7 @@ pub mod extensions;
 pub use extensions::DigitaloceanExtensionsBuilder;
 
 // Ref https://docs.digitalocean.com/reference/api/oauth-api/#scopes
-#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
+#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq, Eq)]
 pub enum DigitaloceanScope {
     //
     #[serde(rename = "read")]

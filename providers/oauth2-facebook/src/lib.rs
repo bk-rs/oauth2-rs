@@ -14,7 +14,7 @@ pub use device_authorization_grant::FacebookProviderForDevices;
 pub mod extensions;
 pub use extensions::FacebookExtensionsBuilder;
 
-#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
+#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum FacebookScope {
     // Ref https://github.com/bk-rs/facebook-rs/blob/master/facebook-permission/src/lib.rs

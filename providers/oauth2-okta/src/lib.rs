@@ -32,7 +32,7 @@ pub fn authorization_url(
 }
 
 // Ref https://developer.okta.com/docs/reference/api/oidc/#access-token-scopes-and-claims
-#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
+#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq, Eq)]
 pub enum OktaScope {
     //
     #[serde(rename = "openid")]

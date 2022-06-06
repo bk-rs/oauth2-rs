@@ -11,7 +11,7 @@ pub const URL: &str = "https://www.googleapis.com/oauth2/v3/userinfo";
 pub struct Oauth2V3UserInfoEndpoint {
     access_token: String,
 }
-impl<'a> Oauth2V3UserInfoEndpoint {
+impl Oauth2V3UserInfoEndpoint {
     pub fn new(access_token: impl AsRef<str>) -> Self {
         Self {
             access_token: access_token.as_ref().to_owned(),

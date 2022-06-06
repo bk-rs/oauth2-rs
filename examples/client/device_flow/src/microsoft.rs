@@ -26,7 +26,7 @@ async fn run(client_id: String) -> Result<(), Box<dyn error::Error>> {
     ];
 
     let flow = Flow::new(IsahcClient::new()?, IsahcClient::new()?);
-    let provider = MicrosoftProviderForDevices::new("common".to_owned(), client_id)?;
+    let provider = MicrosoftProviderForDevices::new("common", client_id)?;
 
     let access_token_body = flow
         .execute(

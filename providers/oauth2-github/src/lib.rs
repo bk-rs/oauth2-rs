@@ -13,7 +13,7 @@ pub use device_authorization_grant::GithubProviderWithDevice;
 pub mod extensions;
 pub use extensions::GithubExtensionsBuilder;
 
-#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
+#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq, Eq)]
 pub enum GithubScope {
     //
     #[serde(rename = "repo")]

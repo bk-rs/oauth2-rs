@@ -11,7 +11,7 @@ pub mod extensions;
 pub use extensions::LinkedinExtensionsBuilder;
 
 // Ref https://docs.microsoft.com/en-us/linkedin/shared/authentication/authentication?context=linkedin/context#permission-types
-#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
+#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq, Eq)]
 pub enum LinkedinScope {
     //
     #[serde(rename = "r_liteprofile")]

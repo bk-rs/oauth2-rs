@@ -15,7 +15,7 @@ pub use device_authorization_grant::AmazonProviderWithDevices;
 pub mod extensions;
 pub use extensions::AmazonExtensionsBuilder;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AmazonTokenUrlRegion {
     NA,
     EU,
@@ -31,7 +31,7 @@ pub fn token_url(region: impl Into<Option<AmazonTokenUrlRegion>>) -> &'static st
 }
 
 // Ref https://developer.amazon.com/docs/login-with-amazon/customer-profile.html
-#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
+#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq, Eq)]
 pub enum AmazonScope {
     //
     #[serde(rename = "profile")]

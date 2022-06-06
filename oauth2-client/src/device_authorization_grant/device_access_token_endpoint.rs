@@ -172,7 +172,7 @@ where
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum DeviceAccessTokenEndpointRetryReason {
     AuthorizationPending,
     SlowDown,

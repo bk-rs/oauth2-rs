@@ -12,7 +12,7 @@ pub struct UsersEndpoint {
     access_token: String,
     client_id: String,
 }
-impl<'a> UsersEndpoint {
+impl UsersEndpoint {
     pub fn new(access_token: impl AsRef<str>, client_id: impl AsRef<str>) -> Self {
         Self {
             access_token: access_token.as_ref().to_owned(),

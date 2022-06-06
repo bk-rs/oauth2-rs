@@ -11,7 +11,7 @@ pub struct SnsUserinfoEndpoint {
     access_token: String,
     openid: String,
 }
-impl<'a> SnsUserinfoEndpoint {
+impl SnsUserinfoEndpoint {
     pub fn new(access_token: impl AsRef<str>, openid: impl AsRef<str>) -> Self {
         Self {
             access_token: access_token.as_ref().to_owned(),

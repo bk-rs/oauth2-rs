@@ -10,7 +10,7 @@ pub use authorization_code_grant::InstagramProviderForBasicDisplayApi;
 pub mod extensions;
 pub use extensions::InstagramExtensionsBuilder;
 
-#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
+#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum InstagramScope {
     // Ref https://github.com/bk-rs/instagram-rs/blob/master/instagram-permission/src/lib.rs

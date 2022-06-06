@@ -11,7 +11,7 @@ pub mod extensions;
 pub use extensions::YahooExtensionsBuilder;
 
 /// [Ref](https://developer.yahoo.com/oauth2/guide/yahoo_scopes/)
-#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
+#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq, Eq)]
 pub enum YahooScope {
     //
     #[serde(rename = "openid")]

@@ -19,7 +19,7 @@ pub fn authorization_url(base_url: impl AsRef<str>) -> Result<Url, UrlParseError
 }
 
 // Ref https://gitlab.com/-/profile/applications
-#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
+#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq, Eq)]
 pub enum GitlabScope {
     #[serde(rename = "api")]
     Api,

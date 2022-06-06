@@ -11,7 +11,7 @@ pub mod extensions;
 pub use extensions::DropboxExtensionsBuilder;
 
 // Ref App Console, Permissions tab
-#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
+#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq, Eq)]
 pub enum DropboxScope {
     //
     #[serde(rename = "account_info.write")]

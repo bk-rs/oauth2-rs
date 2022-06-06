@@ -11,7 +11,7 @@ pub const URL: &str = "https://graph.facebook.com/v12.0/me/";
 pub struct MeEndpoint {
     access_token: String,
 }
-impl<'a> MeEndpoint {
+impl MeEndpoint {
     pub fn new(access_token: impl AsRef<str>) -> Self {
         Self {
             access_token: access_token.as_ref().to_owned(),

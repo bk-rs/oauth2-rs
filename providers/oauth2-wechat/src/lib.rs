@@ -9,7 +9,7 @@ pub use authorization_code_grant::WechatProviderWithWebApplication;
 
 pub mod extensions;
 
-#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
+#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq, Eq)]
 pub enum WechatScope {
     //
     #[serde(rename = "snsapi_login")]

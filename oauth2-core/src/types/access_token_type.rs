@@ -2,7 +2,7 @@
 
 use serde_enum_str::{Deserialize_enum_str, Serialize_enum_str};
 
-#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
+#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq, Eq)]
 pub enum AccessTokenType {
     #[serde(rename = "bearer")]
     #[serde(alias = "Bearer")]

@@ -7,7 +7,7 @@ pub mod authorization_code_grant;
 
 pub use authorization_code_grant::AppleProviderWithAppleJs;
 
-#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq)]
+#[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq, Eq)]
 pub enum AppleScope {
     //
     #[serde(rename = "name")]

@@ -16,7 +16,7 @@ use crate::{
 };
 
 //
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum ProviderExtAuthorizationCodeGrantOidcSupportType {
     No,
     Yes,
@@ -28,7 +28,7 @@ impl Default for ProviderExtAuthorizationCodeGrantOidcSupportType {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum ProviderExtAuthorizationCodeGrantPkceSupportType {
     No,
     Yes,
