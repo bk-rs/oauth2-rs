@@ -1,4 +1,6 @@
 /*
+YOUR_CLIENT_SECRET can generate by https://github.com/bk-rs/apple-rs/blob/main/apple-search-ads-client-secret/cli/src/bin/apple_search_ads_client_secret_gen.rs
+
 RUST_BACKTRACE=1 RUST_LOG=debug cargo run -p oauth2_client_client_credentials_flow_example --bin client_credentials_flow_apple_search_ads_api -- 'YOUR_CLIENT_ID' 'YOUR_CLIENT_SECRET'
 */
 
