@@ -4,6 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [[bin]]
+name = "web_app_flow_axum"
+path = "src/axum.rs"
+
+[[bin]]
 name = "web_app_flow_warp"
 path = "src/warp.rs"
 
@@ -30,15 +34,22 @@ oauth2-okta = { version = "^0.1", path = "../../../providers/oauth2-okta" }
 
 tokio = { version = "1", default-features = false, features = ["macros", "rt-multi-thread"] }
 futures-util = { version = "0.3" }
-async-trait = { version = "0.1" }
 
 
-warp = { version = "0.3", default-features = false, features = ["tls"] }
-warp-sessions = { version = "1.0", default-features = false }
+warp = { version = "0.3", features = ["tls"] }
+warp-sessions = { version = "1.0" }
 
 
-serde = { version = "1.0", default-features = false, features = ["derive"] }
-serde_json = { version = "1.0", default-features = false }
-toml = { version = "0.5", default-features = false }
-pretty_env_logger = { version = "0.4", default-features = false }
-log = { version = "0.4", default-features = false }
+axum = { version = "0.5" }
+axum-server = { version = "0.3", features = ["tls-rustls"] }
+axum-sessions = { version = "0.3" }
+
+
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0" }
+rand = { version = "0.8", features = ["min_const_gen"] }
+
+
+toml = { version = "0.5" }
+pretty_env_logger = { version = "0.4" }
+log = { version = "0.4" }

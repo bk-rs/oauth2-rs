@@ -18,7 +18,7 @@ use oauth2_signin::{
 use warp::{http::Uri, Filter};
 use warp_sessions::{MemoryStore, SessionWithStore};
 
-use oauth2_client_web_app_flow_example::{config::Config, context::Context};
+use oauth2_client_web_app_flow_example::{config::Config, context::Context, helpers::*};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn error::Error>> {
@@ -173,16 +173,4 @@ async fn auth_callback_handler(
     info!("{} {:?}", provider, ret);
 
     Ok((warp::reply::html(format!("{:?}", ret)), session_with_store))
-}
-
-fn state_session_key(provider: &str) -> String {
-    format!("state_{}", provider)
-}
-
-fn nonce_session_key(provider: &str) -> String {
-    format!("nonce_{}", provider)
-}
-
-fn code_verifier_session_key(provider: &str) -> String {
-    format!("code_verifier_{}", provider)
 }
