@@ -21,7 +21,7 @@ pub fn gen_code_challenge(
     let code_challenge = match code_challenge_method {
         CodeChallengeMethod::Sha256 => {
             let digest = Sha256::digest(code_verifier.as_bytes());
-            base64::encode_config(&digest, base64::URL_SAFE_NO_PAD)
+            base64::encode_config(digest, base64::URL_SAFE_NO_PAD)
         }
         CodeChallengeMethod::Plain => code_verifier,
     };
