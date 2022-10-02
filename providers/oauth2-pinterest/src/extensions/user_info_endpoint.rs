@@ -9,8 +9,6 @@ use super::internal_get_user_account_endpoint::{
     GetUserAccountEndpoint, GetUserAccountEndpointError, UserAccount,
 };
 
-pub type IgUserId = u64;
-
 //
 #[derive(Debug, Clone)]
 pub struct PinterestUserInfoEndpoint {

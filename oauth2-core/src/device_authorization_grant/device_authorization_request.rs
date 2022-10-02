@@ -9,6 +9,7 @@ use crate::types::{ClientId, Scope, ScopeFromStrError, ScopeParameter};
 
 pub const METHOD: Method = Method::POST;
 pub const CONTENT_TYPE: Mime = mime::APPLICATION_WWW_FORM_URLENCODED;
+pub const RESPONSE_TYPE: &str = "device_code";
 
 //
 //
