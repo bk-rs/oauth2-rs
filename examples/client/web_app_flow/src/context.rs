@@ -304,8 +304,8 @@ impl Context {
                 IsahcClient::new()?,
                 PinterestProviderWithWebApplication::new(
                     clients_config.pinterest.client_id.to_owned(),
-                    clients_config.pinterest.client_secret.to_owned(),
-                    clients_config.pinterest.redirect_uri.to_owned(),
+                    clients_config.pinterest.client_secret,
+                    clients_config.pinterest.redirect_uri,
                 )?,
                 vec![
                     PinterestScope::BoardsRead,
