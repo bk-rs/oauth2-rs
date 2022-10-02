@@ -140,13 +140,8 @@ impl ProviderExtAuthorizationCodeGrant for WechatProviderWithWebApplication {
             this: &WechatProviderWithWebApplication,
             body: &AccessTokenRequestBody,
         ) -> Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>> {
-            let appid = body
-                .client_id
-                .to_owned()
-                .ok_or(AccessTokenRequestRenderingError::ClientIdMissing)?;
-
             let query = WechatAccessTokenRequestQuery {
-                appid,
+                appid: this.appid.to_owned(),
                 secret: this.secret.to_owned(),
                 code: body.code.to_owned(),
                 grant_type: GRANT_TYPE_WITH_AUTHORIZATION_CODE_GRANT.to_owned(),
@@ -242,8 +237,6 @@ pub struct WechatAccessTokenRequestQuery {
 
 #[derive(thiserror::Error, Debug)]
 pub enum AccessTokenRequestRenderingError {
-    #[error("ClientIdMissing")]
-    ClientIdMissing,
     #[error("SerRequestQueryFailed {0}")]
     SerRequestQueryFailed(SerdeQsError),
     #[error("MakeRequestFailed {0}")]

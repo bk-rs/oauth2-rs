@@ -5,6 +5,7 @@ use oauth2_amazon::{
     AmazonExtensionsBuilder, AmazonProviderWithWebServices, AmazonScope, AmazonTokenUrlRegion,
 };
 use oauth2_apple::AppleProviderWithAppleJs;
+use oauth2_baidu::{BaiduExtensionsBuilder, BaiduProviderWithWebApplication, BaiduScope};
 use oauth2_bitbucket::{
     BitbucketExtensionsBuilder, BitbucketProviderWithWebApplication, BitbucketScope,
 };
@@ -315,6 +316,19 @@ impl Context {
                     PinterestScope::UserAccountsRead,
                 ],
                 PinterestExtensionsBuilder,
+            ),
+        );
+        signin_flow_map.insert(
+            "baidu",
+            SigninFlow::new(
+                IsahcClient::new()?,
+                BaiduProviderWithWebApplication::new(
+                    clients_config.baidu.client_id.to_owned(),
+                    clients_config.baidu.client_secret,
+                    clients_config.baidu.redirect_uri,
+                )?,
+                vec![BaiduScope::Basic, BaiduScope::Netdisk],
+                BaiduExtensionsBuilder,
             ),
         );
 
