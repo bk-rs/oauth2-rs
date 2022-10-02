@@ -34,6 +34,9 @@ use oauth2_microsoft::{
     MicrosoftExtensionsBuilder, MicrosoftProviderForWebApps, MicrosoftScope, TENANT_COMMON,
 };
 use oauth2_okta::{OktaProviderForWebApplication, OktaScope};
+use oauth2_pinterest::{
+    PinterestExtensionsBuilder, PinterestProviderWithWebApplication, PinterestScope,
+};
 use oauth2_signin::{oauth2_client::DefaultExtensionsBuilder, web_app::SigninFlow};
 use oauth2_twitch::{TwitchExtensionsBuilder, TwitchProviderForWebServerApps, TwitchScope};
 use oauth2_yahoo::{YahooExtensionsBuilder, YahooProviderForWebApps, YahooScope};
@@ -293,6 +296,25 @@ impl Context {
                 )?,
                 vec![OktaScope::Openid, OktaScope::Email, OktaScope::Profile],
                 DefaultExtensionsBuilder,
+            ),
+        );
+        signin_flow_map.insert(
+            "pinterest",
+            SigninFlow::new(
+                IsahcClient::new()?,
+                PinterestProviderWithWebApplication::new(
+                    clients_config.pinterest.client_id.to_owned(),
+                    clients_config.pinterest.client_secret.to_owned(),
+                    clients_config.pinterest.redirect_uri.to_owned(),
+                )?,
+                vec![
+                    PinterestScope::BoardsRead,
+                    PinterestScope::BoardsWrite,
+                    PinterestScope::PinsRead,
+                    PinterestScope::PinsWrite,
+                    PinterestScope::UserAccountsRead,
+                ],
+                PinterestExtensionsBuilder,
             ),
         );
 

@@ -4,7 +4,7 @@ Ref [OAuth 2.0 Bearer Token](https://developer.twitter.com/en/docs/authenticatio
 
 ## Prerequisites
 
-1. Create a App
+1. Create a Project then create an App
 
 Ref https://developer.twitter.com/en/docs/apps/app-management
 

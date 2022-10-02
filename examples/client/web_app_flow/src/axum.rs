@@ -106,7 +106,7 @@ async fn auth_handler(
 
     info!("{} authorization_url {}", provider, url.as_str());
 
-    Ok(Redirect::permanent(url.as_str()))
+    Ok(Redirect::temporary(url.as_str()))
 }
 
 async fn auth_callback_handler(
