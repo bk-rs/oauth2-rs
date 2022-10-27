@@ -4,7 +4,7 @@ use oauth2_client::re_exports::{
 };
 use serde_aux::field_attributes::deserialize_number_from_string;
 
-pub const URL: &str = "https://graph.facebook.com/v12.0/me/";
+pub const URL: &str = "https://graph.facebook.com/v15.0/me/";
 
 //
 #[derive(Debug, Clone)]

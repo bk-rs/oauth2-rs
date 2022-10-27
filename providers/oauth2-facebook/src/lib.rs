@@ -1,9 +1,9 @@
 use oauth2_client::re_exports::{Deserialize_enum_str, Scope, Serialize_enum_str};
 
-pub const TOKEN_URL: &str = "https://graph.facebook.com/v12.0/oauth/access_token";
-pub const AUTHORIZATION_URL: &str = "https://www.facebook.com/v12.0/dialog/oauth";
-pub const DEVICE_TOKEN_URL: &str = "https://graph.facebook.com/v12.0/device/login_status";
-pub const DEVICE_AUTHORIZATION_URL: &str = "https://graph.facebook.com/v12.0/device/login";
+pub const TOKEN_URL: &str = "https://graph.facebook.com/v15.0/oauth/access_token";
+pub const AUTHORIZATION_URL: &str = "https://www.facebook.com/v15.0/dialog/oauth";
+pub const DEVICE_TOKEN_URL: &str = "https://graph.facebook.com/v15.0/device/login_status";
+pub const DEVICE_AUTHORIZATION_URL: &str = "https://graph.facebook.com/v15.0/device/login";
 
 pub mod authorization_code_grant;
 pub mod device_authorization_grant;
