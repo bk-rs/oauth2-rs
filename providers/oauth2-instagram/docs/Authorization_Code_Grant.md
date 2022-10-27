@@ -60,3 +60,6 @@ Your Client Secret: (Instagram App Secret)
 
 4. Add an Instagram Test User
 
+## Tips
+
+access_token is short-lived, valid for 1 hour.

@@ -12,7 +12,9 @@ use axum::{
     Router,
 };
 use axum_server::tls_rustls::RustlsConfig;
-use axum_sessions::{async_session::MemoryStore, extractors::WritableSession, SessionLayer};
+use axum_sessions::{
+    async_session::MemoryStore, extractors::WritableSession, SameSite, SessionLayer,
+};
 use futures_util::future;
 use log::info;
 use oauth2_signin::{
@@ -40,7 +42,8 @@ async fn run(config: Config) -> Result<(), Box<dyn error::Error>> {
     //
     let session_store = MemoryStore::new();
     let session_secret = thread_rng().gen::<[u8; 128]>();
-    let session_layer = SessionLayer::new(session_store, &session_secret);
+    let session_layer =
+        SessionLayer::new(session_store, &session_secret).with_same_site_policy(SameSite::Lax);
 
     //
     let app = Router::new()
