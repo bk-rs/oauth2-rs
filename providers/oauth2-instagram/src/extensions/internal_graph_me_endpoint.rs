@@ -3,7 +3,7 @@ use oauth2_client::re_exports::{
     Response, SerdeJsonError, Serialize, MIME_APPLICATION_JSON,
 };
 
-pub const URL: &str = "https://graph.instagram.com/v12.0/me";
+pub const URL: &str = "https://graph.instagram.com/v15.0/me";
 
 //
 #[derive(Debug, Clone)]
