@@ -341,7 +341,11 @@ impl Context {
                     clients_config.twitter.client_secret.to_owned(),
                     clients_config.twitter.redirect_uri,
                 )?,
-                vec![TwitterScope::UsersRead, TwitterScope::TweetRead],
+                vec![
+                    TwitterScope::UsersRead,
+                    TwitterScope::TweetRead,
+                    TwitterScope::OfflineAccess,
+                ],
                 TwitterExtensionsBuilder,
             ),
         );
