@@ -40,6 +40,7 @@ use oauth2_pinterest::{
 };
 use oauth2_signin::{oauth2_client::DefaultExtensionsBuilder, web_app::SigninFlow};
 use oauth2_twitch::{TwitchExtensionsBuilder, TwitchProviderForWebServerApps, TwitchScope};
+use oauth2_twitter::{TwitterExtensionsBuilder, TwitterProviderWithWebApplication, TwitterScope};
 use oauth2_yahoo::{YahooExtensionsBuilder, YahooProviderForWebApps, YahooScope};
 
 use crate::config::Config;
@@ -329,6 +330,19 @@ impl Context {
                 )?,
                 vec![BaiduScope::Basic, BaiduScope::Netdisk],
                 BaiduExtensionsBuilder,
+            ),
+        );
+        signin_flow_map.insert(
+            "twitter",
+            SigninFlow::new(
+                IsahcClient::new()?,
+                TwitterProviderWithWebApplication::new(
+                    clients_config.twitter.client_id.to_owned(),
+                    clients_config.twitter.client_secret.to_owned(),
+                    clients_config.twitter.redirect_uri,
+                )?,
+                vec![TwitterScope::UsersRead, TwitterScope::TweetRead],
+                TwitterExtensionsBuilder,
             ),
         );
 

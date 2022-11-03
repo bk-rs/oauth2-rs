@@ -1,0 +1,7 @@
+{
+    "token_type": "bearer",
+    "expires_in": 7200,
+    "access_token": "x*91",
+    "scope": "tweet.write users.read tweet.read offline.access",
+    "refresh_token": "x*91"
+}

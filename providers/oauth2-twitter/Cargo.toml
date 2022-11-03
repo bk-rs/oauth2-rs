@@ -1,6 +1,6 @@
 [package]
 name = "oauth2-twitter"
-version = "0.0.0"
+version = "0.1.0"
 authors = ["vkill <vkill.net@gmail.com>"]
 edition = "2021"
 description = "OAuth 2.0 Twitter"
@@ -13,3 +13,6 @@ categories = []
 readme = "README.md"
 
 [dependencies]
+oauth2-client = { version = "^0.1", path = "../../oauth2-client", default-features = false }
+serde = { version = "1.0", default-features = false }
+http-authentication = { version = "0.1", default-features = false, features = ["scheme-basic"] }

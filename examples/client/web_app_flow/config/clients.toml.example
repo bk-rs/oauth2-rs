@@ -92,3 +92,8 @@ client_id = "xxx"
 # SecretKey
 client_secret = "xxx"
 redirect_uri = "https://oauth2-rs.lvh.me/auth/baidu/callback"
+
+[twitter]
+client_id = "xxx"
+client_secret = "xxx"
+redirect_uri = "https://oauth2-rs.lvh.me/auth/twitter/callback"
