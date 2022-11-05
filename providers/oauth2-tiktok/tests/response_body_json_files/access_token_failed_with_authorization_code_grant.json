@@ -1,0 +1,9 @@
+{
+    "data": {
+        "captcha": "",
+        "desc_url": "",
+        "description": "Authorization code expired",
+        "error_code": 10007
+    },
+    "message": "error"
+}

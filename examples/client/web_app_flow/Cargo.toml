@@ -34,6 +34,7 @@ oauth2-okta = { version = "^0.1", path = "../../../providers/oauth2-okta" }
 oauth2-pinterest = { version = "^0.1", path = "../../../providers/oauth2-pinterest" }
 oauth2-baidu = { version = "^0.1", path = "../../../providers/oauth2-baidu" }
 oauth2-twitter = { version = "^0.1", path = "../../../providers/oauth2-twitter" }
+oauth2-tiktok = { version = "^0.1", path = "../../../providers/oauth2-tiktok" }
 
 tokio = { version = "1", default-features = false, features = ["macros", "rt-multi-thread"] }
 futures-util = { version = "0.3" }

@@ -1,0 +1,21 @@
+{
+    "data": {
+        "user": {
+            "likes_count": 2,
+            "profile_deep_link": "https://vm.tiktok.com/ZMFDWhf6f/",
+            "union_id": "2fcb3bea-d3db-43a3-b9cc-94843620ec23",
+            "bio_description": "",
+            "display_name": "122755990",
+            "following_count": 8,
+            "is_verified": false,
+            "avatar_url": "https://p16-amd-va.tiktokcdn.com/obj/musically-maliva-obj/1594805258216454",
+            "follower_count": 1,
+            "open_id": "_000fwZ23Mw4RY9cB4lDQyKCgQg4Ft6SyTuE"
+        }
+    },
+    "error": {
+        "code": "ok",
+        "message": "",
+        "log_id": "20221103123341D5B7490A4C2F690195C7"
+    }
+}

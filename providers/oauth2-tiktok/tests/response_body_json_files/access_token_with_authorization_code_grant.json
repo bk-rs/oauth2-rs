@@ -1,0 +1,16 @@
+{
+    "data": {
+        "access_token": "act.x*60!4628",
+        "captcha": "",
+        "desc_url": "",
+        "description": "",
+        "error_code": 0,
+        "expires_in": 86400,
+        "log_id": "202210080258x*22",
+        "open_id": "_000fwZ23Mw4RY9cB4lDQyKCgQg4Ft6SyTuE",
+        "refresh_expires_in": 31536000,
+        "refresh_token": "rft.x*60!4577",
+        "scope": "user.info.basic,video.list"
+    },
+    "message": "success"
+}
