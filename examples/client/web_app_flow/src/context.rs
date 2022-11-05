@@ -39,6 +39,7 @@ use oauth2_pinterest::{
     PinterestExtensionsBuilder, PinterestProviderWithWebApplication, PinterestScope,
 };
 use oauth2_signin::{oauth2_client::DefaultExtensionsBuilder, web_app::SigninFlow};
+use oauth2_tiktok::{TiktokExtensionsBuilder, TiktokProviderWithWebApplication, TiktokScope};
 use oauth2_twitch::{TwitchExtensionsBuilder, TwitchProviderForWebServerApps, TwitchScope};
 use oauth2_twitter::{TwitterExtensionsBuilder, TwitterProviderWithWebApplication, TwitterScope};
 use oauth2_yahoo::{YahooExtensionsBuilder, YahooProviderForWebApps, YahooScope};
@@ -347,6 +348,19 @@ impl Context {
                     TwitterScope::OfflineAccess,
                 ],
                 TwitterExtensionsBuilder,
+            ),
+        );
+        signin_flow_map.insert(
+            "tiktok",
+            SigninFlow::new(
+                IsahcClient::new()?,
+                TiktokProviderWithWebApplication::new(
+                    clients_config.tiktok.client_id.to_owned(),
+                    clients_config.tiktok.client_secret.to_owned(),
+                    clients_config.tiktok.redirect_uri,
+                )?,
+                vec![TiktokScope::UserInfoBasic, TiktokScope::VideoList],
+                TiktokExtensionsBuilder,
             ),
         );
 
