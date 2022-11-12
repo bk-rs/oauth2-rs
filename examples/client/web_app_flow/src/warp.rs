@@ -47,7 +47,7 @@ async fn run(config: Config) -> Result<(), Box<dyn error::Error>> {
 fn filters(
     ctx: Arc<Context>,
     session_store: MemoryStore,
-) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
+) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
     let ctx_t = ctx.clone();
     let session_store_t = session_store.clone();
 
