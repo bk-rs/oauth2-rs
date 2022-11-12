@@ -72,7 +72,7 @@ mod tests {
             Some("your_client_id".to_owned()),
             Some(vec!["email".to_owned(), "profile".to_owned()].into()),
         );
-        match serde_urlencoded::to_string(&body) {
+        match serde_urlencoded::to_string(body) {
             Ok(body_str) => {
                 assert_eq!(body_str, "client_id=your_client_id&scope=email+profile");
             }
