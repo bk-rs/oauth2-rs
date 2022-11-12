@@ -7,7 +7,15 @@ use std::{env, error, io, thread};
 use http_api_isahc_client::IsahcClient;
 use oauth2_client::{authorization_code_grant::Flow, oauth2_core::types::RedirectUri};
 use oauth2_google::{GoogleProviderForDesktopApps, GoogleScope};
-use web_view::{Content, WebViewBuilder};
+use wry::{
+    application::{
+        event::{Event, StartCause, WindowEvent},
+        event_loop::{ControlFlow, EventLoop},
+        platform::unix::EventLoopExtUnix as _,
+        window::WindowBuilder,
+    },
+    webview::WebViewBuilder,
+};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn error::Error>> {
@@ -29,23 +37,39 @@ async fn run(client_id: String, client_secret: String) -> Result<(), Box<dyn err
 
     println!("authorization_url: {:?}", authorization_url.as_str());
 
+    //
+    //
+    //
     thread::spawn(move || {
-        WebViewBuilder::new()
-            .title("OAuth2")
-            .content(Content::Url(authorization_url.as_str()))
-            .size(800, 600)
-            .resizable(true)
-            .debug(false)
-            .user_data(())
-            .invoke_handler(|_webview, _arg| Ok(()))
-            .build()
-            .unwrap()
-            .run()
+        let event_loop: EventLoop<()> = EventLoop::new_any_thread();
+        let window = WindowBuilder::new()
+            .with_title("OAuth2")
+            .build(&event_loop)
             .unwrap();
-    })
-    .join()
-    .unwrap();
+        let _webview = WebViewBuilder::new(window)
+            .unwrap()
+            .with_url(authorization_url.as_str())
+            .unwrap()
+            .build()
+            .unwrap();
 
+        event_loop.run(move |event, _, control_flow| {
+            *control_flow = ControlFlow::Wait;
+
+            match event {
+                Event::NewEvents(StartCause::Init) => {}
+                Event::WindowEvent {
+                    event: WindowEvent::CloseRequested,
+                    ..
+                } => *control_flow = ControlFlow::Exit,
+                _ => (),
+            }
+        });
+    });
+
+    //
+    //
+    //
     println!("Enter code: ");
     let mut code = String::new();
     let stdin = io::stdin();
