@@ -1,0 +1,7 @@
+{
+    "access_token": "1000.x*32.x*32",
+    "scope": "Site24x7.reports.READ Site24x7.reports.CREATE Site24x7.reports.UPDATE Site24x7.reports.DELETE Site24x7.admin.READ Site24x7.admin.CREATE Site24x7.admin.UPDATE Site24x7.admin.DELETE",
+    "api_domain": "https://www.zohoapis.com",
+    "token_type": "Bearer",
+    "expires_in": 3600
+}

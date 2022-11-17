@@ -43,6 +43,9 @@ use oauth2_tiktok::{TiktokExtensionsBuilder, TiktokProviderWithWebApplication, T
 use oauth2_twitch::{TwitchExtensionsBuilder, TwitchProviderForWebServerApps, TwitchScope};
 use oauth2_twitter::{TwitterExtensionsBuilder, TwitterProviderWithWebApplication, TwitterScope};
 use oauth2_yahoo::{YahooExtensionsBuilder, YahooProviderForWebApps, YahooScope};
+use oauth2_zoho::{
+    ZohoProviderForWebServerApps, ZohoProviderForWebServerAppsAccessType, ZohoScope,
+};
 
 use crate::config::Config;
 
@@ -361,6 +364,27 @@ impl Context {
                 )?,
                 vec![TiktokScope::UserInfoBasic, TiktokScope::VideoList],
                 TiktokExtensionsBuilder,
+            ),
+        );
+        signin_flow_map.insert(
+            "zoho",
+            SigninFlow::new(
+                IsahcClient::new()?,
+                ZohoProviderForWebServerApps::new(
+                    clients_config.zoho.client_id.to_owned(),
+                    clients_config.zoho.client_secret.to_owned(),
+                    clients_config.zoho.redirect_uri,
+                )?
+                .configure(|x| {
+                    x.access_type = Some(ZohoProviderForWebServerAppsAccessType::Offline);
+                    x.prompt = Some("consent".into());
+                }),
+                vec![
+                    ZohoScope::Site24x7AccountRead,
+                    ZohoScope::Site24x7AdminAll,
+                    ZohoScope::Site24x7ReportsAll,
+                ],
+                DefaultExtensionsBuilder,
             ),
         );
 

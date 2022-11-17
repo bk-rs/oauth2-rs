@@ -56,6 +56,7 @@ pub struct ClientsConfig {
     pub baidu: ClientConfig,
     pub twitter: ClientConfig,
     pub tiktok: ClientConfig,
+    pub zoho: ClientConfig,
 }
 
 #[derive(Deserialize, Debug, Clone)]
