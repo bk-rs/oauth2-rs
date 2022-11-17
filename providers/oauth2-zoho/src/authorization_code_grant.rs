@@ -82,7 +82,7 @@ impl ProviderExtAuthorizationCodeGrant for ZohoProviderForWebServerApps {
     }
 
     fn scopes_default(&self) -> Option<Vec<<Self as Provider>::Scope>> {
-        None
+        Some(vec![ZohoScope::Email, ZohoScope::AaaServerProfileRead])
     }
 
     fn authorization_endpoint_url(&self) -> &Url {
@@ -178,6 +178,20 @@ mod tests {
         match body_ret {
             Ok(body) => {
                 assert!(body.refresh_token.is_some());
+            }
+            Err(body) => panic!("{:?}", body),
+        }
+
+        //
+        let response_body = include_str!(
+            "../tests/response_body_json_files/access_token_with_authorization_code_grant_and_id_token.json"
+        );
+        let body_ret = AccessTokenEndpoint::new(&provider, "CODE".to_owned())
+            .parse_response(Response::builder().body(response_body.as_bytes().to_vec())?)?;
+
+        match body_ret {
+            Ok(body) => {
+                assert!(body.id_token.is_some());
             }
             Err(body) => panic!("{:?}", body),
         }

@@ -1,0 +1,9 @@
+{
+    "access_token": "1000.x*32.x*32",
+    "refresh_token": "1000.x*32.x*32",
+    "scope": "AaaServer.profile.READ email",
+    "id_token": "x*888",
+    "api_domain": "https://www.zohoapis.com",
+    "token_type": "Bearer",
+    "expires_in": 3600
+}

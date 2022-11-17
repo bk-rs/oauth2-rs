@@ -379,11 +379,7 @@ impl Context {
                     x.access_type = Some(ZohoProviderForWebServerAppsAccessType::Offline);
                     x.prompt = Some("consent".into());
                 }),
-                vec![
-                    ZohoScope::Site24x7AccountRead,
-                    ZohoScope::Site24x7AdminAll,
-                    ZohoScope::Site24x7ReportsAll,
-                ],
+                vec![ZohoScope::Email, ZohoScope::AaaServerProfileRead],
                 DefaultExtensionsBuilder,
             ),
         );
