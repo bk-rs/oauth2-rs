@@ -12,6 +12,10 @@ pub use authorization_code_grant::{
 /// [Ref](https://www.zoho.com/accounts/protocol/oauth-terminology.html)
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq, Eq)]
 pub enum ZohoScope {
+    #[serde(rename = "email")]
+    Email,
+    #[serde(rename = "AAAServer.profile.READ")]
+    AaaServerProfileRead,
     /*
     https://www.site24x7.com/help/api/#authentication
     */
