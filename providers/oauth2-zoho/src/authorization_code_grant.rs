@@ -182,6 +182,9 @@ mod tests {
             Err(body) => panic!("{:?}", body),
         }
 
+        /*
+        When scopes include email or profile
+        */
         //
         let response_body = include_str!(
             "../tests/response_body_json_files/access_token_with_authorization_code_grant_and_id_token.json"

@@ -166,7 +166,7 @@ mod tests {
     }
 
     #[test]
-    fn de() {
+    fn de_and_ser() {
         match serde_json::from_str::<Foo>(r#"{"scope":"a b"}"#) {
             Ok(v) => {
                 assert_eq!(v.scope, vec!["a".to_owned(), "b".to_owned()].into());
@@ -184,6 +184,15 @@ mod tests {
         match serde_json::from_str::<Foo>(r#"{"scope":["a", "b"]}"#) {
             Ok(v) => {
                 assert_eq!(v.scope, vec!["a".to_owned(), "b".to_owned()].into());
+            }
+            Err(err) => panic!("{}", err),
+        }
+
+        match serde_json::to_string(&Foo {
+            scope: vec!["a".to_owned(), "b".to_owned()].into(),
+        }) {
+            Ok(v) => {
+                assert_eq!(v, r#"{"scope":"a b"}"#);
             }
             Err(err) => panic!("{}", err),
         }
