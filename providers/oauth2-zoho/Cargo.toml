@@ -1,6 +1,6 @@
 [package]
 name = "oauth2-zoho"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["vkill <vkill.net@gmail.com>"]
 edition = "2021"
 description = "OAuth 2.0 Zoho"
