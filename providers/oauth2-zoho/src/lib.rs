@@ -9,12 +9,29 @@ pub use authorization_code_grant::{
     ZohoProviderForWebServerApps, ZohoProviderForWebServerAppsAccessType,
 };
 
+pub mod extensions;
+pub use extensions::ZohoExtensionsBuilder;
+
 /// [Ref](https://www.zoho.com/accounts/protocol/oauth-terminology.html)
 #[derive(Deserialize_enum_str, Serialize_enum_str, Debug, Clone, PartialEq, Eq)]
 pub enum ZohoScope {
+    /*
+    https://accounts.zoho.com/.well-known/openid-configuration
+    */
+    // Link with Zoho account
+    #[serde(rename = "openid")]
+    Openid,
+    // Get Your Personal Information
+    #[serde(rename = "profile")]
+    Profile,
+    // Get Email Address associated with your account
     #[serde(rename = "email")]
     Email,
-    #[serde(rename = "AAAServer.profile.READ")]
+    /*
+    https://help.zoho.com/ signin
+    */
+    // Read your basic profile informations
+    #[serde(rename = "AaaServer.profile.READ", alias = "AAAServer.profile.READ")]
     AaaServerProfileRead,
     /*
     https://www.site24x7.com/help/api/#authentication

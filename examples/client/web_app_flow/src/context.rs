@@ -44,7 +44,8 @@ use oauth2_twitch::{TwitchExtensionsBuilder, TwitchProviderForWebServerApps, Twi
 use oauth2_twitter::{TwitterExtensionsBuilder, TwitterProviderWithWebApplication, TwitterScope};
 use oauth2_yahoo::{YahooExtensionsBuilder, YahooProviderForWebApps, YahooScope};
 use oauth2_zoho::{
-    ZohoProviderForWebServerApps, ZohoProviderForWebServerAppsAccessType, ZohoScope,
+    ZohoExtensionsBuilder, ZohoProviderForWebServerApps, ZohoProviderForWebServerAppsAccessType,
+    ZohoScope,
 };
 
 use crate::config::Config;
@@ -379,8 +380,12 @@ impl Context {
                     x.access_type = Some(ZohoProviderForWebServerAppsAccessType::Offline);
                     x.prompt = Some("consent".into());
                 }),
-                vec![ZohoScope::Email, ZohoScope::AaaServerProfileRead],
-                DefaultExtensionsBuilder,
+                vec![
+                    ZohoScope::Email,
+                    ZohoScope::AaaServerProfileRead,
+                    ZohoScope::Site24x7AccountRead,
+                ],
+                ZohoExtensionsBuilder,
             ),
         );
 
