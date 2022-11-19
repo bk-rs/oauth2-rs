@@ -117,11 +117,26 @@ mod tests {
 
     #[test]
     fn de_response_body() {
+        //
         match serde_json::from_str::<OauthUserInfoResponseBodyOkJson>(include_str!(
             "../../tests/response_body_json_files/oauth_user_info.json"
         )) {
-            Ok(body) => {
-                assert_eq!(body.zuid, 795542386);
+            Ok(ok_json) => {
+                assert_eq!(ok_json.zuid, 795542386);
+            }
+            Err(err) => panic!("{}", err),
+        }
+
+        //
+        /*
+        When both AaaServer.profile.READ scope and profile scope are authorized.
+        401
+        */
+        match serde_json::from_str::<OauthUserInfoResponseBodyErrJson>(include_str!(
+            "../../tests/response_body_json_files/oauth_user_info_err.json"
+        )) {
+            Ok(err_json) => {
+                assert_eq!(err_json.cause, "INVALID_OAUTHSCOPE");
             }
             Err(err) => panic!("{}", err),
         }
