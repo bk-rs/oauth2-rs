@@ -84,7 +84,7 @@ mod tests {
             Ok(user_info) => {
                 assert_eq!(user_info.baidu_name, "153*****036");
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 }

@@ -93,7 +93,7 @@ mod tests {
         "#;
         match serde_json::from_str::<SuccessfulBody>(body_str) {
             Ok(_) => {}
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 }

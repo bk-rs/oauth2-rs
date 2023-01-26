@@ -111,7 +111,7 @@ async fn auth_handler(
 
     let url = flow.build_authorization_url(config).unwrap();
 
-    info!("{} authorization_url {}", provider, url.as_str());
+    info!("{provider} authorization_url {}", url.as_str());
 
     Ok((
         warp::redirect::temporary(url.as_str().parse::<Uri>().unwrap()),
@@ -137,7 +137,7 @@ async fn auth_callback_handler(
     session_with_store
         .session
         .remove(state_session_key(&provider).as_str());
-    info!("{} state {:?}", provider, state);
+    info!("{provider} state {state:?}");
     if let Some(state) = state {
         config.set_state(state);
     }
@@ -149,7 +149,7 @@ async fn auth_callback_handler(
         session_with_store
             .session
             .remove(nonce_session_key(&provider).as_str());
-        info!("{} nonce {:?}", provider, nonce);
+        info!("{provider} nonce {nonce:?}");
         if let Some(nonce) = nonce {
             config.set_nonce(nonce);
         }
@@ -162,7 +162,7 @@ async fn auth_callback_handler(
         session_with_store
             .session
             .remove(code_verifier_session_key(&provider).as_str());
-        info!("{} code_verifier {:?}", provider, code_verifier);
+        info!("{provider} code_verifier {code_verifier:?}");
         if let Some(code_verifier) = code_verifier {
             config.set_code_verifier(code_verifier);
         }
@@ -170,7 +170,7 @@ async fn auth_callback_handler(
 
     let ret = flow.handle_callback_by_query(query_raw, config).await;
 
-    info!("{} {:?}", provider, ret);
+    info!("{provider} {ret:?}");
 
-    Ok((warp::reply::html(format!("{:?}", ret)), session_with_store))
+    Ok((warp::reply::html(format!("{ret:?}")), session_with_store))
 }

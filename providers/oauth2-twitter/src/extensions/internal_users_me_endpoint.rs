@@ -84,7 +84,7 @@ pub struct ResponseFailBody {
 
 impl core::fmt::Display for ResponseFailBody {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{:?}", self)
+        write!(f, "{self:?}")
     }
 }
 impl std::error::Error for ResponseFailBody {}
@@ -116,14 +116,14 @@ mod tests {
             Ok(body) => {
                 assert_eq!(body.data.name, "HAWE");
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
 
         match serde_json::from_str::<ResponseFailBody>(include_str!(
             "../../tests/response_body_json_files/users_me_fail.json"
         )) {
             Ok(_) => {}
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 }

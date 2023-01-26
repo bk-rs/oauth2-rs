@@ -25,8 +25,7 @@ impl ClientPassword {
 
     pub fn header_authorization(&self) -> String {
         format!(
-            "{}{}",
-            HEADER_AUTHORIZATION_PREFIX,
+            "{HEADER_AUTHORIZATION_PREFIX}{}",
             base64::encode(format!("{}:{}", self.client_id, self.client_secret))
         )
     }

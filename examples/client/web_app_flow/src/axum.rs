@@ -107,7 +107,7 @@ async fn auth_handler(
 
     let url = flow.build_authorization_url(config).unwrap();
 
-    info!("{} authorization_url {}", provider, url.as_str());
+    info!("{provider} authorization_url {}", url.as_str());
 
     Ok(Redirect::temporary(url.as_str()))
 }
@@ -126,7 +126,7 @@ async fn auth_callback_handler(
 
     let state = session.get::<String>(state_session_key(&provider).as_str());
     session.remove(state_session_key(&provider).as_str());
-    info!("{} state {:?}", provider, state);
+    info!("{provider} state {state:?}");
     if let Some(state) = state {
         config.set_state(state);
     }
@@ -134,7 +134,7 @@ async fn auth_callback_handler(
     if flow.is_oidc_enabled() {
         let nonce = session.get::<String>(nonce_session_key(&provider).as_str());
         session.remove(nonce_session_key(&provider).as_str());
-        info!("{} nonce {:?}", provider, nonce);
+        info!("{provider} nonce {nonce:?}");
         if let Some(nonce) = nonce {
             config.set_nonce(nonce);
         }
@@ -143,7 +143,7 @@ async fn auth_callback_handler(
     if flow.is_pkce_enabled() {
         let code_verifier = session.get::<String>(code_verifier_session_key(&provider).as_str());
         session.remove(code_verifier_session_key(&provider).as_str());
-        info!("{} code_verifier {:?}", provider, code_verifier);
+        info!("{provider} code_verifier {code_verifier:?}");
         if let Some(code_verifier) = code_verifier {
             config.set_code_verifier(code_verifier);
         }
@@ -151,7 +151,7 @@ async fn auth_callback_handler(
 
     let ret = flow.handle_callback_by_query(query_raw, config).await;
 
-    info!("{} {:?}", provider, ret);
+    info!("{provider} {ret:?}");
 
-    Ok(Html(format!("{:?}", ret)))
+    Ok(Html(format!("{ret:?}")))
 }

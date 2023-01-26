@@ -158,7 +158,7 @@ mod tests {
             Ok(query_str) => {
                 assert_eq!(query_str, "response_type=code&client_id=your_client_id&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&scope=email+profile&state=STATE");
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 }

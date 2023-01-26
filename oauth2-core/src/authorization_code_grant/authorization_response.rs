@@ -57,7 +57,7 @@ mod tests {
                 assert_eq!(query.code, "SplxlOBeZQQYbYS6WxSbIA");
                 assert_eq!(query.state, Some("xyz".to_owned()));
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 }

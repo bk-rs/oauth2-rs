@@ -29,12 +29,12 @@ async fn run(app_key: String, secret_key: String) -> Result<(), Box<dyn error::E
             &provider,
             scopes,
             |user_code, verification_uri, _verification_uri_complete| {
-                println!("open [{}] then input [{}]", verification_uri, user_code);
+                println!("open [{verification_uri}] then input [{user_code}]");
             },
         )
         .await?;
 
-    println!("access_token_body: {:?}", access_token_body);
+    println!("access_token_body: {access_token_body:?}");
 
     Ok(())
 }

@@ -187,7 +187,7 @@ mod tests {
             Ok(body) => {
                 assert_eq!(body.expires_in, Some(7200));
             }
-            Err(body) => panic!("{:?}", body),
+            Err(body) => panic!("{body:?}"),
         }
 
         Ok(())

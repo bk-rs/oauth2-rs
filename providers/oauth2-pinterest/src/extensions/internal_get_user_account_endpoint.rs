@@ -79,7 +79,7 @@ mod tests {
             Ok(user) => {
                 assert_eq!(user.username, "xxx");
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 }

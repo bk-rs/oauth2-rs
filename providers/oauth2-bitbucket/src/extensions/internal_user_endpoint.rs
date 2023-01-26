@@ -92,7 +92,7 @@ mod tests {
                     "557058:6096354a-494e-458a-9c38-bc8ef021d382"
                 );
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 }

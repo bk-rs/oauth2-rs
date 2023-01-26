@@ -92,7 +92,7 @@ mod tests {
                     Some(17841403401953170)
                 );
             }
-            Err(body) => panic!("{:?}", body),
+            Err(body) => panic!("{body:?}"),
         }
 
         Ok(())

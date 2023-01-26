@@ -229,7 +229,7 @@ mod tests {
         )?;
 
         match body_ret {
-            Ok(body) => panic!("{:?}", body),
+            Ok(body) => panic!("{body:?}"),
             Err(body) => {
                 assert_eq!(
                     body.error,
@@ -254,7 +254,7 @@ mod tests {
                 let map = body.extra().unwrap();
                 assert!(map.is_empty());
             }
-            Err(body) => panic!("{:?}", body),
+            Err(body) => panic!("{body:?}"),
         }
 
         Ok(())

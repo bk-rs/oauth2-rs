@@ -32,7 +32,7 @@ pub struct FacebookProviderForDevices {
 impl FacebookProviderForDevices {
     pub fn new(app_id: String, client_token: String) -> Result<Self, UrlParseError> {
         Ok(Self {
-            client_access_token: format!("{}|{}", app_id, client_token),
+            client_access_token: format!("{app_id}|{client_token}"),
             redirect_uri: None,
             token_endpoint_url: DEVICE_TOKEN_URL.parse()?,
             device_authorization_endpoint_url: DEVICE_AUTHORIZATION_URL.parse()?,
@@ -388,7 +388,7 @@ mod tests {
             Ok(body) => {
                 assert_eq!(body.device_code, "4c7c240847a4c10bf6850802c51dde1e")
             }
-            Err(body) => panic!("{:?}", body),
+            Err(body) => panic!("{body:?}"),
         }
 
         //
@@ -398,7 +398,7 @@ mod tests {
         let body_ret = endpoint
             .parse_response(Response::builder().body(response_body.as_bytes().to_vec())?)?;
         match body_ret {
-            Ok(body) => panic!("{:?}", body),
+            Ok(body) => panic!("{body:?}"),
             Err(body) => assert_eq!(
                 body.error_description,
                 Some("(#190) This method must be called with a client access token".to_owned())
@@ -464,8 +464,8 @@ mod tests {
                     Some(1644569029)
                 );
             }
-            Ok(Err(body)) => panic!("{:?}", body),
-            Err(reason) => panic!("{:?}", reason),
+            Ok(Err(body)) => panic!("{body:?}"),
+            Err(reason) => panic!("{reason:?}"),
         }
 
         //
@@ -477,8 +477,8 @@ mod tests {
             None,
         )?;
         match body_ret {
-            Ok(Ok(body)) => panic!("{:?}", body),
-            Ok(Err(body)) => panic!("{:?}", body),
+            Ok(Ok(body)) => panic!("{body:?}"),
+            Ok(Err(body)) => panic!("{body:?}"),
             Err(reason) => assert_eq!(
                 reason,
                 DeviceAccessTokenEndpointRetryReason::AuthorizationPending

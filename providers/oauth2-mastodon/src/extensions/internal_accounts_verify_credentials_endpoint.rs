@@ -78,7 +78,7 @@ mod tests {
             Ok(account) => {
                 assert_eq!(account.id, "107241446397110525");
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 }

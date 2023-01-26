@@ -115,7 +115,7 @@ mod tests {
                 let map = body.extra().unwrap();
                 assert!(map.get("created_at").is_some());
             }
-            Err(body) => panic!("{:?}", body),
+            Err(body) => panic!("{body:?}"),
         }
 
         Ok(())

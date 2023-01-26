@@ -80,7 +80,7 @@ mod tests {
             Ok(user) => {
                 assert_eq!(user.id, 610852);
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 }

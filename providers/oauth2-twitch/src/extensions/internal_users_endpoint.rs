@@ -82,7 +82,7 @@ mod tests {
             Ok(users) => {
                 assert_eq!(users.data.len(), 1);
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 }

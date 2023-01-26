@@ -51,7 +51,7 @@ impl From<OauthUserInfoEndpointError> for EndpointRenderRequestError {
                 Self::Other(Box::new(err))
             }
             OauthUserInfoEndpointError::ResponseBodyError(status_code, body) => {
-                Self::Other(format!("status_code:{} body:{:?}", status_code, body).into())
+                Self::Other(format!("status_code:{status_code} body:{body:?}").into())
             }
         }
     }
@@ -64,7 +64,7 @@ impl From<OauthUserInfoEndpointError> for EndpointParseResponseError {
                 Self::DeResponseBodyFailed(err)
             }
             OauthUserInfoEndpointError::ResponseBodyError(status_code, body) => {
-                Self::Other(format!("status_code:{} body:{:?}", status_code, body).into())
+                Self::Other(format!("status_code:{status_code} body:{body:?}").into())
             }
         }
     }

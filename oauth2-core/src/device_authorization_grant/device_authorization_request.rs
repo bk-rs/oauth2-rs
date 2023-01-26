@@ -76,7 +76,7 @@ mod tests {
             Ok(body_str) => {
                 assert_eq!(body_str, "client_id=your_client_id&scope=email+profile");
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 
@@ -91,7 +91,7 @@ mod tests {
                     Some(ScopeParameter(vec!["example_scope".to_owned()]))
                 );
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
 
         let body_str = r"client_id=1406020730";
@@ -100,7 +100,7 @@ mod tests {
                 assert_eq!(body.client_id, Some("1406020730".to_owned()));
                 assert_eq!(body.scope, None);
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 }

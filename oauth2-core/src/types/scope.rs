@@ -151,7 +151,7 @@ pub enum ScopeFromStrError {
 }
 impl fmt::Display for ScopeFromStrError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
+        write!(f, "{self:?}")
     }
 }
 impl error::Error for ScopeFromStrError {}
@@ -171,21 +171,21 @@ mod tests {
             Ok(v) => {
                 assert_eq!(v.scope, vec!["a".to_owned(), "b".to_owned()].into());
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
 
         match serde_json::from_str::<Foo>(r#"{"scope":"a,b"}"#) {
             Ok(v) => {
                 assert_eq!(v.scope, vec!["a".to_owned(), "b".to_owned()].into());
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
 
         match serde_json::from_str::<Foo>(r#"{"scope":["a", "b"]}"#) {
             Ok(v) => {
                 assert_eq!(v.scope, vec!["a".to_owned(), "b".to_owned()].into());
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
 
         match serde_json::to_string(&Foo {
@@ -194,7 +194,7 @@ mod tests {
             Ok(v) => {
                 assert_eq!(v, r#"{"scope":"a b"}"#);
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 }

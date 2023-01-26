@@ -80,11 +80,11 @@ async fn run(client_id: String, client_secret: String) -> Result<(), Box<dyn err
     let stdin = io::stdin();
     stdin.read_line(&mut code)?;
     code = code.trim_end().to_owned();
-    println!("code: {:?}", code);
+    println!("code: {code:?}");
 
     let access_token_body = flow.handle_callback(&provider, code, None).await?;
 
-    println!("access_token_body: {:?}", access_token_body);
+    println!("access_token_body: {access_token_body:?}");
 
     Ok(())
 }

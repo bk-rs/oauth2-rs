@@ -47,7 +47,7 @@ impl fmt::Display for RedirectUri {
             Self::Url(url) => write!(f, "{}", url.as_str()),
             Self::Oob => write!(f, "urn:ietf:wg:oauth:2.0:oob"),
             Self::OobAuto => write!(f, "urn:ietf:wg:oauth:2.0:oob:auto"),
-            Self::Other(s) => write!(f, "{}", s),
+            Self::Other(s) => write!(f, "{s}"),
         }
     }
 }
@@ -115,7 +115,7 @@ mod tests {
             Ok(v) => {
                 assert_eq!(v, r#"{"redirect_uri":"https://client.example.com/cb"}"#);
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
 
         match serde_json::to_string(&Foo {
@@ -124,7 +124,7 @@ mod tests {
             Ok(v) => {
                 assert_eq!(v, r#"{"redirect_uri":"urn:ietf:wg:oauth:2.0:oob"}"#);
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
 
         match serde_json::to_string(&Foo {
@@ -133,7 +133,7 @@ mod tests {
             Ok(v) => {
                 assert_eq!(v, r#"{"redirect_uri":"urn:ietf:wg:oauth:2.0:oob:auto"}"#);
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
 
         match serde_json::to_string(&Foo {
@@ -142,7 +142,7 @@ mod tests {
             Ok(v) => {
                 assert_eq!(v, r#"{"redirect_uri":"com.example.app:redirect_uri_path"}"#);
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 
@@ -155,21 +155,21 @@ mod tests {
                     RedirectUri::Url("https://client.example.com/cb".parse().unwrap())
                 );
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
 
         match serde_json::from_str::<Foo>(r#"{"redirect_uri":"urn:ietf:wg:oauth:2.0:oob"}"#) {
             Ok(v) => {
                 assert_eq!(v.redirect_uri, RedirectUri::Oob);
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
 
         match serde_json::from_str::<Foo>(r#"{"redirect_uri":"urn:ietf:wg:oauth:2.0:oob:auto"}"#) {
             Ok(v) => {
                 assert_eq!(v.redirect_uri, RedirectUri::OobAuto);
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
 
         match serde_json::from_str::<Foo>(r#"{"redirect_uri":"com.example.app:redirect_uri_path"}"#)
@@ -180,7 +180,7 @@ mod tests {
                     RedirectUri::Other("com.example.app:redirect_uri_path".to_owned())
                 );
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 }

@@ -250,13 +250,13 @@ mod tests {
         );
 
         let github_auth_url = map.get("github").unwrap().build_authorization_url(None)?;
-        println!("github_auth_url {}", github_auth_url);
+        println!("github_auth_url {github_auth_url}");
 
         let google_auth_url = map.get("google").unwrap().build_authorization_url(None)?;
-        println!("google_auth_url {}", google_auth_url);
+        println!("google_auth_url {google_auth_url}");
 
         //
-        println!("{:?}", map);
+        println!("{map:?}");
 
         Ok(())
     }

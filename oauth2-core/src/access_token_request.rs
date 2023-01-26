@@ -285,8 +285,8 @@ mod tests_with_authorization_code_grant {
                 );
             }
             #[allow(unreachable_patterns)]
-            Ok(body) => panic!("{:?}", body),
-            Err(err) => panic!("{}", err),
+            Ok(body) => panic!("{body:?}"),
+            Err(err) => panic!("{err}"),
         }
     }
 }
@@ -313,8 +313,8 @@ mod tests_with_device_authorization_grant {
                 );
             }
             #[allow(unreachable_patterns)]
-            Ok(body) => panic!("{:?}", body),
-            Err(err) => panic!("{}", err),
+            Ok(body) => panic!("{body:?}"),
+            Err(err) => panic!("{err}"),
         }
     }
 
@@ -338,8 +338,8 @@ mod tests_with_device_authorization_grant {
                 assert_eq!(body.extra(), Some(&extra));
             }
             #[allow(unreachable_patterns)]
-            Ok(body) => panic!("{:?}", body),
-            Err(err) => panic!("{}", err),
+            Ok(body) => panic!("{body:?}"),
+            Err(err) => panic!("{err}"),
         }
     }
 }
@@ -356,8 +356,8 @@ mod tests_with_client_credentials_grant {
                 assert_eq!(body.client_password, None);
             }
             #[allow(unreachable_patterns)]
-            Ok(body) => panic!("{:?}", body),
-            Err(err) => panic!("{}", err),
+            Ok(body) => panic!("{body:?}"),
+            Err(err) => panic!("{err}"),
         }
 
         let body_str =
@@ -367,8 +367,8 @@ mod tests_with_client_credentials_grant {
                 assert_eq!(body.client_password.unwrap().client_id, "CLIENT_ID");
             }
             #[allow(unreachable_patterns)]
-            Ok(body) => panic!("{:?}", body),
-            Err(err) => panic!("{}", err),
+            Ok(body) => panic!("{body:?}"),
+            Err(err) => panic!("{err}"),
         }
 
         let body_str = "grant_type=client_credentials&client_id=CLIENT_ID";
@@ -377,8 +377,8 @@ mod tests_with_client_credentials_grant {
                 assert_eq!(body.client_password, None);
             }
             #[allow(unreachable_patterns)]
-            Ok(body) => panic!("{:?}", body),
-            Err(err) => panic!("{}", err),
+            Ok(body) => panic!("{body:?}"),
+            Err(err) => panic!("{err}"),
         }
     }
 
@@ -394,8 +394,8 @@ mod tests_with_client_credentials_grant {
                 )
             }
             #[allow(unreachable_patterns)]
-            Ok(body) => panic!("{:?}", body),
-            Err(err) => panic!("{}", err),
+            Ok(body) => panic!("{body:?}"),
+            Err(err) => panic!("{err}"),
         }
 
         let body_str =
@@ -412,8 +412,8 @@ mod tests_with_client_credentials_grant {
                 )
             }
             #[allow(unreachable_patterns)]
-            Ok(body) => panic!("{:?}", body),
-            Err(err) => panic!("{}", err),
+            Ok(body) => panic!("{body:?}"),
+            Err(err) => panic!("{err}"),
         }
     }
 }
@@ -432,8 +432,8 @@ mod tests_with_resource_owner_password_credentials_grant {
                 assert_eq!(body.client_password, None);
             }
             #[allow(unreachable_patterns)]
-            Ok(body) => panic!("{:?}", body),
-            Err(err) => panic!("{}", err),
+            Ok(body) => panic!("{body:?}"),
+            Err(err) => panic!("{err}"),
         }
 
         let body_str =
@@ -445,8 +445,8 @@ mod tests_with_resource_owner_password_credentials_grant {
                 assert_eq!(body.client_password.unwrap().client_id, "CLIENT_ID");
             }
             #[allow(unreachable_patterns)]
-            Ok(body) => panic!("{:?}", body),
-            Err(err) => panic!("{}", err),
+            Ok(body) => panic!("{body:?}"),
+            Err(err) => panic!("{err}"),
         }
 
         let body_str =
@@ -458,8 +458,8 @@ mod tests_with_resource_owner_password_credentials_grant {
                 assert_eq!(body.client_password, None);
             }
             #[allow(unreachable_patterns)]
-            Ok(body) => panic!("{:?}", body),
-            Err(err) => panic!("{}", err),
+            Ok(body) => panic!("{body:?}"),
+            Err(err) => panic!("{err}"),
         }
     }
 }

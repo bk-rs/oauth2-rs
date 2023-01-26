@@ -225,7 +225,7 @@ mod tests {
             Ok(body) => {
                 assert_eq!(body.error, ErrorBodyError::InvalidScope);
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 }
@@ -245,7 +245,7 @@ mod tests_with_authorization_code_grant {
             Ok(body) => {
                 assert_eq!(body.error, ErrorBodyError::AuthorizationPending);
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 }

@@ -101,7 +101,7 @@ mod tests {
                     "dbid:AADMB_j_i3y-F9qhVBv68H3eRnzSJ3bZ9Nw"
                 );
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 }

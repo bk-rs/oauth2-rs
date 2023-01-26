@@ -130,7 +130,7 @@ mod tests {
             Ok(body) => {
                 assert!(body.id_token.is_some());
             }
-            Err(body) => panic!("{:?}", body),
+            Err(body) => panic!("{body:?}"),
         }
 
         Ok(())

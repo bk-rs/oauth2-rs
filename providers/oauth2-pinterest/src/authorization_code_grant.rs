@@ -201,7 +201,7 @@ mod tests {
                     Some(31536000)
                 );
             }
-            Err(body) => panic!("{:?}", body),
+            Err(body) => panic!("{body:?}"),
         }
 
         Ok(())

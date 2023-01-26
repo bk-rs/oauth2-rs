@@ -135,14 +135,14 @@ mod tests {
             None,
         )?;
         match body_ret {
-            Ok(Ok(body)) => panic!("{:?}", body),
+            Ok(Ok(body)) => panic!("{body:?}"),
             Ok(Err(body)) => {
                 assert_eq!(
                     body.error,
                     AccessTokenResponseErrorBodyError::UnsupportedGrantType
                 );
             }
-            Err(reason) => panic!("{:?}", reason),
+            Err(reason) => panic!("{reason:?}"),
         }
 
         Ok(())

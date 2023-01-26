@@ -75,7 +75,7 @@ mod tests {
             Ok(user) => {
                 assert_eq!(user.user_id, "amzn1.account.AGH4ZOFGBUJ5KSAFB5DVL5KTBU3Q");
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 }

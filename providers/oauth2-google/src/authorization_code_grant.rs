@@ -221,9 +221,9 @@ mod tests {
             "CLIENT_SECRET".to_owned(),
             RedirectUri::Oob,
         ) {
-            Ok(p) => panic!("{:?}", p),
+            Ok(p) => panic!("{p:?}"),
             Err(GoogleProviderForWebServerAppsNewError::RedirectUriShouldBeAUrl) => {}
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 
@@ -281,7 +281,7 @@ mod tests {
             Ok(body) => {
                 assert!(body.id_token.is_some());
             }
-            Err(body) => panic!("{:?}", body),
+            Err(body) => panic!("{body:?}"),
         }
 
         Ok(())

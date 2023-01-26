@@ -26,7 +26,7 @@ async fn run(client_id: String, client_secret: String) -> Result<(), Box<dyn err
 
     let access_token_body = flow.execute(&provider, None).await?;
 
-    println!("access_token_body: {:?}", access_token_body);
+    println!("access_token_body: {access_token_body:?}");
 
     Ok(())
 }

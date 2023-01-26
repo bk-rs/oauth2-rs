@@ -76,7 +76,7 @@ mod tests {
             Ok(user_info) => {
                 assert_eq!(user_info.sub, "110578243643543721809");
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 }

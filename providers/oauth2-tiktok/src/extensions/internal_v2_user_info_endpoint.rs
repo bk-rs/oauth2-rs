@@ -90,7 +90,7 @@ pub struct ErrorObject {
 
 impl core::fmt::Display for ErrorObject {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{:?}", self)
+        write!(f, "{self:?}")
     }
 }
 impl std::error::Error for ErrorObject {}
@@ -131,7 +131,7 @@ mod tests {
                     Some("122755990")
                 );
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 }

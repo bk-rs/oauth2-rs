@@ -117,7 +117,7 @@ mod tests {
 
         match body_ret {
             Ok(_body) => {}
-            Err(body) => panic!("{:?}", body),
+            Err(body) => panic!("{body:?}"),
         }
 
         Ok(())

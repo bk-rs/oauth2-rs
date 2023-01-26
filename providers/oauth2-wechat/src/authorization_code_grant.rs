@@ -381,7 +381,7 @@ mod tests {
                 let map = body.extra().unwrap();
                 assert_eq!(map.get("openid").unwrap(), "OPENID");
             }
-            Err(body) => panic!("{:?}", body),
+            Err(body) => panic!("{body:?}"),
         }
 
         Ok(())

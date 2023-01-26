@@ -80,7 +80,7 @@ mod tests {
             Ok(user) => {
                 assert_eq!(user.sub, "AEANXXOAYYOLN3FHPELPUHNLOE");
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 }

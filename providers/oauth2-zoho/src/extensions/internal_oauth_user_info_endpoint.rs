@@ -93,7 +93,7 @@ pub struct OauthUserInfoResponseBodyErrJson {
 
 impl core::fmt::Display for OauthUserInfoResponseBodyErrJson {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{:?}", self)
+        write!(f, "{self:?}")
     }
 }
 impl std::error::Error for OauthUserInfoResponseBodyErrJson {}
@@ -124,7 +124,7 @@ mod tests {
             Ok(ok_json) => {
                 assert_eq!(ok_json.zuid, 795542386);
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
 
         //
@@ -138,7 +138,7 @@ mod tests {
             Ok(err_json) => {
                 assert_eq!(err_json.cause, "INVALID_OAUTHSCOPE");
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => panic!("{err}"),
         }
     }
 }

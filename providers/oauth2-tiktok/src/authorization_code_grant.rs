@@ -321,7 +321,7 @@ mod tests {
                     Some("_000fwZ23Mw4RY9cB4lDQyKCgQg4Ft6SyTuE")
                 );
             }
-            Err(body) => panic!("{:?}", body),
+            Err(body) => panic!("{body:?}"),
         }
 
         //
@@ -333,7 +333,7 @@ mod tests {
 
         match body_ret {
             Ok(body) => {
-                panic!("{:?}", body)
+                panic!("{body:?}")
             }
             Err(body) => assert_eq!(body.error.to_string(), "10007"),
         }
