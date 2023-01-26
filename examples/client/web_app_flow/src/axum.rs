@@ -6,7 +6,7 @@ use core::convert::Infallible;
 use std::{error, sync::Arc};
 
 use axum::{
-    extract::{Extension, Path, RawQuery},
+    extract::{Path, RawQuery, State},
     response::{Html, Redirect},
     routing::get,
     Router,
@@ -42,15 +42,16 @@ async fn run(config: Config) -> Result<(), Box<dyn error::Error>> {
     //
     let session_store = MemoryStore::new();
     let session_secret = thread_rng().gen::<[u8; 128]>();
-    let session_layer =
-        SessionLayer::new(session_store, &session_secret).with_same_site_policy(SameSite::Lax);
+    let session_layer = SessionLayer::new(session_store, &session_secret)
+        .with_same_site_policy(SameSite::Lax)
+        .with_secure(false);
 
     //
     let app = Router::new()
         .route("/auth/:provider", get(auth_handler))
         .route("/auth/:provider/callback", get(auth_callback_handler))
-        .layer(Extension(ctx.clone()))
-        .layer(session_layer.clone());
+        .layer(session_layer.clone())
+        .with_state(ctx.clone());
 
     //
     let server_http =
@@ -72,7 +73,7 @@ async fn run(config: Config) -> Result<(), Box<dyn error::Error>> {
 
 async fn auth_handler(
     Path(provider): Path<String>,
-    Extension(ctx): Extension<Arc<Context>>,
+    State(ctx): State<Arc<Context>>,
     mut session: WritableSession,
 ) -> Result<Redirect, Infallible> {
     let flow = ctx.signin_flow_map.get(provider.as_str()).unwrap();
@@ -115,7 +116,7 @@ async fn auth_handler(
 async fn auth_callback_handler(
     Path(provider): Path<String>,
     RawQuery(query_raw): RawQuery,
-    Extension(ctx): Extension<Arc<Context>>,
+    State(ctx): State<Arc<Context>>,
     mut session: WritableSession,
 ) -> Result<Html<String>, Infallible> {
     let query_raw = query_raw.unwrap();
