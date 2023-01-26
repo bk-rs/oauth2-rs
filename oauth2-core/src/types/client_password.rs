@@ -2,6 +2,7 @@
 
 use std::str;
 
+use base64::{engine::general_purpose, Engine as _};
 use serde::{Deserialize, Serialize};
 
 use crate::types::{ClientId, ClientSecret};
@@ -26,7 +27,7 @@ impl ClientPassword {
     pub fn header_authorization(&self) -> String {
         format!(
             "{HEADER_AUTHORIZATION_PREFIX}{}",
-            base64::encode(format!("{}:{}", self.client_id, self.client_secret))
+            general_purpose::STANDARD.encode(format!("{}:{}", self.client_id, self.client_secret))
         )
     }
 
@@ -37,8 +38,9 @@ impl ClientPassword {
             return Err("Missing prefix");
         }
 
-        let bytes =
-            base64::decode(&s[HEADER_AUTHORIZATION_PREFIX.len()..][..]).map_err(|_| "Invalid")?;
+        let bytes = general_purpose::STANDARD
+            .decode(&s[HEADER_AUTHORIZATION_PREFIX.len()..][..])
+            .map_err(|_| "Invalid")?;
         let s = str::from_utf8(&bytes).map_err(|_| "Invalid")?;
 
         let mut s = s.split(':');

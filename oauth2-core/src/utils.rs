@@ -1,3 +1,4 @@
+use base64::{engine::general_purpose, Engine as _};
 use sha2::{Digest as _, Sha256};
 
 use crate::types::{
@@ -21,7 +22,7 @@ pub fn gen_code_challenge(
     let code_challenge = match code_challenge_method {
         CodeChallengeMethod::Sha256 => {
             let digest = Sha256::digest(code_verifier.as_bytes());
-            base64::encode_config(digest, base64::URL_SAFE_NO_PAD)
+            general_purpose::URL_SAFE_NO_PAD.encode(digest)
         }
         CodeChallengeMethod::Plain => code_verifier,
     };

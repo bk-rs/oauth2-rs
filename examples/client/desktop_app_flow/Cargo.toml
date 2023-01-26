@@ -20,6 +20,6 @@ oauth2-google = { version = "^0.1", path = "../../../providers/oauth2-google" }
 tokio = { version = "1", default-features = false, features = ["macros", "rt-multi-thread"] }
 http-api-isahc-client = { version = "0.2", features = ["with-sleep-via-tokio"] }
 
-wry = { version = "0.22" }
+wry = { version = "0.24" }
 
 pretty_env_logger = { version = "0.4" }

@@ -45,9 +45,9 @@ warp = { version = "0.3", features = ["tls"] }
 warp-sessions = { version = "1" }
 
 
-axum = { version = "0.5" }
+axum = { version = "0.6" }
 axum-server = { version = "0.4", features = ["tls-rustls"] }
-axum-sessions = { version = "0.3" }
+axum-sessions = { version = "0.4" }
 
 
 serde = { version = "1", features = ["derive"] }
@@ -55,6 +55,6 @@ serde_json = { version = "1" }
 rand = { version = "0.8", features = ["min_const_gen"] }
 
 
-toml = { version = "0.5" }
+toml = { version = "0.6" }
 pretty_env_logger = { version = "0.4" }
 log = { version = "0.4" }
