@@ -1,0 +1,8 @@
+{
+    "access_token": "x*64",
+    "expires_in": 7200,
+    "refresh_token": "x*64",
+    "scope": "account:read_only linodes:read_only",
+    "scopes": "account:read_only linodes:read_only",
+    "token_type": "bearer"
+}

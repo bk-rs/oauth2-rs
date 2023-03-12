@@ -35,4 +35,5 @@ xdg-open https://oauth2-rs.lvh.me/auth/baidu
 xdg-open https://oauth2-rs.lvh.me/auth/twitter
 xdg-open https://oauth2-rs.lvh.me/auth/tiktok
 xdg-open http://oauth2-rs.lvh.me/auth/zoho
+xdg-open https://oauth2-rs.lvh.me/auth/linode
 ```

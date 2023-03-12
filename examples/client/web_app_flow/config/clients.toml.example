@@ -109,3 +109,8 @@ redirect_uri = "https://oauth2-rs.lvh.me/auth/tiktok/callback"
 client_id = "xxx"
 client_secret = "xxx"
 redirect_uri = "http://oauth2-rs.lvh.me/auth/zoho/callback"
+
+[linode]
+client_id = "xxx"
+client_secret = "xxx"
+redirect_uri = "https://oauth2-rs.lvh.me/auth/linode/callback"

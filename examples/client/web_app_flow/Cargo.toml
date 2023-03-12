@@ -36,6 +36,7 @@ oauth2-baidu = { version = "0.1", path = "../../../providers/oauth2-baidu" }
 oauth2-twitter = { version = "0.1", path = "../../../providers/oauth2-twitter" }
 oauth2-tiktok = { version = "0.1", path = "../../../providers/oauth2-tiktok" }
 oauth2-zoho = { version = "0.1", path = "../../../providers/oauth2-zoho" }
+oauth2-linode = { version = "0.1", path = "../../../providers/oauth2-linode" }
 
 tokio = { version = "1", default-features = false, features = ["macros", "rt-multi-thread"] }
 futures-util = { version = "0.3" }

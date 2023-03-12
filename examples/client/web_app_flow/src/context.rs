@@ -28,6 +28,7 @@ use oauth2_instagram::{
 use oauth2_linkedin::{
     LinkedinExtensionsBuilder, LinkedinProviderWithWebApplication, LinkedinScope,
 };
+use oauth2_linode::{LinodeExtensionsBuilder, LinodeProviderWithWebApplication, LinodeScope};
 use oauth2_mastodon::{
     MastodonExtensionsBuilder, MastodonProviderForEndUsers, MastodonScope, BASE_URL_MASTODON_SOCIAL,
 };
@@ -386,6 +387,19 @@ impl Context {
                     ZohoScope::Site24x7AccountRead,
                 ],
                 ZohoExtensionsBuilder,
+            ),
+        );
+        signin_flow_map.insert(
+            "linode",
+            SigninFlow::new(
+                IsahcClient::new()?,
+                LinodeProviderWithWebApplication::new(
+                    clients_config.linode.client_id.to_owned(),
+                    clients_config.linode.client_secret.to_owned(),
+                    clients_config.linode.redirect_uri,
+                )?,
+                vec![LinodeScope::AccountReadOnly, LinodeScope::LinodesReadOnly],
+                LinodeExtensionsBuilder,
             ),
         );
 

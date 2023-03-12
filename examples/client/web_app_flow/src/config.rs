@@ -57,6 +57,7 @@ pub struct ClientsConfig {
     pub twitter: ClientConfig,
     pub tiktok: ClientConfig,
     pub zoho: ClientConfig,
+    pub linode: ClientConfig,
 }
 
 #[derive(Deserialize, Debug, Clone)]
