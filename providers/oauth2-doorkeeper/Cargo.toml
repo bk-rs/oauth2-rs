@@ -13,4 +13,4 @@ categories = []
 readme = "README.md"
 
 [dependencies]
-oauth2-client = { version = "^0.1", path = "../../oauth2-client", default-features = false }
+oauth2-client = { version = "0.1", path = "../../oauth2-client", default-features = false }

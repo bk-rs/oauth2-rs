@@ -13,6 +13,6 @@ categories = []
 readme = "README.md"
 
 [dependencies]
-oauth2-client = { version = "^0.1", path = "../../oauth2-client", default-features = false }
+oauth2-client = { version = "0.1", path = "../../oauth2-client", default-features = false }
 serde = { version = "1", default-features = false }
 serde-aux = { version = "4", default-features = false }

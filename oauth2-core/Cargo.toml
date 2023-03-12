@@ -25,7 +25,7 @@ mime = { version = "0.3", default-features = false }
 serde = { version = "1", default-features = false, features = ["std", "derive"] }
 serde-enum-str = { version = "0.3", default-features = false }
 serde_json = { version = "1", default-features = false, features = ["std"] }
-url = { version = "2.3", default-features = false, features = ["serde"] }
+url = { version = "2", default-features = false, features = ["serde"] }
 
 base64 = { version = "0.21", default-features = false, features = ["std"] }
 sha2 = { version = "0.10", default-features = false }
@@ -33,7 +33,7 @@ sha2 = { version = "0.10", default-features = false }
 [dev-dependencies]
 serde_json = { version = "1" }
 serde_urlencoded = { version = "0.7" }
-serde_qs = { version = "0.11" }
+serde_qs = { version = "0.12" }
 
 [package.metadata.cargo-all-features]
 skip_optional_dependencies = true

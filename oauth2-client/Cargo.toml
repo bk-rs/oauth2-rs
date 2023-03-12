@@ -21,14 +21,14 @@ default = ["with-flow"]
 with-flow = ["http-api-client"]
 
 [dependencies]
-oauth2-core = { version = "^0.1", path = "../oauth2-core" }
+oauth2-core = { version = "0.1", path = "../oauth2-core" }
 
 http-api-client-endpoint = { version = "0.2", default-features = false }
 http-api-client = { version = "0.2", default-features = false, optional = true }
 
 serde_json = { version = "1", default-features = false, features = ["std"] }
 serde_urlencoded = { version = "0.7", default-features = false }
-serde_qs = { version = "0.11", default-features = false }
+serde_qs = { version = "0.12", default-features = false }
 
 rand = { version = "0.8", default-features = false, features = ["std", "std_rng"] }
 thiserror = { version = "1", default-features = false }

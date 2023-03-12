@@ -12,30 +12,30 @@ name = "web_app_flow_warp"
 path = "src/warp.rs"
 
 [dependencies]
-oauth2-signin = { version = "^0.1", path = "../../../oauth2-signin" }
+oauth2-signin = { version = "0.1", path = "../../../oauth2-signin" }
 http-api-isahc-client = { version = "0.2" }
 
-oauth2-github = { version = "^0.1", path = "../../../providers/oauth2-github" }
-oauth2-google = { version = "^0.1", path = "../../../providers/oauth2-google" }
-oauth2-twitch = { version = "^0.1", path = "../../../providers/oauth2-twitch" }
-oauth2-mastodon = { version = "^0.1", path = "../../../providers/oauth2-mastodon" }
-oauth2-apple = { version = "^0.1", path = "../../../providers/oauth2-apple" }
-oauth2-instagram = { version = "^0.1", path = "../../../providers/oauth2-instagram" }
-oauth2-facebook = { version = "^0.1", path = "../../../providers/oauth2-facebook" }
-oauth2-amazon = { version = "^0.1", path = "../../../providers/oauth2-amazon" }
-oauth2-gitlab = { version = "^0.1", path = "../../../providers/oauth2-gitlab" }
-oauth2-bitbucket = { version = "^0.1", path = "../../../providers/oauth2-bitbucket" }
-oauth2-digitalocean = { version = "^0.1", path = "../../../providers/oauth2-digitalocean" }
-oauth2-dropbox = { version = "^0.1", path = "../../../providers/oauth2-dropbox" }
-oauth2-linkedin = { version = "^0.1", path = "../../../providers/oauth2-linkedin" }
-oauth2-microsoft = { version = "^0.1", path = "../../../providers/oauth2-microsoft" }
-oauth2-yahoo = { version = "^0.1", path = "../../../providers/oauth2-yahoo" }
-oauth2-okta = { version = "^0.1", path = "../../../providers/oauth2-okta" }
-oauth2-pinterest = { version = "^0.1", path = "../../../providers/oauth2-pinterest" }
-oauth2-baidu = { version = "^0.1", path = "../../../providers/oauth2-baidu" }
-oauth2-twitter = { version = "^0.1", path = "../../../providers/oauth2-twitter" }
-oauth2-tiktok = { version = "^0.1", path = "../../../providers/oauth2-tiktok" }
-oauth2-zoho = { version = "^0.1", path = "../../../providers/oauth2-zoho" }
+oauth2-github = { version = "0.1", path = "../../../providers/oauth2-github" }
+oauth2-google = { version = "0.1", path = "../../../providers/oauth2-google" }
+oauth2-twitch = { version = "0.1", path = "../../../providers/oauth2-twitch" }
+oauth2-mastodon = { version = "0.1", path = "../../../providers/oauth2-mastodon" }
+oauth2-apple = { version = "0.1", path = "../../../providers/oauth2-apple" }
+oauth2-instagram = { version = "0.1", path = "../../../providers/oauth2-instagram" }
+oauth2-facebook = { version = "0.1", path = "../../../providers/oauth2-facebook" }
+oauth2-amazon = { version = "0.1", path = "../../../providers/oauth2-amazon" }
+oauth2-gitlab = { version = "0.1", path = "../../../providers/oauth2-gitlab" }
+oauth2-bitbucket = { version = "0.1", path = "../../../providers/oauth2-bitbucket" }
+oauth2-digitalocean = { version = "0.1", path = "../../../providers/oauth2-digitalocean" }
+oauth2-dropbox = { version = "0.1", path = "../../../providers/oauth2-dropbox" }
+oauth2-linkedin = { version = "0.1", path = "../../../providers/oauth2-linkedin" }
+oauth2-microsoft = { version = "0.1", path = "../../../providers/oauth2-microsoft" }
+oauth2-yahoo = { version = "0.1", path = "../../../providers/oauth2-yahoo" }
+oauth2-okta = { version = "0.1", path = "../../../providers/oauth2-okta" }
+oauth2-pinterest = { version = "0.1", path = "../../../providers/oauth2-pinterest" }
+oauth2-baidu = { version = "0.1", path = "../../../providers/oauth2-baidu" }
+oauth2-twitter = { version = "0.1", path = "../../../providers/oauth2-twitter" }
+oauth2-tiktok = { version = "0.1", path = "../../../providers/oauth2-tiktok" }
+oauth2-zoho = { version = "0.1", path = "../../../providers/oauth2-zoho" }
 
 tokio = { version = "1", default-features = false, features = ["macros", "rt-multi-thread"] }
 futures-util = { version = "0.3" }
@@ -55,6 +55,6 @@ serde_json = { version = "1" }
 rand = { version = "0.8", features = ["min_const_gen"] }
 
 
-toml = { version = "0.6" }
+toml = { version = "0.7" }
 pretty_env_logger = { version = "0.4" }
 log = { version = "0.4" }

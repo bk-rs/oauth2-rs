@@ -12,10 +12,10 @@ name = "desktop_app_flow_google"
 path = "src/google.rs"
 
 [dependencies]
-oauth2-client = { version = "^0.1", path = "../../../oauth2-client", features = ["with-flow"] }
+oauth2-client = { version = "0.1", path = "../../../oauth2-client", features = ["with-flow"] }
 
-oauth2-mastodon = { version = "^0.1", path = "../../../providers/oauth2-mastodon" }
-oauth2-google = { version = "^0.1", path = "../../../providers/oauth2-google" }
+oauth2-mastodon = { version = "0.1", path = "../../../providers/oauth2-mastodon" }
+oauth2-google = { version = "0.1", path = "../../../providers/oauth2-google" }
 
 tokio = { version = "1", default-features = false, features = ["macros", "rt-multi-thread"] }
 http-api-isahc-client = { version = "0.2", features = ["with-sleep-via-tokio"] }

@@ -13,13 +13,13 @@ categories = []
 readme = "README.md"
 
 [dependencies]
-oauth2-client = { version = "^0.1", path = "../oauth2-client", default-features = false, features = [
+oauth2-client = { version = "0.1", path = "../oauth2-client", default-features = false, features = [
     "with-flow",
 ] }
 
 [dev-dependencies]
-oauth2-github = { version = "^0.1", path = "../providers/oauth2-github" }
-oauth2-google = { version = "^0.1", path = "../providers/oauth2-google" }
+oauth2-github = { version = "0.1", path = "../providers/oauth2-github" }
+oauth2-google = { version = "0.1", path = "../providers/oauth2-google" }
 
 http-api-isahc-client = { version = "0.2", default-features = false }
 
