@@ -1,10 +1,6 @@
 //! https://datatracker.ietf.org/doc/html/rfc6749#section-3.3
 
-use std::{
-    cmp, error, fmt,
-    marker::PhantomData,
-    str::{self, FromStr as _},
-};
+use core::{marker::PhantomData, str::FromStr};
 
 use serde::{
     de::{self, SeqAccess, Visitor},
@@ -16,7 +12,7 @@ pub const SCOPE_PARAMETER_DELIMITATION: char = ' ';
 pub const SCOPE_OPENID: &str = "openid";
 
 //
-pub trait Scope: str::FromStr + ToString + fmt::Debug + Clone + cmp::PartialEq {}
+pub trait Scope: FromStr + ToString + core::fmt::Debug + Clone + core::cmp::PartialEq {}
 
 impl Scope for String {}
 
@@ -30,7 +26,7 @@ impl<T> From<Vec<T>> for ScopeParameter<T> {
     }
 }
 
-impl<T> str::FromStr for ScopeParameter<T>
+impl<T> FromStr for ScopeParameter<T>
 where
     T: Scope,
 {
@@ -154,7 +150,7 @@ impl core::fmt::Display for ScopeFromStrError {
         write!(f, "{self:?}")
     }
 }
-impl error::Error for ScopeFromStrError {}
+impl std::error::Error for ScopeFromStrError {}
 
 #[cfg(test)]
 mod tests {

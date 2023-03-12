@@ -1,7 +1,5 @@
 //! https://datatracker.ietf.org/doc/html/rfc6749#section-2.3.1
 
-use std::str;
-
 use base64::{engine::general_purpose, Engine as _};
 use serde::{Deserialize, Serialize};
 
@@ -41,7 +39,7 @@ impl ClientPassword {
         let bytes = general_purpose::STANDARD
             .decode(&s[HEADER_AUTHORIZATION_PREFIX.len()..][..])
             .map_err(|_| "Invalid")?;
-        let s = str::from_utf8(&bytes).map_err(|_| "Invalid")?;
+        let s = core::str::from_utf8(&bytes).map_err(|_| "Invalid")?;
 
         let mut s = s.split(':');
         let client_id = s.next().ok_or("Missing client_id")?.to_owned();
