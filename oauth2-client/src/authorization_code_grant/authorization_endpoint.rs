@@ -1,4 +1,4 @@
-use std::{convert::Infallible, error};
+use std::convert::Infallible;
 
 use http_api_client_endpoint::{Body, Endpoint, Request, Response};
 use oauth2_core::{
@@ -144,7 +144,7 @@ pub enum AuthorizationEndpointError {
     ClientIdMissing,
     //
     #[error("CustomSerRequestQueryFailed {0}")]
-    CustomSerRequestQueryFailed(Box<dyn error::Error + Send + Sync>),
+    CustomSerRequestQueryFailed(Box<dyn std::error::Error + Send + Sync>),
     //
     #[error("SerRequestQueryFailed {0}")]
     SerRequestQueryFailed(SerdeQsError),

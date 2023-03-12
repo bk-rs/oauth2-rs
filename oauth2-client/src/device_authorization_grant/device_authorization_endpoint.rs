@@ -1,5 +1,3 @@
-use std::error;
-
 use http_api_client_endpoint::{Body, Endpoint, Request, Response};
 use oauth2_core::{
     access_token_response::GENERAL_ERROR_BODY_KEY_ERROR,
@@ -122,7 +120,7 @@ where
 #[derive(thiserror::Error, Debug)]
 pub enum DeviceAuthorizationEndpointError {
     #[error("CustomRenderingRequestFailed {0}")]
-    CustomRenderingRequestFailed(Box<dyn error::Error + Send + Sync>),
+    CustomRenderingRequestFailed(Box<dyn std::error::Error + Send + Sync>),
     //
     #[error("SerRequestBodyFailed {0}")]
     SerRequestBodyFailed(SerdeUrlencodedSerError),
@@ -130,7 +128,7 @@ pub enum DeviceAuthorizationEndpointError {
     MakeRequestFailed(HttpError),
     //
     #[error("CustomParsingResponseFailed {0}")]
-    CustomParsingResponseFailed(Box<dyn error::Error + Send + Sync>),
+    CustomParsingResponseFailed(Box<dyn std::error::Error + Send + Sync>),
     //
     #[error("DeResponseBodyFailed {0}")]
     DeResponseBodyFailed(SerdeJsonError),

@@ -1,5 +1,3 @@
-use std::error;
-
 use oauth2_client::{
     authorization_code_grant::provider_ext::{
         AccessTokenRequestBody, AccessTokenResponseErrorBody, AccessTokenResponseSuccessfulBody,
@@ -86,12 +84,12 @@ impl ProviderExtAuthorizationCodeGrant for WechatProviderWithWebApplication {
     fn authorization_request_query_serializing(
         &self,
         query: &AuthorizationRequestQuery<<Self as Provider>::Scope>,
-    ) -> Option<Result<String, Box<dyn error::Error + Send + Sync + 'static>>> {
+    ) -> Option<Result<String, Box<dyn std::error::Error + Send + Sync + 'static>>> {
         fn doing(
             query: &AuthorizationRequestQuery<
                 <WechatProviderWithWebApplication as Provider>::Scope,
             >,
-        ) -> Result<String, Box<dyn error::Error + Send + Sync + 'static>> {
+        ) -> Result<String, Box<dyn std::error::Error + Send + Sync + 'static>> {
             let redirect_uri = query
                 .redirect_uri
                 .to_owned()
@@ -135,11 +133,11 @@ impl ProviderExtAuthorizationCodeGrant for WechatProviderWithWebApplication {
     fn access_token_request_rendering(
         &self,
         body: &AccessTokenRequestBody,
-    ) -> Option<Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>>> {
+    ) -> Option<Result<Request<Body>, Box<dyn std::error::Error + Send + Sync + 'static>>> {
         fn doing(
             this: &WechatProviderWithWebApplication,
             body: &AccessTokenRequestBody,
-        ) -> Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>> {
+        ) -> Result<Request<Body>, Box<dyn std::error::Error + Send + Sync + 'static>> {
             let query = WechatAccessTokenRequestQuery {
                 appid: this.appid.to_owned(),
                 secret: this.secret.to_owned(),
@@ -173,14 +171,14 @@ impl ProviderExtAuthorizationCodeGrant for WechatProviderWithWebApplication {
                 AccessTokenResponseSuccessfulBody<<Self as Provider>::Scope>,
                 AccessTokenResponseErrorBody,
             >,
-            Box<dyn error::Error + Send + Sync + 'static>,
+            Box<dyn std::error::Error + Send + Sync + 'static>,
         >,
     > {
         fn doing(
             response: &Response<Body>,
         ) -> Result<
             Result<WechatAccessTokenResponseSuccessfulBody, WechatAccessTokenResponseErrorBody>,
-            Box<dyn error::Error + Send + Sync + 'static>,
+            Box<dyn std::error::Error + Send + Sync + 'static>,
         > {
             if response.status().is_success() {
                 let map = serde_json::from_slice::<Map<String, Value>>(response.body())
@@ -311,15 +309,13 @@ pub enum AccessTokenResponseParsingError {
 mod tests {
     use super::*;
 
-    use std::error;
-
     use oauth2_client::{
         authorization_code_grant::{AccessTokenEndpoint, AuthorizationEndpoint},
         re_exports::{Endpoint as _, Response},
     };
 
     #[test]
-    fn authorization_request() -> Result<(), Box<dyn error::Error>> {
+    fn authorization_request() -> Result<(), Box<dyn std::error::Error>> {
         let provider = WechatProviderWithWebApplication::new(
             "APPID".to_owned(),
             "SECRET".to_owned(),
@@ -339,7 +335,7 @@ mod tests {
     }
 
     #[test]
-    fn access_token_request() -> Result<(), Box<dyn error::Error>> {
+    fn access_token_request() -> Result<(), Box<dyn std::error::Error>> {
         let provider = WechatProviderWithWebApplication::new(
             "APPID".to_owned(),
             "SECRET".to_owned(),
@@ -355,7 +351,7 @@ mod tests {
     }
 
     #[test]
-    fn access_token_response() -> Result<(), Box<dyn error::Error>> {
+    fn access_token_response() -> Result<(), Box<dyn std::error::Error>> {
         let provider = WechatProviderWithWebApplication::new(
             "APPID".to_owned(),
             "SECRET".to_owned(),

@@ -1,5 +1,3 @@
-use std::error;
-
 use oauth2_client::{
     extensions::{EndpointParseResponseError, EndpointRenderRequestError, UserInfo},
     re_exports::{serde_json, Body, Endpoint, Request, Response},
@@ -71,7 +69,7 @@ impl From<GetAccountEndpointError> for EndpointParseResponseError {
 //
 struct UserInfoWrapper(UserInfo);
 impl TryFrom<(Uid, Account)> for UserInfoWrapper {
-    type Error = Box<dyn error::Error + Send + Sync>;
+    type Error = Box<dyn std::error::Error + Send + Sync>;
 
     fn try_from((uid, account): (Uid, Account)) -> Result<Self, Self::Error> {
         Ok(Self(UserInfo {

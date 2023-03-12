@@ -1,5 +1,3 @@
-use std::error;
-
 use http_api_client::{
     Client, ClientRespondEndpointError, RetryableClient,
     RetryableClientRespondEndpointUntilDoneError,
@@ -132,14 +130,14 @@ where
 #[derive(thiserror::Error, Debug)]
 pub enum FlowExecuteError {
     #[error("DeviceAuthorizationEndpointRespondFailed {0}")]
-    DeviceAuthorizationEndpointRespondFailed(Box<dyn error::Error + Send + Sync>),
+    DeviceAuthorizationEndpointRespondFailed(Box<dyn std::error::Error + Send + Sync>),
     #[error("DeviceAuthorizationEndpointError {0}")]
     DeviceAuthorizationEndpointError(DeviceAuthorizationEndpointError),
     #[error("DeviceAuthorizationFailed {0:?}")]
     DeviceAuthorizationFailed(DA_RES_ErrorBody),
     //
     #[error("DeviceAccessTokenEndpointRespondFailed {0}")]
-    DeviceAccessTokenEndpointRespondFailed(Box<dyn error::Error + Send + Sync>),
+    DeviceAccessTokenEndpointRespondFailed(Box<dyn std::error::Error + Send + Sync>),
     #[error("DeviceAccessTokenEndpointError {0}")]
     DeviceAccessTokenEndpointError(DeviceAccessTokenEndpointError),
     #[error("DeviceAccessTokenEndpointErrorWithReachedMaxRetries")]

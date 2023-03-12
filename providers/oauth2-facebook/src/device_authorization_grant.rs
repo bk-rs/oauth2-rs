@@ -1,5 +1,3 @@
-use std::error;
-
 use oauth2_client::{
     device_authorization_grant::provider_ext::{
         AccessTokenResponseErrorBody, AccessTokenResponseSuccessfulBody,
@@ -91,7 +89,7 @@ impl ProviderExtDeviceAuthorizationGrant for FacebookProviderForDevices {
     ) -> Option<
         Result<
             Result<DeviceAuthorizationResponseSuccessfulBody, DeviceAuthorizationResponseErrorBody>,
-            Box<dyn error::Error + Send + Sync + 'static>,
+            Box<dyn std::error::Error + Send + Sync + 'static>,
         >,
     > {
         fn doing(
@@ -101,7 +99,7 @@ impl ProviderExtDeviceAuthorizationGrant for FacebookProviderForDevices {
                 FacebookDeviceAuthorizationResponseSuccessfulBody,
                 FacebookDeviceAuthorizationResponseErrorBody,
             >,
-            Box<dyn error::Error + Send + Sync + 'static>,
+            Box<dyn std::error::Error + Send + Sync + 'static>,
         > {
             if response.status().is_success() {
                 let map = serde_json::from_slice::<Map<String, Value>>(response.body())
@@ -166,7 +164,7 @@ impl ProviderExtDeviceAuthorizationGrant for FacebookProviderForDevices {
                 >,
                 DeviceAccessTokenEndpointRetryReason,
             >,
-            Box<dyn error::Error + Send + Sync + 'static>,
+            Box<dyn std::error::Error + Send + Sync + 'static>,
         >,
     > {
         fn doing(
@@ -176,7 +174,7 @@ impl ProviderExtDeviceAuthorizationGrant for FacebookProviderForDevices {
                 AccessTokenResponseSuccessfulBody<<FacebookProviderForDevices as Provider>::Scope>,
                 FacebookDeviceAccessTokenResponseErrorBody,
             >,
-            Box<dyn error::Error + Send + Sync + 'static>,
+            Box<dyn std::error::Error + Send + Sync + 'static>,
         > {
             if response.status().is_success() {
                 let map = serde_json::from_slice::<Map<String, Value>>(response.body())
@@ -254,7 +252,7 @@ pub struct FacebookDeviceAuthorizationResponseErrorBodyError {
 impl TryFrom<FacebookDeviceAuthorizationResponseErrorBody>
     for DeviceAuthorizationResponseErrorBody
 {
-    type Error = Box<dyn error::Error + Send + Sync>;
+    type Error = Box<dyn std::error::Error + Send + Sync>;
 
     fn try_from(body: FacebookDeviceAuthorizationResponseErrorBody) -> Result<Self, Self::Error> {
         let mut body_new = Self::new(
@@ -292,7 +290,7 @@ pub struct FacebookDeviceAccessTokenResponseErrorBodyError {
 impl TryFrom<FacebookDeviceAccessTokenResponseErrorBody>
     for Result<DeviceAccessTokenEndpointRetryReason, AccessTokenResponseErrorBody>
 {
-    type Error = Box<dyn error::Error + Send + Sync>;
+    type Error = Box<dyn std::error::Error + Send + Sync>;
 
     fn try_from(body: FacebookDeviceAccessTokenResponseErrorBody) -> Result<Self, Self::Error> {
         match body.error.error_subcode {
@@ -343,15 +341,13 @@ pub enum DeviceAccessTokenResponseParsingError {
 mod tests {
     use super::*;
 
-    use std::error;
-
     use oauth2_client::{
         device_authorization_grant::{DeviceAccessTokenEndpoint, DeviceAuthorizationEndpoint},
         re_exports::{Endpoint as _, RetryableEndpoint as _},
     };
 
     #[test]
-    fn authorization_request() -> Result<(), Box<dyn error::Error>> {
+    fn authorization_request() -> Result<(), Box<dyn std::error::Error>> {
         let provider =
             FacebookProviderForDevices::new("APP_ID".to_owned(), "CLIENT_TOKEN".to_owned())?;
         let endpoint = DeviceAuthorizationEndpoint::new(
@@ -371,7 +367,7 @@ mod tests {
     }
 
     #[test]
-    fn authorization_response() -> Result<(), Box<dyn error::Error>> {
+    fn authorization_response() -> Result<(), Box<dyn std::error::Error>> {
         let provider =
             FacebookProviderForDevices::new("APP_ID".to_owned(), "CLIENT_TOKEN".to_owned())?;
         let endpoint = DeviceAuthorizationEndpoint::new(
@@ -409,7 +405,7 @@ mod tests {
     }
 
     #[test]
-    fn access_token_request() -> Result<(), Box<dyn error::Error>> {
+    fn access_token_request() -> Result<(), Box<dyn std::error::Error>> {
         let provider =
             FacebookProviderForDevices::new("APP_ID".to_owned(), "CLIENT_TOKEN".to_owned())?;
         let endpoint = DeviceAccessTokenEndpoint::new(
@@ -433,7 +429,7 @@ mod tests {
     }
 
     #[test]
-    fn access_token_response() -> Result<(), Box<dyn error::Error>> {
+    fn access_token_response() -> Result<(), Box<dyn std::error::Error>> {
         let provider =
             FacebookProviderForDevices::new("APP_ID".to_owned(), "CLIENT_TOKEN".to_owned())?;
         let endpoint = DeviceAccessTokenEndpoint::new(

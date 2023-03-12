@@ -1,5 +1,3 @@
-use std::error;
-
 use oauth2_client::{
     authorization_code_grant::provider_ext::{
         AccessTokenRequestBody, ProviderExtAuthorizationCodeGrantPkceSupportType,
@@ -81,11 +79,11 @@ impl ProviderExtAuthorizationCodeGrant for TwitterProviderWithWebApplication {
     fn access_token_request_rendering(
         &self,
         body: &AccessTokenRequestBody,
-    ) -> Option<Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>>> {
+    ) -> Option<Result<Request<Body>, Box<dyn std::error::Error + Send + Sync + 'static>>> {
         fn doing(
             this: &TwitterProviderWithWebApplication,
             body: &AccessTokenRequestBody,
-        ) -> Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>> {
+        ) -> Result<Request<Body>, Box<dyn std::error::Error + Send + Sync + 'static>> {
             let body = TwitterAccessTokenRequestBody {
                 grant_type: GRANT_TYPE_WITH_AUTHORIZATION_CODE_GRANT.to_owned(),
                 code: body.code.to_owned(),
@@ -141,15 +139,13 @@ pub enum AccessTokenRequestRenderingError {
 mod tests {
     use super::*;
 
-    use std::error;
-
     use oauth2_client::{
         authorization_code_grant::{AccessTokenEndpoint, AuthorizationEndpoint},
         re_exports::{Endpoint as _, Response},
     };
 
     #[test]
-    fn authorization_request() -> Result<(), Box<dyn error::Error>> {
+    fn authorization_request() -> Result<(), Box<dyn std::error::Error>> {
         let provider = TwitterProviderWithWebApplication::new(
             "CLIENT_ID".to_owned(),
             "CLIENT_SECRET".to_owned(),
@@ -169,7 +165,7 @@ mod tests {
     }
 
     #[test]
-    fn access_token_response() -> Result<(), Box<dyn error::Error>> {
+    fn access_token_response() -> Result<(), Box<dyn std::error::Error>> {
         let provider = TwitterProviderWithWebApplication::new(
             "CLIENT_ID".to_owned(),
             "CLIENT_SECRET".to_owned(),

@@ -1,5 +1,3 @@
-use std::error;
-
 use http_api_client::{Client, ClientRespondEndpointError};
 use http_api_client_endpoint::Endpoint as _;
 use oauth2_core::{
@@ -147,7 +145,7 @@ pub enum FlowHandleCallbackError {
     StateMissing,
     //
     #[error("AccessTokenEndpointRespondFailed {0}")]
-    AccessTokenEndpointRespondFailed(Box<dyn error::Error + Send + Sync>),
+    AccessTokenEndpointRespondFailed(Box<dyn std::error::Error + Send + Sync>),
     #[error("AccessTokenEndpointError {0}")]
     AccessTokenEndpointError(AccessTokenEndpointError),
     #[error("AccessTokenFailed {0:?}")]

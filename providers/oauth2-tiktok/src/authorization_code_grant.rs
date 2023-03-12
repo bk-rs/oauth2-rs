@@ -1,5 +1,3 @@
-use std::error;
-
 use oauth2_client::{
     authorization_code_grant::provider_ext::AccessTokenRequestBody,
     oauth2_core::{
@@ -104,11 +102,11 @@ impl ProviderExtAuthorizationCodeGrant for TiktokProviderWithWebApplication {
     fn access_token_request_rendering(
         &self,
         body: &AccessTokenRequestBody,
-    ) -> Option<Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>>> {
+    ) -> Option<Result<Request<Body>, Box<dyn std::error::Error + Send + Sync + 'static>>> {
         fn doing(
             this: &TiktokProviderWithWebApplication,
             body: &AccessTokenRequestBody,
-        ) -> Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>> {
+        ) -> Result<Request<Body>, Box<dyn std::error::Error + Send + Sync + 'static>> {
             let client_key = this.client_id.to_owned();
             let query = TiktokAccessTokenRequestQuery {
                 client_key,
@@ -145,12 +143,12 @@ impl ProviderExtAuthorizationCodeGrant for TiktokProviderWithWebApplication {
                 AccessTokenResponseSuccessfulBody<<Self as Provider>::Scope>,
                 AccessTokenResponseErrorBody,
             >,
-            Box<dyn error::Error + Send + Sync + 'static>,
+            Box<dyn std::error::Error + Send + Sync + 'static>,
         >,
     > {
         fn doing(
             response: &Response<Body>,
-        ) -> Result<TiktokAccessTokenResponseBody, Box<dyn error::Error + Send + Sync + 'static>>
+        ) -> Result<TiktokAccessTokenResponseBody, Box<dyn std::error::Error + Send + Sync + 'static>>
         {
             let body = serde_json::from_slice::<TiktokAccessTokenResponseBody>(response.body())
                 .map_err(AccessTokenResponseParsingError::DeResponseBodyFailed)?;
@@ -271,15 +269,13 @@ pub enum AccessTokenResponseParsingError {
 mod tests {
     use super::*;
 
-    use std::error;
-
     use oauth2_client::{
         authorization_code_grant::{AccessTokenEndpoint, AuthorizationEndpoint},
         re_exports::{Endpoint as _, Response},
     };
 
     #[test]
-    fn authorization_request() -> Result<(), Box<dyn error::Error>> {
+    fn authorization_request() -> Result<(), Box<dyn std::error::Error>> {
         let provider = TiktokProviderWithWebApplication::new(
             "CLIENT_KEY".to_owned(),
             "CLIENT_SECRET".to_owned(),
@@ -299,7 +295,7 @@ mod tests {
     }
 
     #[test]
-    fn access_token_response() -> Result<(), Box<dyn error::Error>> {
+    fn access_token_response() -> Result<(), Box<dyn std::error::Error>> {
         let provider = TiktokProviderWithWebApplication::new(
             "CLIENT_KEY".to_owned(),
             "CLIENT_SECRET".to_owned(),

@@ -1,4 +1,4 @@
-use std::{env, error, fs, path::PathBuf};
+use std::{env, fs, path::PathBuf};
 
 use serde::Deserialize;
 use serde_json::{Map, Value};
@@ -12,7 +12,7 @@ pub struct Config {
     pub tls_key_path: PathBuf,
 }
 impl Config {
-    pub fn new() -> Result<Self, Box<dyn error::Error>> {
+    pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
         let manifest_path = if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
             PathBuf::from(&manifest_dir)
         } else {

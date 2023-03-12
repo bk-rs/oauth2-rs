@@ -66,15 +66,13 @@ impl ProviderExtClientCredentialsGrant for AppleProviderForSearchAdsApi {
 mod tests {
     use super::*;
 
-    use std::error;
-
     use oauth2_client::{
         client_credentials_grant::AccessTokenEndpoint,
         re_exports::{Endpoint as _, Response},
     };
 
     #[test]
-    fn access_token_request_for_search_ads_api() -> Result<(), Box<dyn error::Error>> {
+    fn access_token_request_for_search_ads_api() -> Result<(), Box<dyn std::error::Error>> {
         let provider = AppleProviderForSearchAdsApi::new(
             "SEARCHADS.27478e71-3bb0-4588-998c-182e2b405577".to_owned(),
             "eyJhbGciOiJFUzI1NiIsImtpZCI6ImJhY2FlYmRhLWUyMTktNDFlZS1hOTA3LWUyYzI1YjI0ZDFiMiJ9.eyJpc3MiOiJTRUFSQ0hBRFMuMjc0NzhlNzEtM2JiMC00NTg4LTk5OGMtMTgyZTJiNDA1NTc3IiwiaWF0IjoxNjU0NDczNjAwLCJleHAiOjE2NzAwMjU2MDAsImF1ZCI6Imh0dHBzOi8vYXBwbGVpZC5hcHBsZS5jb20iLCJzdWIiOiJTRUFSQ0hBRFMuMjc0NzhlNzEtM2JiMC00NTg4LTk5OGMtMTgyZTJiNDA1NTc3In0.bN3KRWDJft-rjqRbOuuzfsImPT4RPEy01ILYJRBe4v_WJtJdi-7xBpi9UCcSN1WRe3Ozobvou5ruxXjVFnB_6Q".to_owned(),
@@ -97,7 +95,7 @@ mod tests {
     }
 
     #[test]
-    fn access_token_response_for_search_ads_api() -> Result<(), Box<dyn error::Error>> {
+    fn access_token_response_for_search_ads_api() -> Result<(), Box<dyn std::error::Error>> {
         let provider =
             AppleProviderForSearchAdsApi::new("CLIENT_ID".to_owned(), "CLIENT_SECRET".to_owned())?;
 

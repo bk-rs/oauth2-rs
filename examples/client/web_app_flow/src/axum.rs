@@ -3,7 +3,7 @@ Read README.md
 */
 
 use core::convert::Infallible;
-use std::{error, sync::Arc};
+use std::sync::Arc;
 
 use axum::{
     extract::{Path, RawQuery, State},
@@ -31,12 +31,12 @@ use rand::{thread_rng, Rng};
 use oauth2_client_web_app_flow_example::{config::Config, context::Context, helpers::*};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn error::Error>> {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     pretty_env_logger::init();
     run(Config::new()?).await
 }
 
-async fn run(config: Config) -> Result<(), Box<dyn error::Error>> {
+async fn run(config: Config) -> Result<(), Box<dyn std::error::Error>> {
     let ctx = Arc::new(Context::new(config)?);
 
     //

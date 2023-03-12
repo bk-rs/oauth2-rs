@@ -62,15 +62,13 @@ impl ProviderExtAuthorizationCodeGrant for GithubProviderWithWebApplication {
 mod tests {
     use super::*;
 
-    use std::error;
-
     use oauth2_client::{
         authorization_code_grant::{AccessTokenEndpoint, AuthorizationEndpoint},
         re_exports::{Endpoint as _, Response},
     };
 
     #[test]
-    fn authorization_request() -> Result<(), Box<dyn error::Error>> {
+    fn authorization_request() -> Result<(), Box<dyn std::error::Error>> {
         let provider = GithubProviderWithWebApplication::new(
             "CLIENT_ID".to_owned(),
             "CLIENT_SECRET".to_owned(),
@@ -87,7 +85,7 @@ mod tests {
     }
 
     #[test]
-    fn access_token_request() -> Result<(), Box<dyn error::Error>> {
+    fn access_token_request() -> Result<(), Box<dyn std::error::Error>> {
         let provider = GithubProviderWithWebApplication::new(
             "CLIENT_ID".to_owned(),
             "CLIENT_SECRET".to_owned(),
@@ -102,7 +100,7 @@ mod tests {
     }
 
     #[test]
-    fn access_token_response() -> Result<(), Box<dyn error::Error>> {
+    fn access_token_response() -> Result<(), Box<dyn std::error::Error>> {
         let provider = GithubProviderWithWebApplication::new(
             "CLIENT_ID".to_owned(),
             "CLIENT_SECRET".to_owned(),

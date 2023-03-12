@@ -1,5 +1,3 @@
-use std::error;
-
 use oauth2_client::{
     oauth2_core::{
         access_token_request::BodyWithDeviceAuthorizationGrant,
@@ -59,11 +57,11 @@ impl ProviderExtDeviceAuthorizationGrant for BaiduProviderWithDevice {
     fn device_authorization_request_rendering(
         &self,
         body: &DeviceAuthorizationRequestBody<BaiduScope>,
-    ) -> Option<Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>>> {
+    ) -> Option<Result<Request<Body>, Box<dyn std::error::Error + Send + Sync + 'static>>> {
         fn doing(
             this: &BaiduProviderWithDevice,
             body: &DeviceAuthorizationRequestBody<BaiduScope>,
-        ) -> Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>> {
+        ) -> Result<Request<Body>, Box<dyn std::error::Error + Send + Sync + 'static>> {
             let query = BaiduDeviceAuthorizationRequestQuery {
                 response_type: "device_code".to_owned(),
                 client_id: body
@@ -97,12 +95,12 @@ impl ProviderExtDeviceAuthorizationGrant for BaiduProviderWithDevice {
         &self,
         body: &BodyWithDeviceAuthorizationGrant,
         device_authorization_response_body: &DeviceAuthorizationResponseSuccessfulBody,
-    ) -> Option<Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>>> {
+    ) -> Option<Result<Request<Body>, Box<dyn std::error::Error + Send + Sync + 'static>>> {
         fn doing(
             this: &BaiduProviderWithDevice,
             _body: &BodyWithDeviceAuthorizationGrant,
             device_authorization_response_body: &DeviceAuthorizationResponseSuccessfulBody,
-        ) -> Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>> {
+        ) -> Result<Request<Body>, Box<dyn std::error::Error + Send + Sync + 'static>> {
             let query = BaiduDeviceAccessTokenRequestQuery {
                 grant_type: "device_token".to_owned(),
                 code: device_authorization_response_body.device_code.to_owned(),

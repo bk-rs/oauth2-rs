@@ -1,5 +1,3 @@
-use std::error;
-
 use oauth2_client::{
     extensions::{EndpointParseResponseError, EndpointRenderRequestError, UserInfo},
     re_exports::{serde_json, Body, Endpoint, Request, Response, UrlParseError},
@@ -72,7 +70,7 @@ impl From<AccountsVerifyCredentialsEndpointError> for EndpointParseResponseError
 
 //
 impl TryFrom<Account> for UserInfo {
-    type Error = Box<dyn error::Error + Send + Sync>;
+    type Error = Box<dyn std::error::Error + Send + Sync>;
 
     fn try_from(account: Account) -> Result<Self, Self::Error> {
         Ok(Self {

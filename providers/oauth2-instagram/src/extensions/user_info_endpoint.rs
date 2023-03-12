@@ -1,5 +1,3 @@
-use std::error;
-
 use oauth2_client::{
     extensions::{EndpointParseResponseError, EndpointRenderRequestError, UserInfo},
     re_exports::{serde_json, Body, Endpoint, Request, Response},
@@ -65,7 +63,7 @@ impl From<GraphMeEndpointError> for EndpointParseResponseError {
 //
 struct UserInfoWrapper(UserInfo);
 impl TryFrom<(IgUserId, User)> for UserInfoWrapper {
-    type Error = Box<dyn error::Error + Send + Sync>;
+    type Error = Box<dyn std::error::Error + Send + Sync>;
 
     fn try_from((ig_user_id, user): (IgUserId, User)) -> Result<Self, Self::Error> {
         Ok(Self(UserInfo {

@@ -2,14 +2,14 @@
 RUST_BACKTRACE=1 RUST_LOG=debug cargo run -p oauth2_client_device_flow_example --bin device_flow_microsoft -- 'YOUR_CLIENT_ID'
 */
 
-use std::{env, error};
+use std::env;
 
 use http_api_isahc_client::IsahcClient;
 use oauth2_client::device_authorization_grant::Flow;
 use oauth2_microsoft::{MicrosoftProviderForDevices, MicrosoftScope};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn error::Error>> {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     pretty_env_logger::init();
 
     let client_id = env::args().nth(1).unwrap();
@@ -17,7 +17,7 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     run(client_id).await
 }
 
-async fn run(client_id: String) -> Result<(), Box<dyn error::Error>> {
+async fn run(client_id: String) -> Result<(), Box<dyn std::error::Error>> {
     let scopes = vec![
         MicrosoftScope::OfflineAccess,
         MicrosoftScope::Openid,

@@ -1,5 +1,3 @@
-use std::error;
-
 use http_api_client::{Client, ClientRespondEndpointError};
 use oauth2_core::{
     client_credentials_grant::access_token_response::{
@@ -75,7 +73,7 @@ where
 #[derive(thiserror::Error, Debug)]
 pub enum FlowExecuteError {
     #[error("AccessTokenEndpointRespondFailed {0}")]
-    AccessTokenEndpointRespondFailed(Box<dyn error::Error + Send + Sync>),
+    AccessTokenEndpointRespondFailed(Box<dyn std::error::Error + Send + Sync>),
     #[error("AccessTokenEndpointError {0}")]
     AccessTokenEndpointError(AccessTokenEndpointError),
     #[error("AccessTokenFailed {0:?}")]

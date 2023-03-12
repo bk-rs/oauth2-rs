@@ -1,5 +1,3 @@
-use std::error;
-
 use oauth2_client::{
     authorization_code_grant::provider_ext::{
         AccessTokenResponseErrorBody, AccessTokenResponseSuccessfulBody,
@@ -103,7 +101,7 @@ impl ProviderExtAuthorizationCodeGrant for TwitchProviderForWebServerApps {
                 AccessTokenResponseSuccessfulBody<<Self as Provider>::Scope>,
                 AccessTokenResponseErrorBody,
             >,
-            Box<dyn error::Error + Send + Sync + 'static>,
+            Box<dyn std::error::Error + Send + Sync + 'static>,
         >,
     > {
         fn doing(
@@ -115,7 +113,7 @@ impl ProviderExtAuthorizationCodeGrant for TwitchProviderForWebServerApps {
                 >,
                 TwitchAccessTokenResponseErrorBody,
             >,
-            Box<dyn error::Error + Send + Sync + 'static>,
+            Box<dyn std::error::Error + Send + Sync + 'static>,
         > {
             if response.status().is_success() {
                 let map = serde_json::from_slice::<Map<String, Value>>(response.body())
@@ -170,15 +168,13 @@ pub enum AccessTokenResponseParsingError {
 mod tests {
     use super::*;
 
-    use std::error;
-
     use oauth2_client::{
         authorization_code_grant::{AccessTokenEndpoint, AuthorizationEndpoint},
         re_exports::{http::StatusCode, Endpoint as _},
     };
 
     #[test]
-    fn authorization_request() -> Result<(), Box<dyn error::Error>> {
+    fn authorization_request() -> Result<(), Box<dyn std::error::Error>> {
         let provider = TwitchProviderForWebServerApps::new(
             "CLIENT_ID".to_owned(),
             "CLIENT_SECRET".to_owned(),
@@ -198,7 +194,7 @@ mod tests {
     }
 
     #[test]
-    fn access_token_request() -> Result<(), Box<dyn error::Error>> {
+    fn access_token_request() -> Result<(), Box<dyn std::error::Error>> {
         let provider = TwitchProviderForWebServerApps::new(
             "CLIENT_ID".to_owned(),
             "CLIENT_SECRET".to_owned(),
@@ -213,7 +209,7 @@ mod tests {
     }
 
     #[test]
-    fn access_token_response() -> Result<(), Box<dyn error::Error>> {
+    fn access_token_response() -> Result<(), Box<dyn std::error::Error>> {
         let provider = TwitchProviderForWebServerApps::new(
             "CLIENT_ID".to_owned(),
             "CLIENT_SECRET".to_owned(),

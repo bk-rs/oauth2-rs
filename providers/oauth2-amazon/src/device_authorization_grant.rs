@@ -1,5 +1,3 @@
-use std::error;
-
 use oauth2_client::{
     device_authorization_grant::provider_ext::{
         BodyWithDeviceAuthorizationGrant, DeviceAuthorizationResponseSuccessfulBody,
@@ -55,12 +53,12 @@ impl ProviderExtDeviceAuthorizationGrant for AmazonProviderWithDevices {
         &self,
         body: &BodyWithDeviceAuthorizationGrant,
         device_authorization_response_body: &DeviceAuthorizationResponseSuccessfulBody,
-    ) -> Option<Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>>> {
+    ) -> Option<Result<Request<Body>, Box<dyn std::error::Error + Send + Sync + 'static>>> {
         fn doing(
             this: &AmazonProviderWithDevices,
             body: &BodyWithDeviceAuthorizationGrant,
             device_authorization_response_body: &DeviceAuthorizationResponseSuccessfulBody,
-        ) -> Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>> {
+        ) -> Result<Request<Body>, Box<dyn std::error::Error + Send + Sync + 'static>> {
             let body = AmazonDeviceAccessTokenRequestBody {
                 grant_type: "device_code".to_owned(),
                 device_code: body.device_code.to_owned(),
@@ -103,8 +101,6 @@ pub enum DeviceAccessTokenRequestRenderingError {
 mod tests {
     use super::*;
 
-    use std::error;
-
     use oauth2_client::{
         device_authorization_grant::DeviceAccessTokenEndpoint,
         oauth2_core::re_exports::AccessTokenResponseErrorBodyError,
@@ -112,7 +108,7 @@ mod tests {
     };
 
     #[test]
-    fn access_token_response() -> Result<(), Box<dyn error::Error>> {
+    fn access_token_response() -> Result<(), Box<dyn std::error::Error>> {
         let provider = AmazonProviderWithDevices::new("CLIENT_ID".to_owned())?;
         let endpoint = DeviceAccessTokenEndpoint::new(
             &provider,

@@ -62,15 +62,13 @@ impl ProviderExtAuthorizationCodeGrant for InstagramProviderForBasicDisplayApi {
 mod tests {
     use super::*;
 
-    use std::error;
-
     use oauth2_client::{
         authorization_code_grant::AccessTokenEndpoint,
         re_exports::{Endpoint as _, Response},
     };
 
     #[test]
-    fn access_token_response() -> Result<(), Box<dyn error::Error>> {
+    fn access_token_response() -> Result<(), Box<dyn std::error::Error>> {
         let provider = InstagramProviderForBasicDisplayApi::new(
             "APP_ID".to_owned(),
             "APP_SECRET".to_owned(),

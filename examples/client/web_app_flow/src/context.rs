@@ -1,4 +1,4 @@
-use std::{collections::HashMap, error};
+use std::collections::HashMap;
 
 use http_api_isahc_client::IsahcClient;
 use oauth2_amazon::{
@@ -57,7 +57,7 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn new(config: Config) -> Result<Self, Box<dyn error::Error>> {
+    pub fn new(config: Config) -> Result<Self, Box<dyn std::error::Error>> {
         let clients_config = config.clients_config.to_owned();
 
         let mut signin_flow_map = HashMap::new();

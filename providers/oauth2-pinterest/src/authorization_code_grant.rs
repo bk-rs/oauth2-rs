@@ -1,5 +1,3 @@
-use std::error;
-
 use oauth2_client::{
     authorization_code_grant::provider_ext::AccessTokenRequestBody,
     oauth2_core::access_token_request::GRANT_TYPE_WITH_AUTHORIZATION_CODE_GRANT,
@@ -98,11 +96,11 @@ impl ProviderExtAuthorizationCodeGrant for PinterestProviderWithWebApplication {
     fn access_token_request_rendering(
         &self,
         body: &AccessTokenRequestBody,
-    ) -> Option<Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>>> {
+    ) -> Option<Result<Request<Body>, Box<dyn std::error::Error + Send + Sync + 'static>>> {
         fn doing(
             this: &PinterestProviderWithWebApplication,
             body: &AccessTokenRequestBody,
-        ) -> Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>> {
+        ) -> Result<Request<Body>, Box<dyn std::error::Error + Send + Sync + 'static>> {
             let body = PinterestAccessTokenRequestBody {
                 grant_type: GRANT_TYPE_WITH_AUTHORIZATION_CODE_GRANT.to_owned(),
                 code: body.code.to_owned(),
@@ -151,15 +149,13 @@ pub enum AccessTokenRequestRenderingError {
 mod tests {
     use super::*;
 
-    use std::error;
-
     use oauth2_client::{
         authorization_code_grant::{AccessTokenEndpoint, AuthorizationEndpoint},
         re_exports::{Endpoint as _, Response},
     };
 
     #[test]
-    fn authorization_request() -> Result<(), Box<dyn error::Error>> {
+    fn authorization_request() -> Result<(), Box<dyn std::error::Error>> {
         let provider = PinterestProviderWithWebApplication::new(
             "APP_ID".to_owned(),
             "APP_SECRET_KEY".to_owned(),
@@ -179,7 +175,7 @@ mod tests {
     }
 
     #[test]
-    fn access_token_response() -> Result<(), Box<dyn error::Error>> {
+    fn access_token_response() -> Result<(), Box<dyn std::error::Error>> {
         let provider = PinterestProviderWithWebApplication::new(
             "APP_ID".to_owned(),
             "APP_SECRET_KEY".to_owned(),

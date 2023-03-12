@@ -1,4 +1,4 @@
-use std::{error, fmt};
+use std::fmt;
 
 pub use crate::device_authorization_grant::device_access_token_endpoint::DeviceAccessTokenEndpointRetryReason;
 use dyn_clone::{clone_trait_object, DynClone};
@@ -34,7 +34,7 @@ pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone {
     fn device_authorization_request_rendering(
         &self,
         _body: &DeviceAuthorizationRequestBody<<Self as Provider>::Scope>,
-    ) -> Option<Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>>> {
+    ) -> Option<Result<Request<Body>, Box<dyn std::error::Error + Send + Sync + 'static>>> {
         None
     }
 
@@ -44,7 +44,7 @@ pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone {
     ) -> Option<
         Result<
             Result<DeviceAuthorizationResponseSuccessfulBody, DeviceAuthorizationResponseErrorBody>,
-            Box<dyn error::Error + Send + Sync + 'static>,
+            Box<dyn std::error::Error + Send + Sync + 'static>,
         >,
     > {
         None
@@ -62,7 +62,7 @@ pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone {
         &self,
         _body: &BodyWithDeviceAuthorizationGrant,
         _device_authorization_response_body: &DeviceAuthorizationResponseSuccessfulBody,
-    ) -> Option<Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>>> {
+    ) -> Option<Result<Request<Body>, Box<dyn std::error::Error + Send + Sync + 'static>>> {
         None
     }
 
@@ -79,7 +79,7 @@ pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone {
                 >,
                 DeviceAccessTokenEndpointRetryReason,
             >,
-            Box<dyn error::Error + Send + Sync + 'static>,
+            Box<dyn std::error::Error + Send + Sync + 'static>,
         >,
     > {
         None
@@ -172,7 +172,7 @@ where
     fn device_authorization_request_rendering(
         &self,
         body: &DeviceAuthorizationRequestBody<<Self as Provider>::Scope>,
-    ) -> Option<Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>>> {
+    ) -> Option<Result<Request<Body>, Box<dyn std::error::Error + Send + Sync + 'static>>> {
         let body =
             match DeviceAuthorizationRequestBody::<<P as Provider>::Scope>::try_from_t_with_string(
                 body,
@@ -190,7 +190,7 @@ where
     ) -> Option<
         Result<
             Result<DeviceAuthorizationResponseSuccessfulBody, DeviceAuthorizationResponseErrorBody>,
-            Box<dyn error::Error + Send + Sync + 'static>,
+            Box<dyn std::error::Error + Send + Sync + 'static>,
         >,
     > {
         self.inner.device_authorization_response_parsing(response)
@@ -209,7 +209,7 @@ where
         &self,
         body: &BodyWithDeviceAuthorizationGrant,
         device_authorization_response_body: &DeviceAuthorizationResponseSuccessfulBody,
-    ) -> Option<Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>>> {
+    ) -> Option<Result<Request<Body>, Box<dyn std::error::Error + Send + Sync + 'static>>> {
         self.inner
             .device_access_token_request_rendering(body, device_authorization_response_body)
     }
@@ -227,7 +227,7 @@ where
                 >,
                 DeviceAccessTokenEndpointRetryReason,
             >,
-            Box<dyn error::Error + Send + Sync + 'static>,
+            Box<dyn std::error::Error + Send + Sync + 'static>,
         >,
     > {
         self.inner

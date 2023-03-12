@@ -1,4 +1,4 @@
-use std::{cmp::max, error, time::Duration};
+use std::{cmp::max, time::Duration};
 
 use http_api_client_endpoint::{
     Body, Request, Response, RetryableEndpoint, RetryableEndpointRetry,
@@ -181,7 +181,7 @@ pub enum DeviceAccessTokenEndpointRetryReason {
 #[derive(thiserror::Error, Debug)]
 pub enum DeviceAccessTokenEndpointError {
     #[error("CustomRenderingRequestFailed {0}")]
-    CustomRenderingRequestFailed(Box<dyn error::Error + Send + Sync>),
+    CustomRenderingRequestFailed(Box<dyn std::error::Error + Send + Sync>),
     //
     #[error("SerRequestBodyFailed {0}")]
     SerRequestBodyFailed(SerdeUrlencodedSerError),
@@ -189,7 +189,7 @@ pub enum DeviceAccessTokenEndpointError {
     MakeRequestFailed(HttpError),
     //
     #[error("CustomParsingResponseFailed {0}")]
-    CustomParsingResponseFailed(Box<dyn error::Error + Send + Sync>),
+    CustomParsingResponseFailed(Box<dyn std::error::Error + Send + Sync>),
     //
     #[error("DeResponseBodyFailed {0}")]
     DeResponseBodyFailed(SerdeJsonError),

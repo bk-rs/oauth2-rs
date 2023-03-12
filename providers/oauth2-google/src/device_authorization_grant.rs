@@ -48,8 +48,6 @@ impl ProviderExtDeviceAuthorizationGrant for GoogleProviderForTvAndDeviceApps {
 mod tests {
     use super::*;
 
-    use std::error;
-
     use oauth2_client::{
         device_authorization_grant::{
             provider_ext::DeviceAuthorizationResponseSuccessfulBody, DeviceAccessTokenEndpoint,
@@ -58,7 +56,7 @@ mod tests {
     };
 
     #[test]
-    fn access_token_request() -> Result<(), Box<dyn error::Error>> {
+    fn access_token_request() -> Result<(), Box<dyn std::error::Error>> {
         let provider = GoogleProviderForTvAndDeviceApps::new(
             "CLIENT_ID".to_owned(),
             "CLIENT_SECRET".to_owned(),

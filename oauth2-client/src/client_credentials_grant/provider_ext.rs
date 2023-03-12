@@ -1,4 +1,4 @@
-use std::{error, fmt};
+use std::fmt;
 
 use dyn_clone::{clone_trait_object, DynClone};
 pub use oauth2_core::access_token_request::BodyWithClientCredentialsGrant;
@@ -21,7 +21,8 @@ pub trait ProviderExtClientCredentialsGrant: Provider + DynClone {
     fn access_token_request_body_extra(
         &self,
         _body: &BodyWithClientCredentialsGrant<<Self as Provider>::Scope>,
-    ) -> Option<Result<Map<String, Value>, Box<dyn error::Error + Send + Sync + 'static>>> {
+    ) -> Option<Result<Map<String, Value>, Box<dyn std::error::Error + Send + Sync + 'static>>>
+    {
         None
     }
 
@@ -107,7 +108,8 @@ where
     fn access_token_request_body_extra(
         &self,
         body: &BodyWithClientCredentialsGrant<<Self as Provider>::Scope>,
-    ) -> Option<Result<Map<String, Value>, Box<dyn error::Error + Send + Sync + 'static>>> {
+    ) -> Option<Result<Map<String, Value>, Box<dyn std::error::Error + Send + Sync + 'static>>>
+    {
         let body =
             match BodyWithClientCredentialsGrant::<<P as Provider>::Scope>::try_from_t_with_string(
                 body,

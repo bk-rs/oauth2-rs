@@ -1,4 +1,4 @@
-use std::{error, fmt};
+use std::fmt;
 
 use dyn_clone::{clone_trait_object, DynClone};
 
@@ -34,7 +34,7 @@ pub enum BuilderObtainUserInfoError {
     Unreachable(&'static str),
     //
     #[error("Other {0}")]
-    Other(Box<dyn error::Error + Send + Sync>),
+    Other(Box<dyn std::error::Error + Send + Sync>),
 }
 
 //

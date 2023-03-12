@@ -2,14 +2,14 @@
 RUST_BACKTRACE=1 RUST_LOG=debug cargo run -p oauth2_client_password_credentials_flow_example --bin password_credentials_flow_mastodon_social -- 'YOUR_CLIENT_ID' 'YOUR_CLIENT_SECRET' 'YOUR_EMAIL' 'YOUR_PASSWORD'
 */
 
-use std::{env, error};
+use std::env;
 
 use http_api_isahc_client::IsahcClient;
 use oauth2_client::resource_owner_password_credentials_grant::Flow;
 use oauth2_mastodon::{MastodonProviderForBots, MastodonScope, BASE_URL_MASTODON_SOCIAL};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn error::Error>> {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     pretty_env_logger::init();
 
     let client_id = env::args().nth(1).unwrap();
@@ -25,7 +25,7 @@ async fn run(
     client_secret: String,
     username: String,
     password: String,
-) -> Result<(), Box<dyn error::Error>> {
+) -> Result<(), Box<dyn std::error::Error>> {
     let scopes = vec![MastodonScope::Read, MastodonScope::Write];
 
     let flow = Flow::new(IsahcClient::new()?);

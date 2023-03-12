@@ -1,5 +1,3 @@
-use std::error;
-
 use http_api_client_endpoint::{Body, Endpoint, Request, Response};
 use oauth2_core::{
     access_token_request::{
@@ -150,7 +148,7 @@ pub enum AccessTokenEndpointError {
     ClientSecretMissing,
     //
     #[error("MakeRequestBodyExtraFailed {0}")]
-    MakeRequestBodyExtraFailed(Box<dyn error::Error + Send + Sync>),
+    MakeRequestBodyExtraFailed(Box<dyn std::error::Error + Send + Sync>),
     //
     #[error("SerRequestBodyFailed {0}")]
     SerRequestBodyFailed(SerdeUrlencodedSerError),

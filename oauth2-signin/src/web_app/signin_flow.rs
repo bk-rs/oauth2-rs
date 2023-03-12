@@ -211,7 +211,7 @@ where
 mod tests {
     use super::*;
 
-    use std::{collections::HashMap, error};
+    use std::collections::HashMap;
 
     use oauth2_github::{GithubExtensionsBuilder, GithubProviderWithWebApplication, GithubScope};
     use oauth2_google::{GoogleExtensionsBuilder, GoogleProviderForWebServerApps, GoogleScope};
@@ -219,7 +219,7 @@ mod tests {
     use http_api_isahc_client::IsahcClient;
 
     #[test]
-    fn test_build_authorization_url() -> Result<(), Box<dyn error::Error>> {
+    fn test_build_authorization_url() -> Result<(), Box<dyn std::error::Error>> {
         let mut map = HashMap::new();
 
         map.insert(
@@ -262,7 +262,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_handle_callback() -> Result<(), Box<dyn error::Error>> {
+    async fn test_handle_callback() -> Result<(), Box<dyn std::error::Error>> {
         let mut map = HashMap::new();
         map.insert(
             "github",

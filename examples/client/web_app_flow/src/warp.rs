@@ -2,7 +2,7 @@
 Read README.md
 */
 
-use std::{error, sync::Arc};
+use std::sync::Arc;
 
 use futures_util::future;
 use log::info;
@@ -21,12 +21,12 @@ use warp_sessions::{MemoryStore, SessionWithStore};
 use oauth2_client_web_app_flow_example::{config::Config, context::Context, helpers::*};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn error::Error>> {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     pretty_env_logger::init();
     run(Config::new()?).await
 }
 
-async fn run(config: Config) -> Result<(), Box<dyn error::Error>> {
+async fn run(config: Config) -> Result<(), Box<dyn std::error::Error>> {
     let ctx = Arc::new(Context::new(config)?);
 
     let session_store = MemoryStore::new();

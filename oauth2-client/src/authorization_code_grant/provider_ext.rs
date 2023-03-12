@@ -1,4 +1,4 @@
-use std::{error, fmt};
+use std::fmt;
 
 use dyn_clone::{clone_trait_object, DynClone};
 pub use oauth2_core::{
@@ -64,7 +64,7 @@ pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone {
     fn authorization_request_query_serializing(
         &self,
         _query: &AuthorizationRequestQuery<<Self as Provider>::Scope>,
-    ) -> Option<Result<String, Box<dyn error::Error + Send + Sync + 'static>>> {
+    ) -> Option<Result<String, Box<dyn std::error::Error + Send + Sync + 'static>>> {
         None
     }
 
@@ -80,7 +80,7 @@ pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone {
     fn access_token_request_rendering(
         &self,
         _body: &AccessTokenRequestBody,
-    ) -> Option<Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>>> {
+    ) -> Option<Result<Request<Body>, Box<dyn std::error::Error + Send + Sync + 'static>>> {
         None
     }
 
@@ -94,7 +94,7 @@ pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone {
                 AccessTokenResponseSuccessfulBody<<Self as Provider>::Scope>,
                 AccessTokenResponseErrorBody,
             >,
-            Box<dyn error::Error + Send + Sync + 'static>,
+            Box<dyn std::error::Error + Send + Sync + 'static>,
         >,
     > {
         None
@@ -199,7 +199,7 @@ where
     fn authorization_request_query_serializing(
         &self,
         query: &AuthorizationRequestQuery<<Self as Provider>::Scope>,
-    ) -> Option<Result<String, Box<dyn error::Error + Send + Sync + 'static>>> {
+    ) -> Option<Result<String, Box<dyn std::error::Error + Send + Sync + 'static>>> {
         let query =
             match AuthorizationRequestQuery::<<P as Provider>::Scope>::try_from_t_with_string(query)
             {
@@ -224,7 +224,7 @@ where
     fn access_token_request_rendering(
         &self,
         body: &AccessTokenRequestBody,
-    ) -> Option<Result<Request<Body>, Box<dyn error::Error + Send + Sync + 'static>>> {
+    ) -> Option<Result<Request<Body>, Box<dyn std::error::Error + Send + Sync + 'static>>> {
         self.inner.access_token_request_rendering(body)
     }
 
@@ -238,7 +238,7 @@ where
                 AccessTokenResponseSuccessfulBody<<Self as Provider>::Scope>,
                 AccessTokenResponseErrorBody,
             >,
-            Box<dyn error::Error + Send + Sync + 'static>,
+            Box<dyn std::error::Error + Send + Sync + 'static>,
         >,
     > {
         self.inner.access_token_response_parsing(response).map(|x| {
