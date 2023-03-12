@@ -95,7 +95,7 @@ impl ProviderExtAuthorizationCodeGrant for TwitterProviderWithWebApplication {
                     .to_owned()
                     .ok_or(AccessTokenRequestRenderingError::CodeVerifierMissing)?,
             };
-            let body_str = serde_urlencoded::to_string(&body)
+            let body_str = serde_urlencoded::to_string(body)
                 .map_err(AccessTokenRequestRenderingError::SerRequestBodyFailed)?;
 
             let url = this.token_endpoint_url().to_owned();
