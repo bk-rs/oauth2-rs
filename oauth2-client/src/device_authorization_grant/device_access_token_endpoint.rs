@@ -1,4 +1,4 @@
-use std::{cmp::max, time::Duration};
+use core::{cmp::max, time::Duration};
 
 use http_api_client_endpoint::{
     Body, Request, Response, RetryableEndpoint, RetryableEndpointRetry,

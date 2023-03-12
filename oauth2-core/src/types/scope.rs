@@ -96,7 +96,7 @@ where
 {
     type Value = ScopeParameter<T>;
 
-    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+    fn expecting(&self, formatter: &mut core::fmt::Formatter) -> core::fmt::Result {
         formatter.write_str("should be a str or seq")
     }
 
@@ -149,8 +149,8 @@ where
 pub enum ScopeFromStrError {
     Unknown(String),
 }
-impl fmt::Display for ScopeFromStrError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+impl core::fmt::Display for ScopeFromStrError {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         write!(f, "{self:?}")
     }
 }

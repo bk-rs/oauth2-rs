@@ -1,4 +1,4 @@
-use std::convert::Infallible;
+use core::convert::Infallible;
 
 use http_api_client_endpoint::{Body, Endpoint, Request, Response};
 use oauth2_core::{

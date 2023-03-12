@@ -1,7 +1,5 @@
 //! https://datatracker.ietf.org/doc/html/rfc6749#section-3.1.2
 
-use std::{fmt, str};
-
 use serde::{
     de::{self, Visitor},
     Deserialize, Deserializer, Serialize, Serializer,
@@ -24,7 +22,7 @@ impl RedirectUri {
     }
 }
 
-impl str::FromStr for RedirectUri {
+impl core::str::FromStr for RedirectUri {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -41,8 +39,8 @@ impl str::FromStr for RedirectUri {
         }
     }
 }
-impl fmt::Display for RedirectUri {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl core::fmt::Display for RedirectUri {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::Url(url) => write!(f, "{}", url.as_str()),
             Self::Oob => write!(f, "urn:ietf:wg:oauth:2.0:oob"),
@@ -86,7 +84,7 @@ struct RedirectUriVisitor;
 impl<'de> Visitor<'de> for RedirectUriVisitor {
     type Value = RedirectUri;
 
-    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+    fn expecting(&self, formatter: &mut core::fmt::Formatter) -> core::fmt::Result {
         formatter.write_str("should be a str")
     }
 

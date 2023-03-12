@@ -1,4 +1,4 @@
-use std::cmp::{max, min};
+use core::cmp::{max, min};
 
 use oauth2_core::types::{
     code_verifier::{CODE_VERIFIER_CHARSET, CODE_VERIFIER_LEN_MAX, CODE_VERIFIER_LEN_MIN},

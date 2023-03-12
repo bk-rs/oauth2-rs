@@ -1,5 +1,3 @@
-use std::fmt;
-
 use dyn_clone::{clone_trait_object, DynClone};
 pub use oauth2_core::{
     access_token_request::BodyWithAuthorizationCodeGrant as AccessTokenRequestBody,
@@ -103,11 +101,11 @@ pub trait ProviderExtAuthorizationCodeGrant: Provider + DynClone {
 
 clone_trait_object!(<SCOPE> ProviderExtAuthorizationCodeGrant<Scope = SCOPE> where SCOPE: Scope + Clone);
 
-impl<SCOPE> fmt::Debug for dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE> + Send + Sync
+impl<SCOPE> core::fmt::Debug for dyn ProviderExtAuthorizationCodeGrant<Scope = SCOPE> + Send + Sync
 where
     SCOPE: Scope,
 {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("ProviderExtAuthorizationCodeGrant")
             .field("client_id", &self.client_id())
             .field("token_endpoint_url", &self.token_endpoint_url().as_str())

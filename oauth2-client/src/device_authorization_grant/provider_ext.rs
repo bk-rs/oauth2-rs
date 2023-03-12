@@ -1,5 +1,3 @@
-use std::fmt;
-
 pub use crate::device_authorization_grant::device_access_token_endpoint::DeviceAccessTokenEndpointRetryReason;
 use dyn_clone::{clone_trait_object, DynClone};
 pub use oauth2_core::{
@@ -88,11 +86,12 @@ pub trait ProviderExtDeviceAuthorizationGrant: Provider + DynClone {
 
 clone_trait_object!(<SCOPE> ProviderExtDeviceAuthorizationGrant<Scope = SCOPE> where SCOPE: Scope + Clone);
 
-impl<SCOPE> fmt::Debug for dyn ProviderExtDeviceAuthorizationGrant<Scope = SCOPE> + Send + Sync
+impl<SCOPE> core::fmt::Debug
+    for dyn ProviderExtDeviceAuthorizationGrant<Scope = SCOPE> + Send + Sync
 where
     SCOPE: Scope,
 {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("ProviderExtDeviceAuthorizationGrant")
             .field("client_id", &self.client_id())
             .field("token_endpoint_url", &self.token_endpoint_url().as_str())

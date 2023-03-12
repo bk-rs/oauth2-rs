@@ -1,5 +1,3 @@
-use std::fmt;
-
 use oauth2_client::{
     authorization_code_grant::{
         provider_ext::{
@@ -37,11 +35,11 @@ where
     pub client_with_user_info: C,
     pkce_enabled: bool,
 }
-impl<C> fmt::Debug for SigninFlow<C>
+impl<C> core::fmt::Debug for SigninFlow<C>
 where
-    C: Client + fmt::Debug,
+    C: Client + core::fmt::Debug,
 {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("SigninFlow")
             .field("flow", &self.flow)
             .field("provider", &self.provider)

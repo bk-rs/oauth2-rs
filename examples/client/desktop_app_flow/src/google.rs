@@ -2,7 +2,7 @@
 RUST_BACKTRACE=1 RUST_LOG=debug cargo run -p oauth2_client_desktop_app_flow_example --bin desktop_app_flow_google -- 'YOUR_CLIENT_ID' 'YOUR_CLIENT_SECRET'
 */
 
-use std::{env, io, thread};
+use std::{env, io::stdin, thread};
 
 use http_api_isahc_client::IsahcClient;
 use oauth2_client::{authorization_code_grant::Flow, oauth2_core::types::RedirectUri};
@@ -72,7 +72,7 @@ async fn run(client_id: String, client_secret: String) -> Result<(), Box<dyn std
     //
     println!("Enter code: ");
     let mut code = String::new();
-    let stdin = io::stdin();
+    let stdin = stdin();
     stdin.read_line(&mut code)?;
     code = code.trim_end().to_owned();
     println!("code: {code:?}");

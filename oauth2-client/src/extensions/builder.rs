@@ -1,5 +1,3 @@
-use std::fmt;
-
 use dyn_clone::{clone_trait_object, DynClone};
 
 use crate::re_exports::Scope;
@@ -40,11 +38,11 @@ pub enum BuilderObtainUserInfoError {
 //
 clone_trait_object!(<SCOPE> Builder<SCOPE> where SCOPE: Scope + Clone);
 
-impl<SCOPE> fmt::Debug for dyn Builder<SCOPE> + Send + Sync
+impl<SCOPE> core::fmt::Debug for dyn Builder<SCOPE> + Send + Sync
 where
     SCOPE: Scope,
 {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("Builder").finish()
     }
 }

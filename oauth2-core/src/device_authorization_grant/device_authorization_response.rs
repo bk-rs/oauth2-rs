@@ -1,6 +1,6 @@
 //! https://datatracker.ietf.org/doc/html/rfc8628#section-3.2
 
-use std::time::Duration;
+use core::time::Duration;
 
 use mime::Mime;
 use serde::{Deserialize, Serialize};
