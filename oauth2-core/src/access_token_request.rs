@@ -312,6 +312,23 @@ where
     pub fn extra(&self) -> Option<&Map<String, Value>> {
         self._extra.as_ref()
     }
+
+    pub fn try_from_t_with_string(
+        body: &BodyWithJwtAuthorizationGrant<String>,
+    ) -> Result<Self, ScopeFromStrError> {
+        let scope = if let Some(x) = &body.scope {
+            Some(ScopeParameter::<SCOPE>::try_from_t_with_string(x)?)
+        } else {
+            None
+        };
+
+        let mut this = Self::new(body.assertion.to_owned(), scope, body.client_id.to_owned());
+
+        if let Some(extra) = body.extra() {
+            this.set_extra(extra.to_owned());
+        }
+        Ok(this)
+    }
 }
 
 #[cfg(test)]
