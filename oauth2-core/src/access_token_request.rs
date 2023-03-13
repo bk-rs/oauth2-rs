@@ -2,6 +2,7 @@
 //! https://datatracker.ietf.org/doc/html/rfc6749#section-4.3.2
 //! https://datatracker.ietf.org/doc/html/rfc6749#section-4.4.2
 //! https://datatracker.ietf.org/doc/html/rfc8628#section-3.4
+//! https://datatracker.ietf.org/doc/html/rfc7523#section-2.1
 
 use http::Method;
 use mime::Mime;
@@ -37,6 +38,9 @@ where
     ClientCredentialsGrant(BodyWithClientCredentialsGrant<SCOPE>),
     #[serde(rename = "password")]
     ResourceOwnerPasswordCredentialsGrant(BodyWithResourceOwnerPasswordCredentialsGrant<SCOPE>),
+    /// https://datatracker.ietf.org/doc/html/rfc7523#section-2.1
+    #[serde(rename = "urn:ietf:params:oauth:grant-type:jwt-bearer")]
+    JwtAuthorizationGrant(BodyWithJwtAuthorizationGrant<SCOPE>),
 }
 
 //
@@ -269,6 +273,64 @@ where
     }
 }
 
+//
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct BodyWithJwtAuthorizationGrant<SCOPE>
+where
+    SCOPE: Scope,
+{
+    pub assertion: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub scope: Option<ScopeParameter<SCOPE>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub client_id: Option<ClientId>,
+
+    #[serde(flatten, skip_serializing_if = "Option::is_none")]
+    _extra: Option<Map<String, Value>>,
+}
+
+impl<SCOPE> BodyWithJwtAuthorizationGrant<SCOPE>
+where
+    SCOPE: Scope,
+{
+    pub fn new(
+        assertion: String,
+        scope: Option<ScopeParameter<SCOPE>>,
+        client_id: Option<ClientId>,
+    ) -> Self {
+        Self {
+            assertion,
+            scope,
+            client_id,
+            _extra: None,
+        }
+    }
+
+    pub fn set_extra(&mut self, extra: Map<String, Value>) {
+        self._extra = Some(extra);
+    }
+    pub fn extra(&self) -> Option<&Map<String, Value>> {
+        self._extra.as_ref()
+    }
+
+    pub fn try_from_t_with_string(
+        body: &BodyWithJwtAuthorizationGrant<String>,
+    ) -> Result<Self, ScopeFromStrError> {
+        let scope = if let Some(x) = &body.scope {
+            Some(ScopeParameter::<SCOPE>::try_from_t_with_string(x)?)
+        } else {
+            None
+        };
+
+        let mut this = Self::new(body.assertion.to_owned(), scope, body.client_id.to_owned());
+
+        if let Some(extra) = body.extra() {
+            this.set_extra(extra.to_owned());
+        }
+        Ok(this)
+    }
+}
+
 #[cfg(test)]
 mod tests_with_authorization_code_grant {
     use super::*;
@@ -456,6 +518,35 @@ mod tests_with_resource_owner_password_credentials_grant {
                 assert_eq!(body.username, "USERNAME");
                 assert_eq!(body.password, "PASSWORD");
                 assert_eq!(body.client_password, None);
+            }
+            #[allow(unreachable_patterns)]
+            Ok(body) => panic!("{body:?}"),
+            Err(err) => panic!("{err}"),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests_with_jwt_authorization_grant {
+    use super::*;
+
+    #[test]
+    fn test_ser_de() {
+        let body_str = "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+        match serde_urlencoded::from_str::<Body<String>>(body_str) {
+            Ok(Body::JwtAuthorizationGrant(body)) => {
+                assert_eq!(
+                    body.assertion,
+                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                );
+                assert_eq!(body.scope, None);
+                assert_eq!(body.client_id, None);
+
+                assert_eq!(
+                    body_str,
+                    serde_urlencoded::to_string(Body::<String>::JwtAuthorizationGrant(body))
+                        .unwrap()
+                );
             }
             #[allow(unreachable_patterns)]
             Ok(body) => panic!("{body:?}"),

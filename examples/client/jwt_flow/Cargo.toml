@@ -1,0 +1,19 @@
+[package]
+name = "oauth2_client_jwt_flow_example"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "jwt_flow_google_service_account"
+path = "src/google_service_account.rs"
+
+[dependencies]
+oauth2-client = { version = "0.1", path = "../../../oauth2-client", features = ["with-flow"] }
+
+oauth2-google = { version = "0.1", path = "../../../providers/oauth2-google" }
+google-service-account-oauth-jwt-assertion = { version = "0.1", features = ["google-service-account-json-key"] }
+
+tokio = { version = "1", default-features = false, features = ["macros", "rt-multi-thread"] }
+http-api-isahc-client = { version = "0.2", features = ["with-sleep-via-tokio"] }
+
+pretty_env_logger = { version = "0.4" }

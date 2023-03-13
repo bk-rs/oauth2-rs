@@ -6,12 +6,14 @@ pub const DEVICE_AUTHORIZATION_URL: &str = "https://oauth2.googleapis.com/device
 
 pub mod authorization_code_grant;
 pub mod device_authorization_grant;
+pub mod jwt_authorization_grant;
 
 pub use authorization_code_grant::{
     GoogleProviderForDesktopApps, GoogleProviderForWebServerApps,
     GoogleProviderForWebServerAppsAccessType,
 };
 pub use device_authorization_grant::GoogleProviderForTvAndDeviceApps;
+pub use jwt_authorization_grant::GoogleProviderForServerToServerApps;
 
 pub mod extensions;
 pub use extensions::GoogleExtensionsBuilder;
@@ -37,6 +39,8 @@ pub enum GoogleScope {
     #[serde(rename = "https://www.googleapis.com/auth/youtube.readonly")]
     YoutubeReadonly,
     //
+    #[serde(rename = "https://www.googleapis.com/auth/androidpublisher")]
+    AndroidPublisher,
     // TODO
     //
     //

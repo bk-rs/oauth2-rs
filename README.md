@@ -11,4 +11,11 @@ cargo test-all-features -- --nocapture
 
 ## Publish providers
 
-Note: First oauth2-doorkeeper
+oauth2-core
+
+oauth2-client
+
+providers/oauth2-doorkeeper
+providers/*
+
+oauth2-signin
