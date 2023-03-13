@@ -15,7 +15,7 @@ oauth2-core
 
 oauth2-client
 
+oauth2-signin
+
 providers/oauth2-doorkeeper
 providers/*
-
-oauth2-signin

@@ -1,6 +1,6 @@
 [package]
 name = "oauth2-pinterest"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["vkill <vkill.net@gmail.com>"]
 edition = "2021"
 description = "OAuth 2.0 Pinterest"
@@ -13,6 +13,6 @@ categories = []
 readme = "README.md"
 
 [dependencies]
-oauth2-client = { version = "0.1", path = "../../oauth2-client", default-features = false }
+oauth2-client = { version = "0.2", path = "../../oauth2-client", default-features = false }
 serde = { version = "1", default-features = false }
 http-authentication = { version = "0.1", default-features = false, features = ["scheme-basic"] }
