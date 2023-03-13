@@ -27,10 +27,7 @@ async fn run(service_account_json_key_path: PathBuf) -> Result<(), Box<dyn std::
 
     let assertion = create_from_service_account_json_key(
         service_account_json_key_bytes,
-        &[
-            GoogleScope::Other("https://www.googleapis.com/auth/androidpublisher".into())
-                .to_string(),
-        ],
+        &[GoogleScope::AndroidPublisher.to_string()],
     )?;
 
     let flow = Flow::new(IsahcClient::new()?);

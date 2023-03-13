@@ -39,6 +39,8 @@ pub enum GoogleScope {
     #[serde(rename = "https://www.googleapis.com/auth/youtube.readonly")]
     YoutubeReadonly,
     //
+    #[serde(rename = "https://www.googleapis.com/auth/androidpublisher")]
+    AndroidPublisher,
     // TODO
     //
     //
